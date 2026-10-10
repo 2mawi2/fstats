@@ -1,83 +1,44 @@
-import { BankAccountId, Currency, ParserId } from '@/types-enums'
-import { parseGermanNumber } from '@/utils/Number'
-import { buildExtra, createParser } from '@/utils/Parser'
+import { AccountType, Currency } from '@/types-enums'
 
-const bankName = 'Comdirect'
-const currency = Currency.EUR
+import { defineBank } from '../definition'
 
-export const comdirect__giro = createParser({
-  id: ParserId.COMDIRECT_GIRO,
-  bankAccountId: BankAccountId.COMDIRECT_GIRO,
-  bankName,
-  accountType: 'Giro',
-  currency,
-
-  headerRowIndex: 1,
-
-  columns: {
-    buchungstag: 'Buchungstag',
-    wertstellung: 'Wertstellung (Valuta)',
-    vorgang: 'Vorgang',
-    buchungstext: 'Buchungstext',
-    umsatzInEur: 'Umsatz in EUR',
-    empty: '',
-  } as const,
-
-  dateFormat: 'dd.MM.yyyy',
-
-  getters: {
-    date: (row) => {
-      return row.get('wertstellung')
+export const comdirect = defineBank({
+  id: 'comdirect',
+  name: 'Comdirect',
+  currency: Currency.EUR,
+  formats: [
+    {
+      accountType: AccountType.CURRENT,
+      accountName: 'Giro',
+      version: '1',
+      dateFormat: 'dd.MM.yyyy',
+      numberFormat: 'de',
+      headers: ['Buchungstag', 'Wertstellung (Valuta)', 'Vorgang', 'Buchungstext', 'Umsatz in EUR'],
+      columns: {
+        date: 'Wertstellung (Valuta)',
+        description: 'Buchungstext',
+        amount: { type: 'signed', header: 'Umsatz in EUR' },
+      },
+      extraColumns: {
+        transactionType: 'Vorgang',
+      },
     },
-    description: (row) => {
-      return row.get('buchungstext')
+    {
+      accountType: AccountType.CREDIT_CARD,
+      accountName: 'Visa',
+      version: '1',
+      dateFormat: 'dd.MM.yyyy',
+      numberFormat: 'de',
+      headers: ['Buchungstag', 'Umsatztag', 'Vorgang', 'Referenz', 'Buchungstext', 'Umsatz in EUR'],
+      columns: {
+        date: 'Umsatztag',
+        description: 'Buchungstext',
+        amount: { type: 'signed', header: 'Umsatz in EUR' },
+      },
+      extraColumns: {
+        transactionType: 'Vorgang',
+        reference: 'Referenz',
+      },
     },
-    value: (row) => {
-      return parseGermanNumber(row.get('umsatzInEur'))
-    },
-    extra: (row) => {
-      return buildExtra({
-        transactionType: row.get('vorgang'),
-      })
-    },
-  },
-})
-
-export const comdirect__visa = createParser({
-  id: ParserId.COMDIRECT_VISA,
-  bankAccountId: BankAccountId.COMDIRECT_VISA,
-  bankName,
-  accountType: 'Visa',
-  currency,
-  headerRowIndex: 1,
-
-  columns: {
-    buchungstag: 'Buchungstag',
-    umsatztag: 'Umsatztag',
-    vorgang: 'Vorgang',
-    referenz: 'Referenz',
-    buchungstext: 'Buchungstext',
-    umsatzInEur: 'Umsatz in EUR',
-    empty: '',
-  } as const,
-
-  dateFormat: 'dd.MM.yyyy',
-
-  getters: {
-    date: (row) => {
-      return row.get('umsatztag')
-    },
-    description: (row) => {
-      return row.get('buchungstext')
-    },
-    value: (row) => {
-      return parseGermanNumber(row.get('umsatzInEur'))
-    },
-    extra: (row) => {
-      return buildExtra({
-        transactionType: row.get('vorgang'),
-        reference: row.get('referenz'),
-      })
-    },
-  },
+  ],
 })

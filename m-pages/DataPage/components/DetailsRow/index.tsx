@@ -76,13 +76,17 @@ const Component = ({ file }: DetailsRowProps) => {
               Uploaded {toDisplayDate(new Date(file.created), locale, { formatTo: 'd MMM yyyy, HH:mm:ss' })}
             </Typography>
 
-            {isErrorFile ? (
+            {file.status === StatsFileStatus.ERROR ? (
               <>
                 <Typography variant="caption" color="text.secondary">
                   {MISC.CENTER_DOT}
                 </Typography>
-                <Typography variant="caption" color="error.main" sx={{ display: 'block' }}>
-                  {file.error}
+                <Typography
+                  variant="caption"
+                  color={isUnknownFile ? 'warning.main' : 'error.main'}
+                  sx={{ display: 'block' }}
+                >
+                  {file.error.message}
                 </Typography>
               </>
             ) : null}

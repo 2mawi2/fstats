@@ -5,11 +5,11 @@ import { Box, Divider, Grid, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { useState } from 'react'
 
-import type { NumberString, ParentCategoryWithTransactions } from '@/types'
+import type { NumberString, ParentCategoryWithTransactions, SortingPref } from '@/types'
 import { Currency } from '@/types-enums'
 import { getCurrencySymbol } from '@/utils/Currency'
 
-import { COL_SPACING, COL1, COL2, COL3, getSortedParentCategoriesWithTransactions, SortingPref } from '../../actions'
+import { COL_SPACING, COL1, COL2, COL3, getSortedParentCategoriesWithTransactions } from '../../actions'
 import { ui } from '../../styled'
 import BreakdownRow from '../BreakdownRow'
 

@@ -51,6 +51,29 @@ export type StatsFileStatus = z.infer<typeof zStatsFileStatus>
 // -------------------------------------------------------
 
 /**
+ * Why a file has the "error" status.
+ */
+export const StatsFileErrorCode = {
+  REJECTED: 'rejected', // Wrong file type or too large
+  DUPLICATE: 'duplicate', // Same content as an existing file
+  UNREADABLE: 'unreadable', // CSV could not be read
+  UNSUPPORTED_FORMAT: 'unsupported_format', // No parser matched
+  INVALID_DATA: 'invalid_data', // Parser matched, but parsing or validation failed
+} as const
+
+export const zStatsFileErrorCode = z.enum([
+  StatsFileErrorCode.REJECTED,
+  StatsFileErrorCode.DUPLICATE,
+  StatsFileErrorCode.UNREADABLE,
+  StatsFileErrorCode.UNSUPPORTED_FORMAT,
+  StatsFileErrorCode.INVALID_DATA,
+] as const)
+
+export type StatsFileErrorCode = z.infer<typeof zStatsFileErrorCode>
+
+// -------------------------------------------------------
+
+/**
  * The user's chosen date format which applies across the app.
  */
 export const DateFormat = {
@@ -152,6 +175,21 @@ export type Currency = z.infer<typeof zCurrency>
 
 // -------------------------------------------------------
 
+/**
+ * Part of the persisted parser and bank account IDs.
+ */
+export const AccountType = {
+  CURRENT: 'current',
+  SAVINGS: 'savings',
+  CREDIT_CARD: 'credit_card',
+} as const
+
+export const zAccountType = z.enum([AccountType.CURRENT, AccountType.SAVINGS, AccountType.CREDIT_CARD] as const)
+
+export type AccountType = z.infer<typeof zAccountType>
+
+// -------------------------------------------------------
+
 export const SortOrder = {
   ASC: 'asc',
   DESC: 'desc',
@@ -160,63 +198,5 @@ export const SortOrder = {
 export const zSortOrder = z.enum([SortOrder.ASC, SortOrder.DESC] as const)
 
 export type SortOrder = z.infer<typeof zSortOrder>
-
-// -------------------------------------------------------
-
-/**
- * The ID uniquely identifies a bank + account type combination, in the format
- * `${snakeCase(bankName)}__${snakeCase(accountType)}`.
- *
- * Multiple parsers can share the same BankAccountId (e.g. different CSV formats for the same account).
- */
-export const BankAccountId = {
-  CAPITEC_SAVINGS: 'capitec__savings',
-  COMDIRECT_GIRO: 'comdirect__giro',
-  COMDIRECT_VISA: 'comdirect__visa',
-  FNB_CREDIT_CARD: 'fnb__credit_card',
-  ING_GIRO: 'ing__giro',
-  LLOYDS_CURRENT: 'lloyds__current',
-} as const
-
-export const zBankAccountId = z.enum([
-  BankAccountId.CAPITEC_SAVINGS,
-  BankAccountId.COMDIRECT_GIRO,
-  BankAccountId.COMDIRECT_VISA,
-  BankAccountId.FNB_CREDIT_CARD,
-  BankAccountId.ING_GIRO,
-  BankAccountId.LLOYDS_CURRENT,
-] as const)
-
-export type BankAccountId = z.infer<typeof zBankAccountId>
-
-// -------------------------------------------------------
-
-/**
- * The ID is of the format `${snakeCase(bankName)}__${snakeCase(accountType)}__${snakeCase(parserVariant)}`,
- * where parser variant is only applicable if there are multiple CSV formats for an account type.
- */
-export const ParserId = {
-  CAPITEC_SAVINGS: BankAccountId.CAPITEC_SAVINGS,
-  CAPITEC_SAVINGS__ALT: `${BankAccountId.CAPITEC_SAVINGS}__alt`,
-  COMDIRECT_GIRO: BankAccountId.COMDIRECT_GIRO,
-  COMDIRECT_VISA: BankAccountId.COMDIRECT_VISA,
-  FNB_CREDIT_CARD: BankAccountId.FNB_CREDIT_CARD,
-  ING_GIRO: BankAccountId.ING_GIRO,
-  ING_GIRO__WB: `${BankAccountId.ING_GIRO}__wb`, // with account balance
-  LLOYDS_CURRENT: BankAccountId.LLOYDS_CURRENT,
-} as const
-
-export const zParserId = z.enum([
-  ParserId.CAPITEC_SAVINGS,
-  ParserId.CAPITEC_SAVINGS__ALT,
-  ParserId.COMDIRECT_GIRO,
-  ParserId.COMDIRECT_VISA,
-  ParserId.FNB_CREDIT_CARD,
-  ParserId.ING_GIRO,
-  ParserId.ING_GIRO__WB,
-  ParserId.LLOYDS_CURRENT,
-] as const)
-
-export type ParserId = z.infer<typeof zParserId>
 
 // -------------------------------------------------------

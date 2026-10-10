@@ -4,12 +4,11 @@ import type {
   NumberString,
   ParentCategoryCode,
   ParentCategoryWithTransactions,
+  SortingPref,
   Transaction,
 } from '@/types'
 import { ALL_CATEGORIES } from '@/common'
 import { Big } from '@/lib/w-big'
-
-export type SortingPref = 'asc' | 'desc' | 'totalAsc' | 'totalDesc'
 
 export const COL_SPACING = { xs: 1, sm: 2 }
 export const COL1 = [4.5, 3]

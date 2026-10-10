@@ -1,10 +1,10 @@
-import type { StatsFile, StatsFileAtRest, Transaction } from '@/types'
-import { zSyncableStatsFile } from '@/types'
-import { Currency } from '@/types-enums'
+import type { StatsFile, StatsFileAtRest } from '@/types'
+import { zStatsFile } from '@/types'
+import { Currency, StatsFileStatus } from '@/types-enums'
 import { SHA256 } from '@/utils/Encryption'
 
 export const syncStatsFile = (dataToSync: StatsFile): StatsFileAtRest => {
-  const res = zSyncableStatsFile.safeParse(dataToSync)
+  const res = zStatsFile.safeParse(dataToSync)
 
   if (!res.success) {
     const errors = res.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join(', ')
@@ -15,18 +15,19 @@ export const syncStatsFile = (dataToSync: StatsFile): StatsFileAtRest => {
 }
 
 export const parseStatsFile = (dataToParse: StatsFileAtRest): StatsFile => {
-  const res: StatsFile = {
+  if (dataToParse.status !== StatsFileStatus.PARSED) {
+    return dataToParse
+  }
+
+  return {
     ...dataToParse,
     transactions: dataToParse.transactions.map((row) => ({
       ...row,
       currency: row.currency as Currency,
     })),
   }
-  return res
 }
 
-export const getTransactionsHash = async (rows: Transaction[]): Promise<string> => {
-  const rowString = rows.map((row) => Object.values(row).join('|')).join('__')
-  const hash = await SHA256.encrypt(rowString)
-  return hash
+export const getFileHash = async (file: Blob): Promise<string> => {
+  return SHA256.encrypt(await file.arrayBuffer())
 }

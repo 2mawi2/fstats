@@ -1,34 +1,18 @@
 # fstats
 
-Bank statement parser
+Privacy-focused bank statement parser. Turns CSV exports from your bank into income/expense stats. Everything runs in the browser: no uploads, no tracking, no accounts.
 
 
-## Environments
+## How it works
 
-The website is hosted on Vercel. The website makes use of MUI for styling.
+1. **Add files** — On the Data page, drop CSV bank statements or add an entire folder. Files are stored locally in the browser (IndexedDB).
+2. **Parse** — Each file is matched to a supported bank format by its CSV headers and parsed into transactions. Transactions are categorised automatically.
+3. **Select** — Choose which files to include, then continue to Stats.
+4. **Analyse** — View profit/loss, income and expense breakdowns by category, charts and a transactions table. Filter by bank and date range, combine datasets and pick a display currency.
 
-| Environment | URL |
-| --- | --- |
-| Local | http://localhost:3000/ |
-| Staging | https://staging.fstats.site/ |
-| Production | https://fstats.site/ |
+Supported banks: Capitec, FNB (South Africa), Comdirect, ING (Germany), Lloyds (UK). Try it at [fstats.site](https://fstats.site/).
 
 
 ## Development
 
-Start dev server on [localhost](http://localhost:3000/) with:
-
-```
-pnpm dev
-```
-
-
-## Deployment
-
-We use GitHub together with GitHub Actions to push code to staging and production.
-
-Pushing code to a feature branch will trigger a "build-branch" workflow.
-
-Merging/pushing to `develop` will trigger a build on Vercel and a deploy out to staging.
-
-Merging/pushing to `main` will trigger a build on Vercel and a deploy out to production.
+See [DEVELOPMENT.md](DEVELOPMENT.md).

@@ -1,50 +1,36 @@
-import { BankAccountId, Currency, ParserId } from '@/types-enums'
-import { buildExtra, createParser } from '@/utils/Parser'
-import { Big } from '@/lib/w-big'
+import { AccountType, Currency } from '@/types-enums'
 
-const bankName = 'Lloyds'
-const currency = Currency.GBP
+import { defineBank } from '../definition'
 
-export const lloyds__current = createParser({
-  id: ParserId.LLOYDS_CURRENT,
-  bankAccountId: BankAccountId.LLOYDS_CURRENT,
-  bankName,
-  accountType: 'Current Account',
-  currency,
-
-  headerRowIndex: 0,
-
-  columns: {
-    transactionDate: 'Transaction Date',
-    transactionType: 'Transaction Type',
-    sortCode: 'Sort Code',
-    accountNumber: 'Account Number',
-    transactionDescription: 'Transaction Description',
-    debitAmount: 'Debit Amount',
-    creditAmount: 'Credit Amount',
-    balance: 'Balance',
-  } as const,
-
-  dateFormat: 'dd/MM/yyyy',
-
-  getters: {
-    date: (row) => {
-      return row.get('transactionDate')
+export const lloyds = defineBank({
+  id: 'lloyds',
+  name: 'Lloyds',
+  currency: Currency.GBP,
+  formats: [
+    {
+      accountType: AccountType.CURRENT,
+      accountName: 'Current Account',
+      version: '1',
+      dateFormat: 'dd/MM/yyyy',
+      headers: [
+        'Transaction Date',
+        'Transaction Type',
+        'Sort Code',
+        'Account Number',
+        'Transaction Description',
+        'Debit Amount',
+        'Credit Amount',
+        'Balance',
+      ],
+      columns: {
+        date: 'Transaction Date',
+        description: 'Transaction Description',
+        amount: { type: 'inOut', in: 'Credit Amount', out: 'Debit Amount' },
+      },
+      extraColumns: {
+        balance: 'Balance',
+        transactionType: 'Transaction Type',
+      },
     },
-    description: (row) => {
-      return row.get('transactionDescription')
-    },
-    value: (row) => {
-      const valIn = row.get('creditAmount')
-      const valOut = row.get('debitAmount')
-
-      return valIn ? valIn : valOut ? Big(valOut).times(-1).toString() : '0'
-    },
-    extra: (row) => {
-      return buildExtra({
-        balance: row.get('balance') || '0',
-        transactionType: row.get('transactionType'),
-      })
-    },
-  },
+  ],
 })
