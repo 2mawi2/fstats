@@ -1,15 +1,16 @@
 'use client'
 
-import { Container } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
 
-import { LAYOUT } from '@/common'
+import { LAYOUT, MISC } from '@/common'
 import { useIsMobile } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import SwipeableDrawer from '../SwipeableDrawer'
-import { Footer, Header, MenuDrawer } from './components'
+import { Header, MenuDrawer, Sidebar } from './components'
 
 type LayoutProps = {
   children: ReactNode
@@ -19,6 +20,7 @@ const Component = ({ children }: LayoutProps) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
+  const [expanded, setExpanded] = useLocalStorage(MISC.LS_SIDEBAR_EXPANDED_KEY, false, { initializeWithValue: false })
 
   const onOpen = () => {
     setOpen(true)
@@ -28,13 +30,29 @@ const Component = ({ children }: LayoutProps) => {
     setOpen(false)
   }
 
+  if (!isMobile) {
+    return (
+      <>
+        <Sidebar expanded={expanded} onToggle={() => setExpanded(!expanded)} />
+
+        <Box
+          sx={{
+            pl: `${expanded ? LAYOUT.SIDEBAR_WIDTH_EXPANDED : LAYOUT.SIDEBAR_WIDTH}px`,
+            transition: 'padding-left 0.2s',
+            '@media print': { pl: 0 },
+          }}
+        >
+          <Container maxWidth={LAYOUT.CONTAINER_MAX_WIDTH}>{children}</Container>
+        </Box>
+      </>
+    )
+  }
+
   return (
     <>
       <Header onMenuClick={() => setOpen(!open)} />
 
       <Container maxWidth={LAYOUT.CONTAINER_MAX_WIDTH}>{children}</Container>
-
-      <Footer />
 
       <SwipeableDrawer
         title={t('DATA_DISPLAY.MENU')}
@@ -43,7 +61,7 @@ const Component = ({ children }: LayoutProps) => {
         onClose={onClose}
         onOpen={onOpen}
         mainMenu
-        headerSx={{ mt: isMobile ? 1 : 2, py: 2, px: 4 }}
+        headerSx={{ mt: 1, py: 2, px: 4 }}
       >
         <MenuDrawer onClose={onClose} />
       </SwipeableDrawer>

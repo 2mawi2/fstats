@@ -1,12 +1,21 @@
 {
   "MISC": {
+    "VERSION": "Version",
     "ALL_RIGHTS_RESERVED": "All rights reserved."
   },
   "NAVIGATION": {
     "HOME": "Home",
     "DATA": "Data",
     "STATS": "Stats",
-    "SETTINGS": "Settings"
+    "SETTINGS": "Settings",
+    "ABOUT": "About",
+    "EXPAND_MENU": "Expand menu",
+    "COLLAPSE_MENU": "Collapse menu"
+  },
+  "ABOUT_PAGE": {
+    "TITLE": "About",
+    "BLURB": "fstats is open source. Browse the code, report issues or contribute on GitHub.",
+    "VIEW_ON_GITHUB": "View on GitHub"
   },
   "DATA_DISPLAY": {
     "MENU": "Menu"
