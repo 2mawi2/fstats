@@ -37,15 +37,6 @@ export const ui = (theme: Theme, isDarkMode: boolean, isMobile: boolean) => {
       opacity: 0.75,
     },
 
-    homeButton: (isActive: boolean) => ({
-      width: 35,
-      height: 35,
-      backgroundColor: isActive ? theme.vars.palette.action.hover : 'transparent',
-      '&:hover': {
-        backgroundColor: theme.vars.palette.action.hover,
-      },
-    }),
-
     divider: {
       position: 'sticky',
       top: isMobile ? LAYOUT.NAV_HEIGHT_MOBILE : LAYOUT.NAV_HEIGHT,

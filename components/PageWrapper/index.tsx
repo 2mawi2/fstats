@@ -19,7 +19,7 @@ const Component = ({ children }: PageWrapperProps) => {
         pt: 4,
         pb: 12,
         maxWidth: '100%',
-        minHeight: `calc(100vh - ${(isMobile ? LAYOUT.NAV_HEIGHT_MOBILE : LAYOUT.NAV_HEIGHT) + LAYOUT.NAV_BORDER + (isMobile ? LAYOUT.FOOTER_HEIGHT_MOBILE : LAYOUT.FOOTER_HEIGHT) + LAYOUT.FOOTER_BORDER}px)`,
+        minHeight: isMobile ? `calc(100vh - ${LAYOUT.NAV_HEIGHT_MOBILE + LAYOUT.NAV_BORDER}px)` : '100vh',
 
         '@media print': {
           maxWidth: 'none',
