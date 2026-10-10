@@ -32,11 +32,11 @@ const Component = () => {
   const { locale, dateFormat } = useUserPreferences()
 
   const onDrop = useCallback(
-    async (acceptedFiles: RDZFileWithPath[], fileRejections: RDZFileRejection[]) => {
+    async (acceptedFiles: File[], fileRejections: RDZFileRejection[]) => {
       const newFiles: StatsFile[] = []
 
       acceptedFiles.forEach((file) => {
-        newFiles.push(getStatsFileDefaults(file))
+        newFiles.push(getStatsFileDefaults(file as RDZFileWithPath))
       })
 
       fileRejections.forEach(({ file, errors }) => {

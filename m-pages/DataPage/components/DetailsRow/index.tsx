@@ -38,7 +38,7 @@ const Component = ({ file }: DetailsRowProps) => {
       sx={sx.fileCard(isErrorFile, isUnknownFile, file.status === StatsFileStatus.PARSING)}
       onClick={isErrorFile || isUnknownFile ? undefined : () => toggleFileSelection(file.id)}
     >
-      <Stack direction="row" alignItems="center" spacing={1}>
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         {isErrorFile ? (
           <Box sx={{ width: 28, display: 'flex', justifyContent: 'center' }}>
             <ErrorOutlined sx={{ color: 'error.main', fontSize: 18 }} />
@@ -58,18 +58,17 @@ const Component = ({ file }: DetailsRowProps) => {
         )}
 
         <Box sx={sx.fileContentBox}>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Typography
               variant="body2"
               color={isErrorFile ? 'error' : isUnknownFile ? 'warning' : 'text.primary'}
-              fontWeight="medium"
               sx={sx.fileName}
             >
               {file.file.name}
             </Typography>
           </Stack>
 
-          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
+          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
             <Typography variant="caption" color="text.secondary">
               {formatFileSize(file.file.size)}
             </Typography>

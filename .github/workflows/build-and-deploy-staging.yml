@@ -6,10 +6,9 @@ on:
   push:
     branches:
       - develop
-  # workflow_run:
-  #   workflows: ['build-and-deploy-production']
-  #   types:
-  #     - completed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   build-and-test:
     if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
@@ -26,9 +25,9 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup environment
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '26.4.0'
+          node-version: '26.11.1'
           cache: 'pnpm'
 
       - name: Bump version for build
@@ -72,9 +71,9 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup environment
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '26.4.0'
+          node-version: '26.11.1'
           cache: 'pnpm'
 
       - name: Bump version for build
@@ -117,9 +116,9 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Setup environment
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '26.4.0'
+          node-version: '26.11.1'
           cache: 'pnpm'
 
       - name: Bump version
