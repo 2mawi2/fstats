@@ -25,7 +25,7 @@ const Component = () => {
           control={<Switch checked={persistData} onChange={onChange} />}
           label={
             <Box>
-              <Typography variant="body2" fontWeight="medium" sx={{ mb: 0 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0 }}>
                 Persist data
               </Typography>
             </Box>

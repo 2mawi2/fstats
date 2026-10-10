@@ -17,6 +17,7 @@ export const ui = () => {
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
+      fontWeight: 'medium',
     },
   }
 }

@@ -62,9 +62,9 @@ const Component = () => {
   return (
     <>
       <Box sx={sx.summaryCard()} onClick={() => setExpanded(!expanded)}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Typography variant="h6" fontWeight="medium">
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
               {files.length} {files.length === 1 ? 'file' : 'files'}
             </Typography>
             {
@@ -74,7 +74,7 @@ const Component = () => {
             }
           </Stack>
 
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ gap: 1 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', gap: 1 }}>
             {files.some((file) => file.status === StatsFileStatus.PARSED) ? (
               <Typography variant="body2" color="text.secondary">
                 {typesFound}
@@ -113,7 +113,7 @@ const Component = () => {
       {expanded ? (
         <Box sx={{ mt: 2 }}>
           <Stack spacing={1.5}>
-            <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
               <Button
                 size="small"
                 startIcon={
