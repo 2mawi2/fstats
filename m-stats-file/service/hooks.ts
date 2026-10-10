@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import type { StatsFile } from '@/types'
+import type { NewStatsFile, StatsFileState } from '@/types'
 import { useFileHelper } from '@/hooks'
 
 import {
@@ -40,7 +40,7 @@ export const useMutateAddFile = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (file: StatsFile) => {
+    mutationFn: (file: NewStatsFile) => {
       return addFile(file)
     },
     onSuccess: (data) => {
@@ -54,7 +54,7 @@ export const useMutateAddFiles = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (files: StatsFile[]) => {
+    mutationFn: (files: NewStatsFile[]) => {
       return addFiles(files)
     },
     onSuccess: (data) => {
@@ -70,8 +70,8 @@ export const useMutateUpdateFile = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<StatsFile> }) => {
-      return updateFile(id, updates)
+    mutationFn: ({ id, state }: { id: string; state: StatsFileState }) => {
+      return updateFile(id, state)
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: statsFileKey.all })
@@ -84,7 +84,7 @@ export const useMutateUpdateFiles = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (filesToUpdate: { id: string; updates: Partial<StatsFile> }[]) => {
+    mutationFn: (filesToUpdate: { id: string; state: StatsFileState }[]) => {
       return updateFiles(filesToUpdate)
     },
     onSuccess: (data) => {

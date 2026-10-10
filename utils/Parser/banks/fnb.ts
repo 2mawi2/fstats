@@ -1,41 +1,26 @@
-import { BankAccountId, Currency, ParserId } from '@/types-enums'
-import { buildExtra, createParser } from '@/utils/Parser'
+import { AccountType, Currency } from '@/types-enums'
 
-const bankName = 'FNB'
-const currency = Currency.ZAR
+import { defineBank } from '../definition'
 
-export const fnb__credit_card = createParser({
-  id: ParserId.FNB_CREDIT_CARD,
-  bankAccountId: BankAccountId.FNB_CREDIT_CARD,
-  bankName,
-  accountType: 'Credit Card',
-  currency,
-
-  headerRowIndex: 4,
-
-  columns: {
-    date: 'Date',
-    amount: 'Amount',
-    balance: 'Balance',
-    description: 'Description',
-  } as const,
-
-  dateFormat: 'yyyy/MM/dd',
-
-  getters: {
-    date: (row) => {
-      return row.get('date')
+export const fnb = defineBank({
+  id: 'fnb',
+  name: 'FNB',
+  currency: Currency.ZAR,
+  formats: [
+    {
+      accountType: AccountType.CREDIT_CARD,
+      accountName: 'Credit Card',
+      version: '1',
+      dateFormat: 'yyyy/MM/dd',
+      headers: ['Date', 'Amount', 'Balance', 'Description'],
+      columns: {
+        date: 'Date',
+        description: 'Description',
+        amount: { type: 'signed', header: 'Amount' },
+      },
+      extraColumns: {
+        balance: 'Balance',
+      },
     },
-    description: (row) => {
-      return row.get('description')
-    },
-    value: (row) => {
-      return row.get('amount')
-    },
-    extra: (row) => {
-      return buildExtra({
-        balance: row.get('balance') || '0',
-      })
-    },
-  },
+  ],
 })

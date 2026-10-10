@@ -15,7 +15,6 @@ type SummaryChartProps = {
 }
 
 const Component = ({ transactionRangeItems }: SummaryChartProps) => {
-  console.log('transactionRangeItems', transactionRangeItems)
   const isDarkMode = useIsDarkMode()
   const theme = useTheme()
   const sx = ui()

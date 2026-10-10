@@ -1,9 +1,10 @@
 import { formatISO } from 'date-fns'
 
-import type { StatsFile, StatsFileAtRest } from '@/types'
+import type { NewStatsFile, StatsFile, StatsFileAtRest, StatsFileState } from '@/types'
+import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
 import { db } from '@/lib/localforage'
 
-import { getTransactionsHash, parseStatsFile, syncStatsFile } from './helper'
+import { getFileHash, parseStatsFile, syncStatsFile } from './helper'
 
 export const getFile = async (id: string): Promise<StatsFile | null> => {
   if (!id) {
@@ -21,50 +22,74 @@ export const getFiles = async (): Promise<StatsFile[]> => {
   return files
 }
 
-export const addFile = async (file: StatsFile): Promise<StatsFile> => {
-  if (!file) {
-    throw new Error('No file provided!')
-  }
-  if (!file.file) {
-    throw new Error('StatsFile requires the `file` to be present!')
-  }
-
-  const modified = formatISO(new Date())
-  const updatedFile: StatsFile = {
-    ...file,
-    id: crypto.randomUUID(),
-    created: modified,
-    modified,
-  }
-
-  await db.filesStore.setItem<StatsFileAtRest>(updatedFile.id, syncStatsFile(updatedFile))
-
-  return updatedFile
+export const addFile = async (newFile: NewStatsFile): Promise<StatsFile> => {
+  const [addedFile] = await addFiles([newFile])
+  return addedFile
 }
 
-export const addFiles = async (files: StatsFile[]): Promise<StatsFile[]> => {
-  const promises = files.map((file) => addFile(file))
-  const addedFiles = await Promise.all(promises)
+/**
+ * Accepted files are added with status "parsing", unless their content was already uploaded.
+ */
+export const addFiles = async (newFiles: NewStatsFile[]): Promise<StatsFile[]> => {
+  const existingFiles = await getFiles()
+  const knownHashes = new Map(
+    existingFiles
+      .filter((file) => {
+        return file.hash && !(file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.DUPLICATE)
+      })
+      .map((file) => [file.hash, file.file.name]),
+  )
+
+  const addedFiles: StatsFile[] = []
+
+  // Sequential, so duplicates within the same upload are detected too
+  for (const { file, rejection } of newFiles) {
+    const hash = rejection ? null : await getFileHash(file)
+    const duplicateOf = hash ? knownHashes.get(hash) : undefined
+
+    const state: StatsFileState = rejection
+      ? {
+          status: StatsFileStatus.ERROR,
+          error: { code: StatsFileErrorCode.REJECTED, message: rejection },
+        }
+      : duplicateOf
+        ? {
+            status: StatsFileStatus.ERROR,
+            error: { code: StatsFileErrorCode.DUPLICATE, message: `Same content as "${duplicateOf}"` },
+          }
+        : { status: StatsFileStatus.PARSING }
+
+    if (hash && !duplicateOf) {
+      knownHashes.set(hash, file.name)
+    }
+
+    const created = formatISO(new Date())
+    const addedFile: StatsFile = { id: crypto.randomUUID(), created, modified: created, file, hash, ...state }
+
+    await db.filesStore.setItem<StatsFileAtRest>(addedFile.id, syncStatsFile(addedFile))
+    addedFiles.push(addedFile)
+  }
+
   return addedFiles
 }
 
-export const updateFile = async (id: string, updates: Partial<StatsFile>): Promise<StatsFile> => {
+/**
+ * Replaces the status dependent part of a file (e.g. with the parse result).
+ */
+export const updateFile = async (id: string, state: StatsFileState): Promise<StatsFile> => {
   const file = await db.filesStore.getItem<StatsFileAtRest>(id)
 
   if (!file) {
     throw new Error(`File with id ${id} not found`)
   }
 
-  const modified = formatISO(new Date())
-  let updatedFile: StatsFile = {
-    ...parseStatsFile(file),
-    ...updates,
-    modified,
-  }
-
-  updatedFile = {
-    ...updatedFile,
-    // hash: await getTransactionsHash(updatedFile.transactions),
+  const updatedFile: StatsFile = {
+    id: file.id,
+    created: file.created,
+    modified: formatISO(new Date()),
+    file: file.file,
+    hash: file.hash,
+    ...state,
   }
 
   await db.filesStore.setItem<StatsFileAtRest>(id, syncStatsFile(updatedFile))
@@ -72,10 +97,8 @@ export const updateFile = async (id: string, updates: Partial<StatsFile>): Promi
   return updatedFile
 }
 
-export const updateFiles = async (
-  filesToUpdate: { id: string; updates: Partial<StatsFile> }[],
-): Promise<StatsFile[]> => {
-  const promises = filesToUpdate.map(({ id, updates }) => updateFile(id, updates))
+export const updateFiles = async (filesToUpdate: { id: string; state: StatsFileState }[]): Promise<StatsFile[]> => {
+  const promises = filesToUpdate.map(({ id, state }) => updateFile(id, state))
   return await Promise.all(promises)
 }
 

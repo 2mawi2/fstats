@@ -1,6 +1,6 @@
 import type { Transaction } from '@/types'
 
-export const DEMO_TRANSACTIONS: Transaction[] = [
+const DEMO_TRANSACTION_DATA: Omit<Transaction, 'id'>[] = [
   // January 2026
   {
     date: '2026-01-02',
@@ -613,3 +613,8 @@ export const DEMO_TRANSACTIONS: Transaction[] = [
     category: 'FAM_04',
   },
 ]
+
+export const DEMO_TRANSACTIONS: Transaction[] = DEMO_TRANSACTION_DATA.map((transaction, index) => ({
+  ...transaction,
+  id: `demo-${index}`,
+}))

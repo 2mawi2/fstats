@@ -3,9 +3,9 @@
 import { Box, List } from '@mui/material'
 import { usePathname } from 'next/navigation'
 
-import { ROUTES } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
+import { NAV_ITEMS_BOTTOM, NAV_ITEMS_TOP } from '../../actions'
 import MenuDrawerNavButton from '../MenuDrawerNavButton'
 
 type MenuDrawerProps = {
@@ -19,18 +19,11 @@ const Component = ({ onClose }: MenuDrawerProps) => {
   return (
     <List disablePadding>
       <Box sx={{ mt: 3 }}>
-        <MenuDrawerNavButton route={ROUTES.HOME} isActive={pathname === ROUTES.HOME} onClose={onClose}>
-          {t('NAVIGATION.HOME')}
-        </MenuDrawerNavButton>
-        <MenuDrawerNavButton route={ROUTES.DATA} isActive={pathname === ROUTES.DATA} onClose={onClose}>
-          {t('NAVIGATION.DATA')}
-        </MenuDrawerNavButton>
-        <MenuDrawerNavButton route={ROUTES.STATS} isActive={pathname === ROUTES.STATS} onClose={onClose}>
-          {t('NAVIGATION.STATS')}
-        </MenuDrawerNavButton>
-        <MenuDrawerNavButton route={ROUTES.SETTINGS} isActive={pathname === ROUTES.SETTINGS} onClose={onClose}>
-          {t('NAVIGATION.SETTINGS')}
-        </MenuDrawerNavButton>
+        {[...NAV_ITEMS_TOP, ...NAV_ITEMS_BOTTOM].map((item) => (
+          <MenuDrawerNavButton key={item.route} route={item.route} isActive={pathname === item.route} onClose={onClose}>
+            {t(item.labelKey)}
+          </MenuDrawerNavButton>
+        ))}
       </Box>
     </List>
   )

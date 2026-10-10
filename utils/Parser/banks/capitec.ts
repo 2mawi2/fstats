@@ -1,104 +1,70 @@
-import { BankAccountId, Currency, ParserId } from '@/types-enums'
-import { buildExtra, createParser } from '@/utils/Parser'
-import { Big } from '@/lib/w-big'
+import { AccountType, Currency } from '@/types-enums'
 
-const bankName = 'Capitec'
-const currency = Currency.ZAR
+import { defineBank } from '../definition'
 
-export const capitec__savings = createParser({
-  id: ParserId.CAPITEC_SAVINGS,
-  bankAccountId: BankAccountId.CAPITEC_SAVINGS,
-  bankName,
-  accountType: 'Savings',
-  currency,
-
-  headerRowIndex: 0,
-
-  columns: {
-    nr: 'Nr',
-    account: 'Account',
-    postingDate: 'Posting Date',
-    transactionDate: 'Transaction Date',
-    description: 'Description',
-    originalDescription: 'Original Description',
-    parentCategory: 'Parent Category',
-    category: 'Category',
-    moneyIn: 'Money In',
-    moneyOut: 'Money Out',
-    fee: 'Fee',
-    balance: 'Balance',
-  } as const,
-
-  dateFormat: 'yyyy-MM-dd HH:mm',
-
-  getters: {
-    date: (row) => {
-      return row.get('transactionDate')
+export const capitec = defineBank({
+  id: 'capitec',
+  name: 'Capitec',
+  currency: Currency.ZAR,
+  formats: [
+    {
+      accountType: AccountType.SAVINGS,
+      accountName: 'Savings',
+      version: '1',
+      dateFormat: 'yyyy-MM-dd HH:mm',
+      headers: [
+        'Nr',
+        'Account',
+        'Posting Date',
+        'Transaction Date',
+        'Description',
+        'Original Description',
+        'Parent Category',
+        'Category',
+        'Money In',
+        'Money Out',
+        'Fee',
+        'Balance',
+      ],
+      columns: {
+        date: 'Transaction Date',
+        description: 'Description',
+        amount: { type: 'firstOf', headers: ['Money In', 'Money Out', 'Fee'] },
+      },
+      extraColumns: {
+        parentCategory: 'Parent Category',
+        category: 'Category',
+        balance: 'Balance',
+      },
     },
-    description: (row) => {
-      return row.get('description')
+    {
+      accountType: AccountType.SAVINGS,
+      accountName: 'Savings',
+      version: '2',
+      dateFormat: 'dd/MM/yyyy',
+      headers: [
+        'Sequence Number',
+        'Account',
+        'Posting Date',
+        'Transaction Date',
+        'Statement Description',
+        'Long Description',
+        'Parent Category',
+        'Sub-category',
+        'Debit Amount',
+        'Credit Amount',
+        'Balance',
+      ],
+      columns: {
+        date: 'Transaction Date',
+        description: 'Statement Description',
+        amount: { type: 'inOut', in: 'Credit Amount', out: 'Debit Amount' },
+      },
+      extraColumns: {
+        parentCategory: 'Parent Category',
+        category: 'Sub-category',
+        balance: 'Balance',
+      },
     },
-    value: (row) => {
-      const valIn = row.get('moneyIn')
-      const valOut = row.get('moneyOut')
-      const valFee = row.get('fee')
-
-      return valIn || valOut || valFee || '0'
-    },
-    extra: (row) => {
-      return buildExtra({
-        parentCategory: row.get('parentCategory'),
-        category: row.get('category'),
-        balance: row.get('balance') || '0',
-      })
-    },
-  },
-})
-
-export const capitec__savings__alt = createParser({
-  id: ParserId.CAPITEC_SAVINGS__ALT,
-  bankAccountId: BankAccountId.CAPITEC_SAVINGS,
-  bankName,
-  accountType: 'Savings',
-  currency,
-
-  headerRowIndex: 1,
-
-  columns: {
-    sequenceNumber: 'Sequence Number',
-    account: 'Account',
-    postingDate: 'Posting Date',
-    transactionDate: 'Transaction Date',
-    statementDescription: 'Statement Description',
-    longDescription: 'Long Description',
-    parentCategory: 'Parent Category',
-    subcategory: 'Sub-category',
-    debitAmount: 'Debit Amount',
-    creditAmount: 'Credit Amount',
-    balance: 'Balance',
-  } as const,
-
-  dateFormat: 'dd/MM/yyyy',
-
-  getters: {
-    date: (row) => {
-      return row.get('transactionDate')
-    },
-    description: (row) => {
-      return row.get('statementDescription')
-    },
-    value: (row) => {
-      const valIn = row.get('creditAmount')
-      const valOut = row.get('debitAmount')
-
-      return valIn ? valIn : valOut ? Big(valOut).times(-1).toString() : '0'
-    },
-    extra: (row) => {
-      return buildExtra({
-        parentCategory: row.get('parentCategory'),
-        category: row.get('subcategory'),
-        balance: row.get('balance') || '0',
-      })
-    },
-  },
+  ],
 })

@@ -26,27 +26,47 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 - Dates in storage must be ISO strings (`DateTimeString`)
 - Support light/dark themes and EN/DE locales
 
-## Adding a New Bank Parser
+## Adding a New Bank / CSV Format
 
-Parsers live in `utils/Parser/banks/`. `ParserId` is in `types-enums/index.ts`.
+Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Parser/registry.ts` is the single registry; `ParserId`, `BankAccountId` and `zParserId` are derived from it.
 
-1. Add `ParserId` entry in `types-enums/index.ts` + add to `zParserId` array
-2. Create parser in `utils/Parser/banks/`:
+1. Create `utils/Parser/banks/new_bank.ts` (or add a format to an existing bank):
 ```typescript
-import { Currency, ParserId } from '@/types-enums'
-import { createParser } from '@/utils/Parser'
+import { AccountType, Currency } from '@/types-enums'
 
-export const new_bank__account = createParser({
-  id: ParserId.NEW_BANK_ACCOUNT,
-  bankName: 'New Bank',
-  accountType: 'Account Type',
+import { defineBank } from '../definition'
+
+export const newBank = defineBank({
+  id: 'new_bank',
+  name: 'New Bank',
   currency: Currency.EUR,
-  headerRowIndex: 0,
-  columns: { date: 'Date', description: 'Description', amount: 'Amount', balance: 'Balance' } as const,
-  dateFormat: 'dd/MM/yyyy',
-  getters: { date: 'date', description: 'description', value: 'amount' },
-  // Use functions for complex logic: value: (row) => parseGermanNumber(row.get('amount'))
+  formats: [
+    {
+      accountType: AccountType.CURRENT, // bank account ID `new_bank__current`
+      accountName: 'Giro', // display name
+      version: '1', // parser ID `new_bank__current__1`; '2', '3', etc. for additional formats of the same account
+      dateFormat: 'dd.MM.yyyy',
+      numberFormat: 'de', // optional, '1.234,56'
+      // All CSV headers of the file (any order, header row found automatically). Used for detection: all
+      // non-optional headers must be present, unlisted headers still match but are logged.
+      headers: ['Buchung', 'Datum', 'Empfänger', 'Verwendungszweck', { header: 'Saldo', optional: true }, 'Betrag'],
+      // Headers below must be listed in `headers` (type-checked)
+      columns: {
+        date: 'Datum',
+        description: 'Empfänger', // or ['Empfänger', 'Verwendungszweck'] (joined)
+        amount: { type: 'signed', header: 'Betrag' },
+        // | { type: 'inOut', in: 'Haben', out: 'Soll' } (out is always negative)
+        // | { type: 'firstOf', headers: ['In', 'Out', 'Fee'] } (first non-empty)
+      },
+      extraColumns: {
+        balance: 'Saldo',
+        reference: 'Verwendungszweck',
+      },
+    },
+  ],
 })
 ```
-3. Export from `utils/Parser/banks/index.ts`
-4. Register in `utils/Parser/utils.ts` `AVAILABLE_PARSERS` record
+2. Export from `utils/Parser/banks/index.ts` and add to `BANKS` in `utils/Parser/registry.ts`
+   - New account type: add it to `AccountType` in `types-enums/index.ts`
+   - Update the expected IDs in the "should derive literal ID types" test (`utils/Parser/__tests__/index.test.ts`)
+3. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.

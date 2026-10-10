@@ -1,13 +1,13 @@
 'use client'
 
 import { parseISO } from 'date-fns'
-import { difference, isEqual, uniqWith } from 'lodash'
+import { difference, uniqBy } from 'lodash'
 
 import {
   DateRange,
   GroupDataByOption,
+  ParsedStatsFile,
   SelectOptionBankAccountId,
-  StatsFile,
   Transaction,
   TransactionRangeItem,
 } from '@/types'
@@ -27,7 +27,7 @@ export const useTransactionHelper = ({
 }: {
   isDemoMode: boolean
   selectedId: SelectOptionBankAccountId
-  files: StatsFile[]
+  files: ParsedStatsFile[]
   groupDataBy: GroupDataByOption
   locale: UserLocale
   dateFormat: DateFormat
@@ -43,9 +43,7 @@ export const useTransactionHelper = ({
     allTransactions = DEMO_TRANSACTIONS
   } else {
     const filesForSelectedId =
-      selectedId === 'all'
-        ? files
-        : files.filter((file) => file.parserId && getBankAccountId(file.parserId) === selectedId)
+      selectedId === 'all' ? files : files.filter((file) => getBankAccountId(file.parserId) === selectedId)
     allTransactions = filesForSelectedId.flatMap((file) => file.transactions)
   }
 
@@ -58,7 +56,8 @@ export const useTransactionHelper = ({
     }
   }
 
-  const transactions = uniqWith(allTransactions, isEqual)
+  // IDs are content hashes, so this removes identical transactions (e.g. from overlapping statements)
+  const transactions = uniqBy(allTransactions, 'id')
   const duplicates = difference(allTransactions, transactions)
   const transactionsSortedByDate = transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
   const earliestTransaction = transactionsSortedByDate[0]

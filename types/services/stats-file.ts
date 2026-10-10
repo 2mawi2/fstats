@@ -1,86 +1,77 @@
 import { z } from 'zod'
 
-import { zParserId, zStatsFileStatus } from '@/types-enums'
+import { StatsFileStatus, zStatsFileErrorCode } from '@/types-enums'
+import { zParserId } from '@/utils/Parser/registry'
 
 import { zDateTimeString, zIdString, zNonEmptyString } from '../global'
 import type { _KeysCheck } from '../key-check'
 import { _zKeysCheck } from '../key-check'
-import { zPPRawParseResult } from '../lib/papaparse'
+import type { RDZFileWithPath } from '../lib/react-dropzone'
 import { zRDZFileWithPath } from '../lib/react-dropzone'
 import { zTransaction, zTransactionAtRest } from './transaction'
-
-const zDefaultRawParseResult = z.object({
-  type: z.string(),
-  result: z.literal(null),
-  success: z.boolean(),
-  error: z.string().optional(),
-})
-
-export const zCsvParseResult = z.object({
-  ...zDefaultRawParseResult.shape,
-  type: z.literal('text/csv'),
-  result: zPPRawParseResult.nullable(),
-})
-
-export type CsvParseResult = z.infer<typeof zCsvParseResult>
-
-export const zPdfParseResult = z.object({
-  ...zDefaultRawParseResult.shape,
-  type: z.literal('application/pdf'),
-  result: z.string().nullable(), // TODO: Add correct type
-})
-
-export type PdfParseResult = z.infer<typeof zPdfParseResult>
-
-export const zRawParseResult = z.union([zCsvParseResult, zPdfParseResult, zDefaultRawParseResult])
-
-export type RawParseResult = z.infer<typeof zRawParseResult>
 
 export const zRowData = z.array(z.string())
 
 export type RowData = z.infer<typeof zRowData>
 
-export const zParsedDataResult = z.object({
-  type: z.string(),
-  data: z.array(zRowData),
-  success: z.boolean(),
-  error: z.string().optional(),
+export const zStatsFileError = z.object({
+  code: zStatsFileErrorCode,
+  message: z.string(),
 })
 
-export type ParsedDataResult = z.infer<typeof zParsedDataResult>
+export type StatsFileError = z.infer<typeof zStatsFileError>
 
-export const zStatsFile = z.object({
-  created: z.union([z.literal(''), zDateTimeString]),
-  modified: z.union([z.literal(''), zDateTimeString]),
-  id: z.union([z.literal(''), zIdString]),
-  /**
-   * This is a hash of all transactions, not the actual parse result.
-   */
-  // hash: z.union([z.literal(''), zNonEmptyString]),
+const zStatsFileMeta = z.object({
+  id: zIdString,
+  created: zDateTimeString,
+  modified: zDateTimeString,
   file: zRDZFileWithPath,
-  status: zStatsFileStatus,
-  parserId: zParserId.nullable(),
-  parseResult: zRawParseResult.nullable(),
-  transactions: z.array(zTransaction),
-  error: z.string().optional(),
+  /**
+   * SHA-256 of the file content, used to detect duplicate uploads. `null` for rejected files.
+   */
+  hash: zNonEmptyString.nullable(),
 })
+
+const zStatsFileParsing = z.object({ status: z.literal(StatsFileStatus.PARSING) })
+const zStatsFileErrorState = z.object({ status: z.literal(StatsFileStatus.ERROR), error: zStatsFileError })
+
+/**
+ * The status dependent part of a file, i.e. the result of parsing.
+ */
+export const zStatsFileState = z.discriminatedUnion('status', [
+  zStatsFileParsing,
+  z.object({ status: z.literal(StatsFileStatus.PARSED), parserId: zParserId, transactions: z.array(zTransaction) }),
+  zStatsFileErrorState,
+])
+
+export type StatsFileState = z.infer<typeof zStatsFileState>
+
+export const zStatsFile = z.intersection(zStatsFileMeta, zStatsFileState)
 
 export type StatsFile = z.infer<typeof zStatsFile>
 
-export const zSyncableStatsFile = z.object({
-  ...zStatsFile.shape,
-  created: zDateTimeString,
-  modified: zDateTimeString,
-  id: zNonEmptyString,
-})
+export type ParsedStatsFile = Extract<StatsFile, { status: typeof StatsFileStatus.PARSED }>
 
-export type SyncableStatsFile = z.infer<typeof zSyncableStatsFile>
+export type NewStatsFile = {
+  file: RDZFileWithPath
+  /**
+   * Set if the file was rejected on upload (e.g. wrong type or too large).
+   */
+  rejection?: string
+}
 
-export const zStatsFileAtRest = z.object({
-  ...zSyncableStatsFile.shape,
-  // hash: zNonEmptyString,
-  transactions: z.array(zTransactionAtRest),
-})
+export const zStatsFileAtRest = z.intersection(
+  zStatsFileMeta,
+  z.discriminatedUnion('status', [
+    zStatsFileParsing,
+    z.object({
+      status: z.literal(StatsFileStatus.PARSED),
+      parserId: zParserId,
+      transactions: z.array(zTransactionAtRest),
+    }),
+    zStatsFileErrorState,
+  ]),
+)
 
 export type StatsFileAtRest = z.infer<typeof zStatsFileAtRest>
 

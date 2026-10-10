@@ -1,45 +1,23 @@
 import type { Parser } from '@/types'
-import { BankAccountId, ParserId } from '@/types-enums'
 import { MISC } from '@/common'
 
-import {
-  capitec__savings,
-  capitec__savings__alt,
-  comdirect__giro,
-  comdirect__visa,
-  fnb__credit_card,
-  ing__giro,
-  ing__giro__wb,
-  lloyds__current,
-} from './banks'
+import { createParser } from './helper'
+import type { BankAccountId, ParserId } from './registry'
+import { BANKS } from './registry'
 
-export const AVAILABLE_PARSERS: Record<ParserId, Parser> = {
-  // South African Banks
-  [capitec__savings.id]: capitec__savings,
-  [capitec__savings__alt.id]: capitec__savings__alt,
-  [fnb__credit_card.id]: fnb__credit_card,
-
-  // German Banks
-  [comdirect__giro.id]: comdirect__giro,
-  [comdirect__visa.id]: comdirect__visa,
-  [ing__giro.id]: ing__giro,
-  [ing__giro__wb.id]: ing__giro__wb,
-
-  // UK Banks
-  [lloyds__current.id]: lloyds__current,
-}
+export const AVAILABLE_PARSERS = Object.fromEntries(
+  BANKS.flatMap((bank) => bank.formats.map((format) => createParser(bank, format))).map((parser) => [
+    parser.id,
+    parser,
+  ]),
+) as Record<ParserId, Parser>
 
 export const getParserCurrency = (parserId: ParserId) => {
   return AVAILABLE_PARSERS[parserId].currency
 }
 
-/**
- * The BankId uses the bank name and account type, because e.g. there
- * can be multiple parser for a single account type.
- */
 export const getBankAccountId = (parserId: ParserId): BankAccountId => {
-  const parser = AVAILABLE_PARSERS[parserId]
-  return parser.bankAccountId
+  return AVAILABLE_PARSERS[parserId].bankAccountId
 }
 
 type BankAccountName = {
@@ -62,8 +40,8 @@ export const getBankAccountName = (value: ParserId | null): BankAccountName => {
   if (parser) {
     return {
       short: parser.bankName,
-      long: `${parser.bankName} ${MISC.CENTER_DOT} ${parser.accountType}`,
-      alt: `${parser.bankName} / ${parser.accountType}`,
+      long: `${parser.bankName} ${MISC.CENTER_DOT} ${parser.accountName}`,
+      alt: `${parser.bankName} / ${parser.accountName}`,
     }
   }
 

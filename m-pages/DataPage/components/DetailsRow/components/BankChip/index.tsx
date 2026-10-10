@@ -5,7 +5,8 @@ import { Box, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
 import type { StatsFile } from '@/types'
-import { isError, isUnknown } from '@/m-stats-file/service'
+import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
+import { isError, isParsed, isUnknown } from '@/m-stats-file/service'
 import { getBankAccountName } from '@/utils/Parser'
 
 import { ui } from './styled'
@@ -26,7 +27,9 @@ const Component = ({ file }: BankChipProps) => {
         <ErrorOutlineOutlined sx={{ fontSize: 14, color: 'error.main' }} />
 
         <Typography variant="caption" color="error" sx={sx.label}>
-          Invalid file
+          {file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.DUPLICATE
+            ? 'Duplicate file'
+            : 'Invalid file'}
         </Typography>
       </Box>
     )
@@ -37,7 +40,7 @@ const Component = ({ file }: BankChipProps) => {
       {isUnknownFile ? <HelpOutlineOutlined color="warning" sx={{ fontSize: 14 }} /> : null}
 
       <Typography variant="caption" sx={{ ...sx.label, color: isUnknownFile ? 'warning.main' : 'text.secondary' }}>
-        {getBankAccountName(file.parserId).long}
+        {getBankAccountName(isParsed(file) ? file.parserId : null).long}
       </Typography>
     </Box>
   )

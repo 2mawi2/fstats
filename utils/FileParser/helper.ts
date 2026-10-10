@@ -1,139 +1,79 @@
 import { parse } from 'papaparse'
 
-import type { ParsedDataResult, Parser, PPRawParseResult, RawParseResult, RDZFileWithPath, Transaction } from '@/types'
-import { DateFormat, UserLocale } from '@/types-enums'
+import type { Parser, PPRowData, RowData } from '@/types'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
 
-export const parseCsv = async (file: RDZFileWithPath): Promise<PPRawParseResult> => {
+// Many bank exports (e.g. ING) are Windows-1252, so fall back when the file isn't valid UTF-8
+export const readFileText = async (file: Blob): Promise<string> => {
+  const buffer = await file.arrayBuffer()
+
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(buffer)
+  } catch {
+    return new TextDecoder('windows-1252').decode(buffer)
+  }
+}
+
+export const readCsvRows = async (file: Blob): Promise<RowData[]> => {
+  const text = await readFileText(file)
+
   return new Promise((resolve, reject) => {
-    parse(file, {
+    parse<PPRowData>(text, {
       header: false,
       skipEmptyLines: 'greedy',
-      encoding: 'utf-8',
       worker: true,
       complete: (results) => {
-        resolve(results as PPRawParseResult)
+        resolve(results.data)
       },
-      error: (err) => {
+      error: (err: Error) => {
         reject(err)
       },
     })
   })
 }
 
-export const parsePdf = async (file: RDZFileWithPath): Promise<string> => {
-  // TODO: Implement PDF parsing, perhaps using
-  return new Promise((resolve) => {
-    resolve(file.name)
-  })
-}
+const getParserName = ({ bankName, accountName }: Parser) => `${bankName} ${accountName}`
 
-export const rawParseFile = async (file: RDZFileWithPath): Promise<RawParseResult> => {
-  switch (file.type) {
-    case 'text/csv': {
-      try {
-        const result = await parseCsv(file)
-        return { type: file.type, result, success: true }
-      } catch (err) {
-        return {
-          type: file.type,
-          result: null,
-          success: false,
-          error: `Parsing "${file.type}" failed: ${err instanceof Error ? err.message : String(err)}`,
-        }
-      }
-    }
+/**
+ * Exactly one parser must match, multiple matches are an error rather than a guess.
+ * If none match, `error` explains why the closest parser was rejected.
+ */
+export const getMatchingParser = (rows: RowData[]): { parser: Parser | null; error: string } => {
+  const matches: Parser[] = []
+  let closest: { parser: Parser; closeness: number; reason: string } | null = null
 
-    case 'application/pdf': {
-      try {
-        const result = await parsePdf(file)
-        return { type: file.type, result, success: true }
-      } catch (err) {
-        return {
-          type: file.type,
-          result: null,
-          success: false,
-          error: `Parsing "${file.type}" failed: ${err instanceof Error ? err.message : String(err)}`,
-        }
-      }
-    }
-
-    default:
-      return {
-        type: file.type,
-        result: null,
-        success: false,
-        error: `Parsing "${file.type}" failed: Unsupported file type.`,
-      }
-  }
-}
-
-export const getTransformedRawData = (rawData: RawParseResult): ParsedDataResult => {
-  switch (rawData.type) {
-    case 'text/csv':
-      if (!rawData.result) {
-        return {
-          type: rawData.type,
-          data: [],
-          success: false,
-          error: 'No result from CSV parse',
-        }
-      }
-      return {
-        type: rawData.type,
-        data: rawData.result.data,
-        success: true,
-      }
-    case 'application/pdf':
-      if (!rawData.result) {
-        return {
-          type: rawData.type,
-          data: [],
-          success: false,
-          error: 'No result from PDF parse',
-        }
-      }
-      return {
-        type: rawData.type,
-        data: [[rawData.result]], // TODO: Add correct data transformation
-        success: true,
-      }
-    default:
-      return {
-        type: rawData.type,
-        data: [],
-        success: false,
-        error: `Unsupported file type: ${rawData.type}`,
-      }
-  }
-}
-
-export const getMatchingParser = (parsedData: ParsedDataResult): Parser | null => {
   for (const parser of Object.values(AVAILABLE_PARSERS)) {
     try {
-      if (parser.detect(parsedData)) {
-        return parser
+      const result = parser.detect(rows)
+
+      if (result.match) {
+        matches.push(parser)
+      } else if (!closest || result.closeness > closest.closeness) {
+        closest = { parser, closeness: result.closeness, reason: result.reason }
       }
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : String(err)
-      console.error(`Error detecting with ${parser.id}:`, errMsg)
+      console.error(`Error detecting with ${parser.id}:`, getErrorMessage(err))
     }
   }
 
-  return null
+  if (matches.length === 1) {
+    return { parser: matches[0], error: '' }
+  }
+
+  if (matches.length > 1) {
+    return { parser: null, error: `Ambiguous format, matches: ${matches.map(getParserName).join(', ')}` }
+  }
+
+  if (closest && closest.closeness >= 0.5) {
+    return {
+      parser: null,
+      error: `No matching parser found. Closest: ${getParserName(closest.parser)} (${closest.reason})`,
+    }
+  }
+
+  return { parser: null, error: 'No matching parser found!' }
 }
 
-export const parseData = (
-  parsedData: ParsedDataResult,
-  parser: Parser,
-  locale: UserLocale,
-  dateFormat: DateFormat,
-): Transaction[] | null => {
-  try {
-    return parser.parse(parsedData, locale, dateFormat)
-  } catch (err) {
-    const errMsg = err instanceof Error ? err.message : String(err)
-    console.error(`Parsing failed with ${parser.id}:`, errMsg)
-    return null
-  }
+export const getErrorMessage = (err: unknown) => {
+  return err instanceof Error ? err.message : String(err)
 }
