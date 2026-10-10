@@ -6,10 +6,9 @@ on:
   push:
     branches:
       - develop
-  # workflow_run:
-  #   workflows: ['build-and-deploy-production']
-  #   types:
-  #     - completed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   build-and-test:
     if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')

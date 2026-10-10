@@ -3,14 +3,12 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
-  # push:
-  #   branches:
-  #     - '**'
-  #     - '!develop'
-  #     - '!main'
   pull_request:
     branches:
       - 'develop'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   build-and-test:
     name: Build & test
@@ -39,6 +37,3 @@ jobs:
 
       - name: Vercel - Build project artifacts
         run: ./node_modules/.bin/vercel build --token=${{ secrets.VERCEL_TOKEN }}
-
-      # - name: Vercel - Deploy project artifacts
-      #   run: ./node_modules/.bin/vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
