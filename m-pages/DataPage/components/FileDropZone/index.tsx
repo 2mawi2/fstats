@@ -6,16 +6,10 @@ import { useTheme } from '@mui/material/styles'
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 
-import type { RDZFileRejection, RDZFileWithPath, StatsFile } from '@/types'
+import type { NewStatsFile, RDZFileRejection, RDZFileWithPath } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
-import {
-  getStatsFileDefaults,
-  isError,
-  isUnknown,
-  useMutateAddFiles,
-  useMutateUpdateFiles,
-} from '@/m-stats-file/service'
+import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-file/service'
 import { useFileHelper, useIsDarkMode, useIsMobile, useUserPreferences } from '@/hooks'
 import { parseFiles } from '@/utils/FileParser'
 
@@ -33,31 +27,19 @@ const Component = () => {
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: RDZFileRejection[]) => {
-      const newFiles: StatsFile[] = []
-
-      acceptedFiles.forEach((file) => {
-        newFiles.push(getStatsFileDefaults(file as RDZFileWithPath))
-      })
-
-      fileRejections.forEach(({ file, errors }) => {
-        newFiles.push({
-          ...getStatsFileDefaults(file),
-          status: StatsFileStatus.ERROR,
-          error: errors.map((e) => e.message).join(', '),
-        })
-      })
+      const newFiles: NewStatsFile[] = [
+        ...acceptedFiles.map((file) => ({ file: file as RDZFileWithPath })),
+        ...fileRejections.map(({ file, errors }) => ({ file, rejection: errors.map((e) => e.message).join(', ') })),
+      ]
 
       const addedFiles = await addFiles(newFiles)
-      const parsedFiles = await parseFiles(
+      const parseResults = await parseFiles(
         addedFiles.filter((file) => file.status === StatsFileStatus.PARSING),
         locale,
         dateFormat,
       )
-      await updateFiles(parsedFiles.map((file) => ({ id: file.id, updates: file })))
-      setSelectedFileIds((prev) => [
-        ...prev,
-        ...parsedFiles.filter((file) => !isError(file) && !isUnknown(file)).map((file) => file.id),
-      ])
+      const updatedFiles = await updateFiles(parseResults)
+      setSelectedFileIds((prev) => [...prev, ...updatedFiles.filter(isParsed).map((file) => file.id)])
     },
     [addFiles, updateFiles, setSelectedFileIds, locale, dateFormat],
   )

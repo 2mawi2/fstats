@@ -1,78 +1,55 @@
-import { zSyncableStatsFile } from '@/types'
-import type { RawParseResult, StatsFile } from '@/types'
-import { DateFormat, StatsFileStatus, UserLocale } from '@/types-enums'
+import type { RowData, StatsFile, StatsFileState, Transaction } from '@/types'
+import { zStatsFileState } from '@/types'
+import { DateFormat, StatsFileErrorCode, StatsFileStatus, UserLocale } from '@/types-enums'
 
-import { getMatchingParser, getTransformedRawData, parseData, rawParseFile } from './helper'
+import { getErrorMessage, getMatchingParser, readCsvRows } from './helper'
 
 export const parseFiles = async (
   files: StatsFile[],
   locale: UserLocale,
   dateFormat: DateFormat,
-): Promise<StatsFile[]> => {
-  const parsedFiles = await Promise.all(files.map((file) => parseFile(file, locale, dateFormat)))
-  return parsedFiles
+): Promise<{ id: string; state: StatsFileState }[]> => {
+  return Promise.all(
+    files.map(async (file) => ({ id: file.id, state: await parseFile(file.file, locale, dateFormat) })),
+  )
 }
 
-export const parseFile = async (file: StatsFile, locale: UserLocale, dateFormat: DateFormat): Promise<StatsFile> => {
-  // 1. Parse the raw file (CSV, PDF, etc.)
-  const parseResult = await rawParseFile(file.file)
-  if (!parseResult.success) {
-    return _returnError(file, parseResult, null, parseResult.error)
+export const parseFile = async (file: File, locale: UserLocale, dateFormat: DateFormat): Promise<StatsFileState> => {
+  // 1. Read the CSV rows
+  let rows: RowData[]
+  try {
+    rows = await readCsvRows(file)
+  } catch (err) {
+    return _toError(StatsFileErrorCode.UNREADABLE, `Reading CSV failed: ${getErrorMessage(err)}`)
   }
 
-  // 2. Transform the raw parse result to a unified format
-  const parsedData = getTransformedRawData(parseResult)
-  if (!parsedData.success) {
-    return _returnError(file, parseResult, null, parsedData.error)
+  // 2. Find a matching parser
+  const { parser, error } = getMatchingParser(rows)
+  if (!parser) {
+    return _toError(StatsFileErrorCode.UNSUPPORTED_FORMAT, error)
   }
 
-  // 3. Find a matching parser
-  const matchedParser = getMatchingParser(parsedData)
-  if (!matchedParser) {
-    return _returnError(file, parseResult, null, 'No matching parser found!')
+  // 3. Transform rows to transactions
+  let transactions: Transaction[]
+  try {
+    transactions = parser.parse(rows, locale, dateFormat)
+  } catch (err) {
+    console.error(`Parsing failed with ${parser.id}:`, getErrorMessage(err))
+    return _toError(StatsFileErrorCode.INVALID_DATA, `Parsing "${parser.id}" failed: ${getErrorMessage(err)}`)
   }
 
-  // 4. Transform data to clean transactions
-  const transactions = parseData(parsedData, matchedParser, locale, dateFormat)
-  if (!transactions) {
-    return _returnError(file, parseResult, matchedParser.id, `Parsing "${matchedParser.id}" failed!`)
-  }
-
-  // 5. Create StatsFile and check if it can be synced so consumers are working with valid data
-  const parserId = matchedParser.id
-  const result: StatsFile = {
-    ...file,
-    parseResult,
-    parserId,
-    transactions,
-  }
-
-  const res = zSyncableStatsFile.safeParse(result)
+  // 4. Validate so consumers are working with valid data
+  const res = zStatsFileState.safeParse({ status: StatsFileStatus.PARSED, parserId: parser.id, transactions })
 
   if (!res.success) {
     const errors = res.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join(', ')
-    console.error(`Validation failed for parser "${parserId}":`, errors)
-    return _returnError(file, parseResult, parserId, `Validating "${parserId}" failed: ${errors}`)
+    console.error(`Validation failed for parser "${parser.id}":`, errors)
+    return _toError(StatsFileErrorCode.INVALID_DATA, `Validating "${parser.id}" failed: ${errors}`)
   }
 
-  // 6. Only once validation passes can we mark it as parsed
-  return {
-    ...result,
-    status: StatsFileStatus.PARSED,
-  }
+  return res.data
 }
 
-const _returnError = (
-  file: StatsFile,
-  parseResult: RawParseResult,
-  parserId: StatsFile['parserId'],
-  error: string | undefined,
-): StatsFile => {
-  return {
-    ...file,
-    parseResult,
-    parserId,
-    status: StatsFileStatus.ERROR,
-    error,
-  }
+const _toError = (code: StatsFileErrorCode, message: string): StatsFileState => {
+  return { status: StatsFileStatus.ERROR, error: { code, message } }
 }

@@ -31,9 +31,7 @@ const Component = () => {
   const { mutate: removeFiles, isPending: isRemovingFiles } = useMutateRemoveFiles()
   const { files, isLoadingFiles, selectedFiles, selectableFiles, errorFiles, unknownFiles, setSelectedFileIds } =
     useFileHelper()
-  const parserIds = Array.from(
-    new Set(selectedFiles.filter((file) => file.status === StatsFileStatus.PARSED).map((file) => file.parserId)),
-  )
+  const parserIds = Array.from(new Set(selectedFiles.map((file) => file.parserId)))
   const typesFound = Array.from(
     new Set(parserIds.map((parserId) => getBankAccountName(parserId).short).sort((a, b) => a.localeCompare(b))),
   ).join(', ')

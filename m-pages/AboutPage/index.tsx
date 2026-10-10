@@ -36,7 +36,7 @@ const Component = () => {
         </Grid>
 
         <Grid size={12}>
-          <Typography sx={{ color: 'text.secondary', fontSize: 13 }}>
+          <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
             © 2025 fstats. {t('MISC.ALL_RIGHTS_RESERVED')} {t('MISC.VERSION')}: v{CONFIG.APP_VERSION}
           </Typography>
         </Grid>

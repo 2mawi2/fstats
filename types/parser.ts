@@ -1,47 +1,128 @@
-import type { BankAccountId } from '@/types-enums'
-import { Currency, DateFormat, ParserId, UserLocale } from '@/types-enums'
+import { AccountType, Currency, DateFormat, UserLocale } from '@/types-enums'
+import type { BankAccountId, ParserId } from '@/utils/Parser/registry'
 
-import { ParsedDataResult } from './services/stats-file'
+import type { RowData } from './services/stats-file'
 import type { Transaction } from './services/transaction'
 
-export type ColDef = Record<string, string>
+export type DetectResult =
+  | { match: true }
+  | {
+      match: false
+      reason: string
+      /**
+       * 0..1 share of required headers found. 1 = header matched but no valid rows.
+       */
+      closeness: number
+    }
 
-export type RowAccessor<T extends ColDef> = {
-  get: (key: keyof T) => string
-}
-
-export type Getter<T extends ColDef> = (row: RowAccessor<T>) => string
-
-export type ExtraGetter<T extends ColDef> = (row: RowAccessor<T>) => Transaction['extra']
-
-export type ParserGetters<T extends ColDef> = {
-  date: Getter<T>
-  description: Getter<T>
-  value: Getter<T>
-  extra?: ExtraGetter<T>
-}
-
-export type CreateParserParams<T extends ColDef, Id extends ParserId = ParserId> = {
-  id: Id
+export type Parser = {
+  id: ParserId
   bankAccountId: BankAccountId
   bankName: string
-  accountType: string
+  accountType: AccountType
+  accountName: string
   currency: Currency
-  headerRowIndex: number
-  columns: T
   dateFormat: string
-  getters: ParserGetters<T>
+  detect: (rows: RowData[]) => DetectResult
+  parse: (rows: RowData[], locale: UserLocale, dateFormat: DateFormat) => Transaction[]
 }
 
-export type Parser<Id extends ParserId = ParserId> = {
-  id: Id
-  bankAccountId: BankAccountId
-  bankName: string
-  accountType: string
-  currency: Currency
-  headerRowIndex: number
-  columns: ColDef
+// Bank definitions
+
+export type ExtraField = keyof NonNullable<Transaction['extra']>
+
+/**
+ * A CSV header of the file. Optional headers aren't always present and aren't required for detection.
+ */
+export type HeaderDef<H extends string = string> = H | { readonly header: H; readonly optional: true }
+
+/**
+ * - `signed`: one signed column
+ * - `inOut`: money in / money out columns, out is always negative
+ * - `firstOf`: first non-empty signed column
+ */
+export type AmountColumnDef<H extends string = string> =
+  | { readonly type: 'signed'; readonly header: H }
+  | { readonly type: 'inOut'; readonly in: H; readonly out: H }
+  | { readonly type: 'firstOf'; readonly headers: readonly H[] }
+
+/**
+ * Multiple headers are joined (empty values are skipped).
+ */
+export type DescriptionColumnDef<H extends string = string> = H | readonly H[]
+
+export type FormatDef<H extends string = string> = {
+  /**
+   * Part of the persisted IDs.
+   * Parser ID: `${bank.id}__${accountType}__${version}`, bank account ID: `${bank.id}__${accountType}`.
+   */
+  accountType: AccountType
+  /**
+   * Display name, e.g. "Giro" or "Current Account".
+   */
+  accountName: string
+  /**
+   * Part of the parser ID. "1" for the first CSV format of an account, then "2", "3", etc.
+   */
+  version: string
   dateFormat: string
-  detect: (input: ParsedDataResult) => boolean
-  parse: (input: ParsedDataResult, locale: UserLocale, dateFormat: DateFormat) => Transaction[]
+  /**
+   * 'de' = "1.234,56". 'en' = "1,234.56". Defaults to 'en'.
+   */
+  numberFormat?: 'en' | 'de'
+  /**
+   * All CSV headers of the file, used for detection. A file matches if all non-optional headers are present (any
+   * order), unlisted headers are logged but still match.
+   */
+  headers: readonly HeaderDef<H>[]
+  /**
+   * Core transaction fields, headers must be listed in `headers`.
+   */
+  columns: { date: H; description: DescriptionColumnDef<H>; amount: AmountColumnDef<H> }
+  /**
+   * Stored in `Transaction['extra']`, headers must be listed in `headers`.
+   */
+  extraColumns?: Partial<Record<ExtraField, H>>
 }
+
+export type BankDef = {
+  /**
+   * Part of the persisted IDs.
+   */
+  id: string
+  name: string
+  currency: Currency
+  formats: readonly FormatDef[]
+}
+
+type HeaderNames<F> = F extends { headers: readonly (infer D)[] }
+  ? D extends string
+    ? D
+    : D extends { header: infer H extends string }
+      ? H
+      : never
+  : never
+
+/**
+ * Checks that `columns` and `extraColumns` only reference headers listed in `headers`.
+ */
+export type ValidFormats<F extends readonly FormatDef[]> = { [K in keyof F]: FormatDef<HeaderNames<F[K]>> }
+
+type ParserIdOf<BankId extends string, F> = F extends {
+  accountType: infer A extends string
+  version: infer V extends string
+}
+  ? `${BankId}__${A}__${V}`
+  : never
+
+type AccountIdOf<BankId extends string, F> = F extends { accountType: infer A extends string }
+  ? `${BankId}__${A}`
+  : never
+
+export type ParserIds<B> = B extends { id: infer BankId extends string; formats: readonly (infer F)[] }
+  ? ParserIdOf<BankId, F>
+  : never
+
+export type AccountIds<B> = B extends { id: infer BankId extends string; formats: readonly (infer F)[] }
+  ? AccountIdOf<BankId, F>
+  : never

@@ -1,6 +1,6 @@
 import { uniqBy } from 'lodash'
 
-import type { BankSelectOption, SelectOptionBankAccountId, StatsFile, Transaction } from '@/types'
+import type { BankSelectOption, ParsedStatsFile, SelectOptionBankAccountId, Transaction } from '@/types'
 import { MISC } from '@/common'
 import { AVAILABLE_PARSERS, getBankAccountName } from '@/utils/Parser'
 
@@ -14,9 +14,9 @@ export const getCurrencyForSelection = (selectedId: SelectOptionBankAccountId, t
   return parser?.currency ?? MISC.DEFAULT_CURRENCY
 }
 
-export const getBankSelectOptions = (selectedFiles: StatsFile[]): BankSelectOption[] => {
+export const getBankSelectOptions = (selectedFiles: ParsedStatsFile[]): BankSelectOption[] => {
   const banks = selectedFiles.map((file) => {
-    const parser = AVAILABLE_PARSERS[file.parserId!]
+    const parser = AVAILABLE_PARSERS[file.parserId]
     return {
       bankAccountId: parser.bankAccountId,
       label: getBankAccountName(file.parserId).alt,

@@ -1,21 +1,4 @@
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  endOfYear,
-  format,
-  getDay,
-  isAfter,
-  isBefore,
-  isSameDay,
-  isValid,
-  parse,
-  parseISO,
-  startOfDay,
-  startOfMonth,
-  startOfWeek,
-  startOfYear,
-} from 'date-fns'
+import { eachDayOfInterval, format, isAfter, isBefore, isSameDay, isValid, parse, parseISO, startOfDay } from 'date-fns'
 import { de, enGB } from 'date-fns/locale'
 
 import type { DateFnsLocale, DateRange, DateTimeString, SelectOptionWithType, SystemDateString } from '@/types'
@@ -201,33 +184,8 @@ export const getUniqueTimestamps = ({
   })
 }
 
-// 0 = Sunday, 1 = Monday, etc.
-export type WeekdayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6
-
 // FIXME: Ensure error handling for invalid date ranges, e.g. picking start date after end date and vice versa
 export const getDaysInRange = ({ start, end }: DateRange): Date[] => {
   const interval = { start, end }
   return eachDayOfInterval(interval)
 }
-
-// export const getStartEndOfYear = (date: Date, locale: UserLocale): DateRange => {
-//   return {
-//     start: isValid(date) ? toSystemDate(startOfYear(date), locale) : '',
-//     end: isValid(date) ? toSystemDate(endOfYear(date), locale) : '',
-//   }
-// }
-
-// export const getStartEndOfMonth = (date: Date): DateRange => {
-//   return {
-//     start: isValid(date) ? toSystemDate(startOfMonth(date)) : '',
-//     end: isValid(date) ? toSystemDate(endOfMonth(date)) : '',
-//   }
-// }
-
-// export const getStartEndOfWeek = (date: Date): DateRange => {
-//   const { weekStartsOn } = getUserPreferences()
-//   return {
-//     start: isValid(date) ? toSystemDate(startOfWeek(date, { weekStartsOn })) : '',
-//     end: isValid(date) ? toSystemDate(endOfWeek(date, { weekStartsOn })) : '',
-//   }
-// }

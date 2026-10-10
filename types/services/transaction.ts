@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { zCurrency } from '@/types-enums'
 
-import { zDateTimeString, zNumberString } from '../global'
+import { zDateTimeString, zIdString, zNumberString } from '../global'
 import type { _KeysCheck } from '../key-check'
 import { _zKeysCheck } from '../key-check'
 
@@ -28,6 +28,11 @@ export const zParentCategory = z.object({
 export type ParentCategory = z.infer<typeof zParentCategory>
 
 export const zTransaction = z.object({
+  /**
+   * Hash of the transaction content (excluding `category`), so it's stable across re-parses
+   * and equal for identical transactions in overlapping statements.
+   */
+  id: zIdString,
   date: zDateTimeString,
   description: z.string(),
   value: zNumberString,
