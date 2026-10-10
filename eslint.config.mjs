@@ -1,9 +1,15 @@
-const react = require('eslint-plugin-react')
-const tseslint = require('typescript-eslint')
-const reactHooks = require('eslint-plugin-react-hooks')
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
+import tseslint from 'typescript-eslint'
 
-module.exports = [
+export default [
+  {
+    ignores: ['.next/**', 'out/**', 'coverage/**', 'node_modules/**', '_data/**', 'public/**', 'next-env.d.ts'],
+  },
   react.configs.flat.recommended,
+  {
+    settings: { react: { version: '19.3' } },
+  },
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
   {

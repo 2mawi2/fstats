@@ -72,11 +72,13 @@ const Component = <T extends FieldValues, P>({
               {...field}
               error={hasErrors}
               MenuProps={{
-                PaperProps: {
-                  elevation: 0,
-                  sx: {
-                    ...sxMenuPaper(theme, isMobile),
-                    maxWidth: 350, // Setting maxwidth to 0 here will force it to never expand past the selectbox width
+                slotProps: {
+                  paper: {
+                    elevation: 0,
+                    sx: {
+                      ...sxMenuPaper(theme, isMobile),
+                      maxWidth: 350, // Setting maxwidth to 0 here will force it to never expand past the selectbox width
+                    },
                   },
                 },
               }}
