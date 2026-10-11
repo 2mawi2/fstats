@@ -22,7 +22,9 @@ type Row = {
   get: (header: string) => string
 }
 
-type LocatedRows = { rows: Row[]; unexpectedHeaders: string[] } | Extract<DetectResult, { match: false }>
+type LocatedRows =
+  | { header: RowData; rawRows: RowData[]; rows: Row[]; unexpectedHeaders: string[] }
+  | Extract<DetectResult, { match: false }>
 
 /**
  * Turns a declarative bank format into a parser.
@@ -101,15 +103,17 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 
     const indexes = new Map(headers.map((header) => [header, best.headers.indexOf(normalizeHeader(header))]))
 
-    const rows = data
+    const toRow = (row: RowData): Row => ({
+      has: (header) => (indexes.get(header) ?? -1) !== -1,
+      get: (header) => row[indexes.get(header) ?? -1]?.trim() ?? '',
+    })
+
+    const rawRows = data
       .slice(best.index + 1)
       // Rows with a different column count are preambles, footers or other sections
       .filter((row) => row.length === best.headers.length)
-      .map((row): Row => ({
-        has: (header) => (indexes.get(header) ?? -1) !== -1,
-        get: (header) => row[indexes.get(header) ?? -1]?.trim() ?? '',
-      }))
-      .filter((row) => isValidDate(row.get(columns.date)))
+      .filter((row) => isValidDate(toRow(row).get(columns.date)))
+    const rows = rawRows.map(toRow)
 
     if (!rows.length) {
       return {
@@ -125,7 +129,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
       .map((header) => header.trim())
       .filter((header) => header && !knownHeaders.includes(normalizeHeader(header)))
 
-    return { rows, unexpectedHeaders }
+    return { header: data[best.index], rawRows, rows, unexpectedHeaders }
   }
 
   return {
@@ -140,6 +144,11 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
     detect: (rows) => {
       const located = locateRows(rows)
       return 'rows' in located ? { match: true } : located
+    },
+
+    extractRows: (rows) => {
+      const located = locateRows(rows)
+      return 'rows' in located ? { header: located.header, rows: located.rawRows } : null
     },
 
     parse: (rows) => {

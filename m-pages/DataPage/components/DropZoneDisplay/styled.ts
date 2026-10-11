@@ -11,7 +11,7 @@ export const ui = (theme: Theme, isMobile: boolean, isDarkMode: boolean) => {
       opacity: 0.7,
     },
 
-    dropZone: (isDragActive: boolean) => ({
+    dropZoneBox: (isDragActive: boolean) => ({
       border: `2px dashed ${isDragActive ? theme.vars.palette.primary.main : isDarkMode ? blueGrey[700] : grey[300]}`,
       borderRadius: 2,
       padding: isMobile ? theme.spacing(4) : theme.spacing(6),
@@ -28,5 +28,23 @@ export const ui = (theme: Theme, isMobile: boolean, isDarkMode: boolean) => {
         borderColor: theme.vars.palette.primary.light,
       },
     }),
+    wrapper: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      // Full viewport height minus the column padding
+      minHeight: 'calc(100vh - 32px)',
+    },
+    dropZone: {
+      width: '100%',
+      maxWidth: 560,
+    },
+    subtitle: {
+      mb: 1,
+    },
+    folderLink: {
+      verticalAlign: 'baseline',
+      mb: 0,
+    },
   }
 }

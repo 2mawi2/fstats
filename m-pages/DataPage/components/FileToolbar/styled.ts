@@ -1,0 +1,100 @@
+export const ui = () => {
+  return {
+    toolbar: {
+      position: 'sticky',
+      top: 0,
+      zIndex: 2,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 0.25,
+      minHeight: 40,
+      pl: 1,
+      pr: 0.5,
+      bgcolor: 'background.default',
+      borderBottom: 1,
+      borderColor: 'divider',
+    },
+    select: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    checkbox: {
+      p: 0.5,
+      '& .MuiSvgIcon-root': { fontSize: 18 },
+    },
+    selectMenuButton: {
+      p: 0,
+      ml: -0.5,
+      color: 'text.secondary',
+    },
+    actionButton: {
+      p: 0.75,
+      color: 'text.secondary',
+      '& .MuiSvgIcon-root': { fontSize: 18 },
+    },
+    divider: {
+      mx: 0.5,
+      my: 1.25,
+    },
+    menu: {
+      '& .MuiMenu-paper': {
+        minWidth: 180,
+        maxWidth: 300,
+        borderRadius: '6px',
+        border: 1,
+        borderColor: 'divider',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+      },
+      '& .MuiMenu-list': {
+        py: 0.5,
+      },
+    },
+    menuItem: {
+      minHeight: 0,
+      m: 0,
+      py: 0.5,
+      px: 1.5,
+      gap: 1,
+      fontSize: 14,
+      lineHeight: 1.4,
+      '&.Mui-selected': { fontWeight: 600 },
+    },
+    menuItemLabel: {
+      flexGrow: 1,
+      minWidth: 0,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+    menuItemCount: {
+      fontSize: 12,
+      fontWeight: 400,
+      color: 'text.secondary',
+      fontVariantNumeric: 'tabular-nums',
+    },
+    menuDivider: {
+      my: '4px !important',
+    },
+    menuSubheader: {
+      px: 1.5,
+      py: 0.5,
+      fontSize: 11,
+      fontWeight: 'medium',
+      lineHeight: 1.5,
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase',
+      color: 'text.secondary',
+      bgcolor: 'transparent',
+      position: 'static',
+    },
+    count: {
+      flexGrow: 1,
+      minWidth: 0,
+      ml: 0.5,
+      color: 'text.secondary',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  }
+}

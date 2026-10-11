@@ -24,6 +24,10 @@ export type Parser = {
   currency: Currency
   dateFormat: string
   detect: (rows: RowData[]) => DetectResult
+  /**
+   * The header row and transaction rows as is, without preambles, footers or other sections.
+   */
+  extractRows: (rows: RowData[]) => { header: RowData; rows: RowData[] } | null
   parse: (rows: RowData[], locale: UserLocale, dateFormat: DateFormat) => Transaction[]
 }
 

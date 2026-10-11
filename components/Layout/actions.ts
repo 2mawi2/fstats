@@ -19,3 +19,8 @@ export const NAV_ITEMS_BOTTOM: NavItem[] = [
   { route: ROUTES.SETTINGS, labelKey: 'NAVIGATION.SETTINGS', icon: SettingsOutlined },
   { route: ROUTES.ABOUT, labelKey: 'NAVIGATION.ABOUT', icon: HelpOutlineRounded },
 ]
+
+/**
+ * Routes rendered edge to edge, i.e. without the max width container.
+ */
+export const FULL_WIDTH_ROUTES: string[] = [ROUTES.DATA]

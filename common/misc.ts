@@ -17,6 +17,8 @@ export const MISC = {
   LS_MUI_COLOR_MODE_KEY: 'fstats__mui-mode',
   LS_SELECTED_FILE_IDS_KEY: 'fstats__selected_file_ids',
   LS_SIDEBAR_EXPANDED_KEY: 'fstats__sidebar_expanded',
+  LS_DATA_COLUMN_WIDTHS_KEY: 'fstats__data_column_widths',
+  LS_DATA_EXPLORER_SPLIT_KEY: 'fstats__data_explorer_split',
   SS_SESSION_KEY: 'fstats__session',
   USER_KEY: 'current_user',
 } as const

@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, Container } from '@mui/material'
+import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
@@ -10,6 +11,7 @@ import { useIsMobile } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import SwipeableDrawer from '../SwipeableDrawer'
+import { FULL_WIDTH_ROUTES } from './actions'
 import { Header, MenuDrawer, Sidebar } from './components'
 
 type LayoutProps = {
@@ -20,6 +22,8 @@ const Component = ({ children }: LayoutProps) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
+  const pathname = usePathname()
+  const isFullWidth = FULL_WIDTH_ROUTES.includes(pathname)
   const [expanded, setExpanded] = useLocalStorage(MISC.LS_SIDEBAR_EXPANDED_KEY, false, { initializeWithValue: false })
 
   const onOpen = () => {
@@ -42,7 +46,9 @@ const Component = ({ children }: LayoutProps) => {
             '@media print': { pl: 0 },
           }}
         >
-          <Container maxWidth={LAYOUT.CONTAINER_MAX_WIDTH}>{children}</Container>
+          <Container maxWidth={isFullWidth ? false : LAYOUT.CONTAINER_MAX_WIDTH} disableGutters={isFullWidth}>
+            {children}
+          </Container>
         </Box>
       </>
     )
@@ -52,7 +58,9 @@ const Component = ({ children }: LayoutProps) => {
     <>
       <Header onMenuClick={() => setOpen(!open)} />
 
-      <Container maxWidth={LAYOUT.CONTAINER_MAX_WIDTH}>{children}</Container>
+      <Container maxWidth={isFullWidth ? false : LAYOUT.CONTAINER_MAX_WIDTH} disableGutters={isFullWidth}>
+        {children}
+      </Container>
 
       <SwipeableDrawer
         title={t('DATA_DISPLAY.MENU')}
