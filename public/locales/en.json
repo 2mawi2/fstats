@@ -1,5 +1,6 @@
 {
   "MISC": {
+    "OR": "or",
     "VERSION": "Version",
     "ALL_RIGHTS_RESERVED": "All rights reserved.",
     "VIEW_DEMO": "View demo",
@@ -134,12 +135,12 @@
   "STATS_PAGE": {
     "DATE_RANGE": "{{start}} to {{end}}",
     "NO_DATA": "No data to analyse",
-    "NO_DATA_BLURB": "Upload a CSV file to view your stats.",
-    "UPLOAD_FILES": "Upload files",
+    "NO_DATA_SELECT": "Drop or <files>select files</files> {{dot}} <link>select a folder</link>",
     "AT_A_GLANCE": "At a glance",
     "CASHFLOW": "Cashflow",
     "ALL_ACCOUNTS": "All accounts",
     "DEMO_BANNER": "You are viewing demo data",
+    "END_DEMO": "End demo",
     "UPLOAD_YOUR_DATA": "Upload your data",
     "TRANSACTION_COUNT_one": "{{count}} Transaction",
     "TRANSACTION_COUNT_other": "{{count}} Transactions",

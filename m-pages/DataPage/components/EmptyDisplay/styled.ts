@@ -2,19 +2,20 @@ export const ui = () => {
   return {
     wrapper: {
       display: 'flex',
-      justifyContent: 'center',
-      pt: 8,
+      flexDirection: 'column',
+      alignItems: 'center',
+      // Same position as before the clickable area was reduced to its content
+      pt: 13,
     },
-    // Padded, so the hover effect starts before the pointer reaches the icon
+    // Slightly padded, so the hover effect starts just before the pointer reaches the content
     content: (isClickable: boolean) => ({
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       gap: 1,
-      width: '100%',
       maxWidth: 560,
-      px: 4,
-      py: 8,
+      px: 3,
+      py: 3,
       textAlign: 'center',
       ...(isClickable && {
         cursor: 'pointer',
@@ -43,10 +44,11 @@ export const ui = () => {
     },
     actions: {
       display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      gap: 1.5,
-      mt: 2,
+      flexDirection: 'column',
+      alignItems: 'center',
+      // Same as the space above the first action: content padding plus margin
+      gap: 6,
+      mt: 3,
     },
   }
 }

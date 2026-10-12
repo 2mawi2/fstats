@@ -1,38 +1,28 @@
 'use client'
 
 import { InsertChartOutlined } from '@mui/icons-material'
-import { Button } from '@mui/material'
-import Link from 'next/link'
 
-import { ROUTES } from '@/common'
-import { EmptyDisplay } from '@/m-pages/DataPage/components'
+import { DropZoneDisplay } from '@/m-pages/DataPage/components'
 import { useTranslation } from '@/lib/i18n'
 
 type NoDataDisplayProps = {
   onAddFiles: () => void
+  onAddFolder: () => void
 }
 
 /**
- * Shown in place of the stats when there are no files. The whole page is the drop zone.
+ * Shown in place of the stats when there are no files, like the drop zone of the data page.
  */
-const Component = ({ onAddFiles }: NoDataDisplayProps) => {
+const Component = ({ onAddFiles, onAddFolder }: NoDataDisplayProps) => {
   const { t } = useTranslation()
 
   return (
-    <EmptyDisplay
+    <DropZoneDisplay
       icon={InsertChartOutlined}
       title={t('STATS_PAGE.NO_DATA')}
-      subtitle={t('STATS_PAGE.NO_DATA_BLURB')}
-      actions={
-        <>
-          <Button variant="contained" onClick={onAddFiles}>
-            {t('STATS_PAGE.UPLOAD_FILES')}
-          </Button>
-          <Button component={Link} href={`${ROUTES.STATS}?demo=true`} variant="outlined">
-            {t('MISC.VIEW_DEMO')}
-          </Button>
-        </>
-      }
+      subtitleKey="STATS_PAGE.NO_DATA_SELECT"
+      onAddFiles={onAddFiles}
+      onAddFolder={onAddFolder}
     />
   )
 }

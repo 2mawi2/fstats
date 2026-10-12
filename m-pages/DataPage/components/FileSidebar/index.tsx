@@ -13,15 +13,16 @@ import { ui } from './styled'
 
 type FileSidebarProps = {
   includeDuplicates: boolean
+  isDemoMode?: boolean
 }
 
 /**
  * Summary of the checked files and the details per file.
  */
-const Component = ({ includeDuplicates }: FileSidebarProps) => {
+const Component = ({ includeDuplicates, isDemoMode = false }: FileSidebarProps) => {
   const sx = ui()
   const { t } = useTranslation()
-  const { checkedFiles, selectedFiles: checkedParsedFiles } = useFileHelper()
+  const { checkedFiles, selectedFiles: checkedParsedFiles } = useFileHelper({ isDemoMode })
 
   if (!checkedFiles.length) {
     return <StatsSkeleton />

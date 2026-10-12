@@ -15,9 +15,10 @@ type FileRowProps = {
   file: StatsFile
   isChecked: boolean
   onToggle: (fileId: string) => void
+  disabled?: boolean
 }
 
-const Component = ({ file, isChecked, onToggle }: FileRowProps) => {
+const Component = ({ file, isChecked, onToggle, disabled = false }: FileRowProps) => {
   const sx = ui()
   // Re-render on language change, the format label is translated
   useTranslation()
@@ -25,7 +26,7 @@ const Component = ({ file, isChecked, onToggle }: FileRowProps) => {
 
   return (
     <ListItem disablePadding divider>
-      <ListItemButton onClick={() => onToggle(file.id)} sx={sx.row}>
+      <ListItemButton onClick={() => onToggle(file.id)} disabled={disabled} sx={sx.row}>
         <Checkbox size="small" checked={isChecked} tabIndex={-1} disableRipple sx={sx.checkbox} />
         <Typography
           sx={{ ...sx.name, color: getFileNameColor(file), fontWeight: isChecked ? 700 : 400 }}

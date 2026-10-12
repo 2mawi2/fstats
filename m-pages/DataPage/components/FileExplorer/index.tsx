@@ -14,12 +14,16 @@ import { ui } from './styled'
 type FileExplorerProps = {
   onAddFiles: () => void
   onAddFolder: () => void
+  /**
+   * Shows only the read-only demo file.
+   */
+  isDemoMode?: boolean
 }
 
-const Component = ({ onAddFiles, onAddFolder }: FileExplorerProps) => {
+const Component = ({ onAddFiles, onAddFolder, isDemoMode = false }: FileExplorerProps) => {
   const sx = ui()
   const { t } = useTranslation()
-  const { files, isChecked, toggleFile } = useFileHelper()
+  const { files, isChecked, toggleFile } = useFileHelper({ isDemoMode })
   const panesRef = useRef<HTMLDivElement>(null)
   const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
   const startResize = useResizeHandle(panesRef, 'y')
@@ -28,10 +32,16 @@ const Component = ({ onAddFiles, onAddFolder }: FileExplorerProps) => {
     <Box sx={sx.explorer}>
       <Box ref={panesRef} sx={sx.panes}>
         <Box sx={{ ...sx.pane, ...sx.filesPane, flexBasis: `${split}%` }}>
-          <FileToolbar onAddFiles={onAddFiles} onAddFolder={onAddFolder} />
+          <FileToolbar onAddFiles={onAddFiles} onAddFolder={onAddFolder} isDemoMode={isDemoMode} />
           <List disablePadding>
             {files.map((file) => (
-              <FileRow key={file.id} file={file} isChecked={isChecked(file.id)} onToggle={toggleFile} />
+              <FileRow
+                key={file.id}
+                file={file}
+                isChecked={isChecked(file.id)}
+                onToggle={toggleFile}
+                disabled={isDemoMode}
+              />
             ))}
           </List>
           {files.length ? (

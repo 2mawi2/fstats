@@ -1,9 +1,11 @@
 'use client'
 
+import type { SvgIconComponent } from '@mui/icons-material'
 import { CloudUploadOutlined } from '@mui/icons-material'
-import { Link } from '@mui/material'
+import { Button, Divider, Link } from '@mui/material'
+import NextLink from 'next/link'
 
-import { MISC } from '@/common'
+import { MISC, ROUTES } from '@/common'
 import { Trans, useTranslation } from '@/lib/i18n'
 
 import EmptyDisplay from '../EmptyDisplay'
@@ -11,12 +13,24 @@ import EmptyDisplay from '../EmptyDisplay'
 type DropZoneDisplayProps = {
   onAddFiles: () => void
   onAddFolder: () => void
+  icon?: SvgIconComponent
+  title?: string
+  /**
+   * Translation key of the subtitle with the `files` and `link` components, see `DATA_PAGE.CLICK_TO_SELECT`.
+   */
+  subtitleKey?: string
 }
 
 /**
- * Shown in place of the data when there are no files. The whole page is the drop zone.
+ * Shown in place of the data or stats when there are no files. The whole page is the drop zone.
  */
-const Component = ({ onAddFiles, onAddFolder }: DropZoneDisplayProps) => {
+const Component = ({
+  onAddFiles,
+  onAddFolder,
+  icon = CloudUploadOutlined,
+  title,
+  subtitleKey = 'DATA_PAGE.CLICK_TO_SELECT',
+}: DropZoneDisplayProps) => {
   const { t } = useTranslation()
 
   // Don't also trigger the click of the whole display
@@ -34,16 +48,24 @@ const Component = ({ onAddFiles, onAddFolder }: DropZoneDisplayProps) => {
 
   return (
     <EmptyDisplay
-      icon={CloudUploadOutlined}
-      title={t('DATA_PAGE.DROP_FILES_ANYWHERE')}
+      icon={icon}
+      title={title ?? t('DATA_PAGE.DROP_FILES_ANYWHERE')}
       subtitle={
         <Trans
-          i18nKey="DATA_PAGE.CLICK_TO_SELECT"
+          i18nKey={subtitleKey}
           values={{ dot: MISC.CENTER_DOT }}
           components={{ files: renderLink(onAddFiles), link: renderLink(onAddFolder) }}
         />
       }
       caption={t('DATA_PAGE.FILE_RESTRICTIONS')}
+      actions={
+        <>
+          <Divider sx={{ width: 240, fontSize: 12, color: 'text.secondary' }}>{t('MISC.OR')}</Divider>
+          <Button component={NextLink} href={`${ROUTES.STATS}?demo=true`} variant="outlined">
+            {t('MISC.VIEW_DEMO')}
+          </Button>
+        </>
+      }
       onClick={onAddFiles}
     />
   )

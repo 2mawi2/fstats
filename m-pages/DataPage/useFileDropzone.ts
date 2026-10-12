@@ -15,7 +15,7 @@ import { openFolderPicker, setInputFiles } from './actions'
 /**
  * Dropzone that adds, parses and selects the dropped files, and a folder picker that goes through the same flow.
  */
-export const useFileDropzone = () => {
+export const useFileDropzone = ({ onAdded }: { onAdded?: () => void } = {}) => {
   const { mutateAsync: addFiles } = useMutateAddFiles()
   const { mutateAsync: updateFiles } = useMutateUpdateFiles()
   const { setSelectedFileIds } = useFileHelper()
@@ -31,8 +31,9 @@ export const useFileDropzone = () => {
       const parseResults = await parseFiles(addedFiles.filter((file) => file.status === StatsFileStatus.PARSING))
       const updatedFiles = await updateFiles(parseResults)
       setSelectedFileIds((prev) => [...prev, ...updatedFiles.filter(isParsed).map((file) => file.id)])
+      onAdded?.()
     },
-    [addFiles, updateFiles, setSelectedFileIds],
+    [addFiles, updateFiles, setSelectedFileIds, onAdded],
   )
 
   const dropzone = useDropzone({

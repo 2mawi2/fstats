@@ -1,5 +1,6 @@
 {
   "MISC": {
+    "OR": "oder",
     "VERSION": "Version",
     "ALL_RIGHTS_RESERVED": "Alle Rechte vorbehalten.",
     "VIEW_DEMO": "Demo ansehen",
@@ -134,12 +135,12 @@
   "STATS_PAGE": {
     "DATE_RANGE": "{{start}} bis {{end}}",
     "NO_DATA": "Keine Daten zum Analysieren",
-    "NO_DATA_BLURB": "Lade eine CSV-Datei hoch, um deine Statistiken zu sehen.",
-    "UPLOAD_FILES": "Dateien hochladen",
+    "NO_DATA_SELECT": "Ablegen oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
     "AT_A_GLANCE": "Auf einen Blick",
     "CASHFLOW": "Cashflow",
     "ALL_ACCOUNTS": "Alle Konten",
     "DEMO_BANNER": "Du siehst Demodaten",
+    "END_DEMO": "Demo beenden",
     "UPLOAD_YOUR_DATA": "Eigene Daten hochladen",
     "TRANSACTION_COUNT_one": "{{count}} Umsatz",
     "TRANSACTION_COUNT_other": "{{count}} Umsätze",

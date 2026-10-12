@@ -36,8 +36,9 @@ const Component = ({ icon: Icon, title, subtitle, caption, actions, onClick }: E
             {caption}
           </Typography>
         ) : null}
-        {actions ? <Box sx={sx.actions}>{actions}</Box> : null}
       </Box>
+      {/* Outside the clickable content, so they don't trigger its click */}
+      {actions ? <Box sx={sx.actions}>{actions}</Box> : null}
     </Box>
   )
 }

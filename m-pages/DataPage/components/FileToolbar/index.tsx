@@ -15,13 +15,17 @@ import { ui } from './styled'
 type FileToolbarProps = {
   onAddFiles: () => void
   onAddFolder: () => void
+  /**
+   * The demo file can't be unchecked or removed.
+   */
+  isDemoMode?: boolean
 }
 
-const Component = ({ onAddFiles, onAddFolder }: FileToolbarProps) => {
+const Component = ({ onAddFiles, onAddFolder, isDemoMode = false }: FileToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
-  const { files, checkedIds, isAllChecked, toggleAll, setSelectedFileIds } = useFileHelper()
+  const { files, checkedIds, isAllChecked, toggleAll, setSelectedFileIds } = useFileHelper({ isDemoMode })
   const { mutate: removeFiles, isPending: isRemoving } = useMutateRemoveFiles()
 
   const toIds = (list: typeof files) => list.map((file) => file.id)
@@ -72,14 +76,14 @@ const Component = ({ onAddFiles, onAddFolder }: FileToolbarProps) => {
         <Checkbox
           size="small"
           checked={isAllChecked}
-          disabled={!files.length}
+          disabled={!files.length || isDemoMode}
           indeterminate={checkedIds.length > 0 && !isAllChecked}
           onChange={toggleAll}
           sx={sx.checkbox}
         />
         <IconButton
           size="small"
-          disabled={!files.length}
+          disabled={!files.length || isDemoMode}
           onClick={(event) => setMenuAnchor(event.currentTarget)}
           sx={sx.selectMenuButton}
         >
@@ -115,7 +119,7 @@ const Component = ({ onAddFiles, onAddFolder }: FileToolbarProps) => {
         ))}
       </Menu>
 
-      {checkedIds.length ? (
+      {checkedIds.length && !isDemoMode ? (
         <>
           <Tooltip title={t('DATA_PAGE.TOOLBAR.REMOVE_SELECTED')}>
             <IconButton size="small" disabled={isRemoving} onClick={() => removeFiles(checkedIds)} sx={sx.actionButton}>

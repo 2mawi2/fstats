@@ -1,6 +1,5 @@
 export { default as CardTitle } from './CardTitle'
 export { default as CategoryBreakdown } from './CategoryBreakdown'
-export { default as DemoBanner } from './DemoBanner'
 export { default as NoDataDisplay } from './NoDataDisplay'
 export { default as SummaryChart } from './SummaryChart'
 export { default as TransactionChart } from './TransactionChart'

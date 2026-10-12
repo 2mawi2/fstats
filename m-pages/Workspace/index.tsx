@@ -1,0 +1,100 @@
+'use client'
+
+import { Box } from '@mui/material'
+import type { SxProps, Theme } from '@mui/material'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import type { ReactNode } from 'react'
+import { Fragment, useRef } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
+
+import { MISC, ROUTES } from '@/common'
+import { PageWrapper } from '@/components'
+import { resizeColumns } from '@/m-pages/DataPage/actions'
+import { DropOverlay, FileExplorer, FileSidebar } from '@/m-pages/DataPage/components'
+import { useFileDropzone } from '@/m-pages/DataPage/useFileDropzone'
+import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
+
+import { DemoBanner } from './components'
+import { WorkspaceContext } from './context'
+import { ui } from './styled'
+
+type WorkspaceProps = {
+  children: ReactNode
+}
+
+/**
+ * Layout of the data and stats pages: file explorer, the page in the middle column, and the file summary. Stays
+ * mounted when switching between the pages.
+ */
+const Component = ({ children }: WorkspaceProps) => {
+  const sx = ui()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const isStats = pathname === ROUTES.STATS
+  const isDemoMode = searchParams.get('demo') === 'true'
+  const { isLoadingFiles } = useFileHelper()
+  const [includeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
+    initializeWithValue: false,
+  })
+  const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
+  // Leave demo mode once real files are added, so they are shown
+  const { dropzone, addFolder } = useFileDropzone({
+    onAdded: isDemoMode ? () => router.replace(pathname) : undefined,
+  })
+  const startResize = useResizeHandle(containerRef, 'x')
+
+  if (isLoadingFiles) {
+    return <PageWrapper />
+  }
+
+  const columns: {
+    id: string
+    sx?: SxProps<Theme>
+    content: ReactNode
+  }[] = [
+    {
+      id: 'left',
+      sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn },
+      content: <FileExplorer onAddFiles={dropzone.open} onAddFolder={addFolder} isDemoMode={isDemoMode} />,
+    },
+    {
+      id: 'middle',
+      sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn },
+      content: children,
+    },
+    {
+      id: 'right',
+      sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn, ...sx.rightColumn },
+      // Duplicates are always excluded from the stats
+      content: <FileSidebar includeDuplicates={!isStats && includeDuplicates} isDemoMode={isDemoMode} />,
+    },
+  ]
+
+  return (
+    <WorkspaceContext.Provider value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder }}>
+      <Box {...dropzone.getRootProps()} sx={sx.dropzone}>
+        <input {...dropzone.getInputProps()} />
+        {/* Across all columns, only the middle column's content changes in demo mode */}
+        {isDemoMode ? <DemoBanner onAddFiles={dropzone.open} /> : null}
+        <Box ref={containerRef} sx={sx.container}>
+          {columns.map((column, index) => (
+            <Fragment key={column.id}>
+              {index > 0 ? (
+                <Box
+                  sx={sx.divider}
+                  onPointerDown={startResize((delta) => setWidths(resizeColumns(widths, index - 1, delta)))}
+                />
+              ) : null}
+              <Box sx={{ ...sx.column, ...column.sx, flexBasis: `${widths[index]}%` }}>{column.content}</Box>
+            </Fragment>
+          ))}
+        </Box>
+        {dropzone.isDragActive ? <DropOverlay /> : null}
+      </Box>
+    </WorkspaceContext.Provider>
+  )
+}
+
+export default Component
