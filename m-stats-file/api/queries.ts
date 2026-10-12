@@ -19,7 +19,8 @@ export const getFiles = async (): Promise<StatsFile[]> => {
   await db.filesStore.iterate<StatsFileAtRest, void>((value) => {
     files.push(parseStatsFile(value))
   })
-  return files
+  // Storage order is by (random) ID. Numeric, so "file 2" comes before "file 10".
+  return files.sort((a, b) => a.file.name.localeCompare(b.file.name, undefined, { numeric: true }))
 }
 
 export const addFile = async (newFile: NewStatsFile): Promise<StatsFile> => {
