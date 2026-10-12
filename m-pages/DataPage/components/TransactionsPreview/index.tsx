@@ -1,7 +1,6 @@
 'use client'
 
 import { FormControlLabel, Switch } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import { useMemo } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
@@ -40,7 +39,6 @@ type TransactionsPreviewProps = {
  * Transactions of all files in a single table, with their source file when there is more than one.
  */
 const Component = ({ files, amountFilter, scrollElement }: TransactionsPreviewProps) => {
-  const theme = useTheme()
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const parsedFiles = useMemo(() => files.filter(isParsed), [files])
@@ -62,8 +60,8 @@ const Component = ({ files, amountFilter, scrollElement }: TransactionsPreviewPr
     [allTransactions, showDuplicates],
   )
   const columns = useMemo(
-    () => getTransactionColumns(currency, isCombined, amountFilter, theme.vars.palette.success.main, t),
-    [currency, isCombined, amountFilter, theme, t],
+    () => getTransactionColumns(currency, isCombined, amountFilter, t),
+    [currency, isCombined, amountFilter, t],
   )
 
   const getCells = (index: number) => {

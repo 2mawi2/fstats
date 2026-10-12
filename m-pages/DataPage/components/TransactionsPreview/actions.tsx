@@ -74,7 +74,6 @@ export const getTransactionColumns = (
   currency: Currency | null,
   showSource: boolean,
   amountFilter: AmountFilter,
-  incomeColor: string,
   t: TFunction,
 ): VirtualTableColumn[] => [
   { label: t('MISC.DATE'), width: 100, getStyle: () => TABULAR_NUMS },
@@ -86,9 +85,7 @@ export const getTransactionColumns = (
     align: 'right',
     // Only highlight money in when both directions are shown
     getStyle: (value) =>
-      amountFilter === AmountFilter.ALL && value.startsWith('+')
-        ? { ...TABULAR_NUMS, color: incomeColor, fontWeight: 600 }
-        : TABULAR_NUMS,
+      amountFilter === AmountFilter.ALL && value.startsWith('+') ? { ...TABULAR_NUMS, fontWeight: 600 } : TABULAR_NUMS,
   },
   { label: t('MISC.CATEGORY'), width: 160 },
   ...(showSource
