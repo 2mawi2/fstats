@@ -1,12 +1,11 @@
 'use client'
 
 import { parseISO } from 'date-fns'
-import { difference } from 'lodash'
 
 import { ParsedStatsFile, SelectOptionBankAccountId, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { DEMO_TRANSACTIONS } from '@/common'
-import { getUniqueTransactions } from '@/m-stats-file/service'
+import { splitDuplicates } from '@/m-stats-file/service'
 import { getBankAccountId } from '@/utils/Parser'
 
 import { getTransactionsGroupedByDay } from './helper'
@@ -47,8 +46,7 @@ export const useTransactionHelper = ({
     }
   }
 
-  const transactions = getUniqueTransactions(allTransactions)
-  const duplicates = difference(allTransactions, transactions)
+  const { unique: transactions, duplicates } = splitDuplicates(allTransactions)
   transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
   const transactionRangeItems = getTransactionsGroupedByDay({
     dateRange: {

@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, Grid, Typography } from '@mui/material'
+import { Card, Grid } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 
@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/i18n'
 import { getBankSelectOptions, getCurrencyForSelection } from './actions'
 import {
   BankSelector,
+  CardTitle,
   CategoryBreakdown,
   DemoBanner,
   ProfitLossSummary,
@@ -74,9 +75,7 @@ const Component = () => {
 
           <Grid size={12}>
             <Card>
-              <Typography variant="h6" color="secondary">
-                {t('STATS_PAGE.AT_A_GLANCE')}
-              </Typography>
+              <CardTitle>{t('STATS_PAGE.AT_A_GLANCE')}</CardTitle>
               <SummaryChart transactionRangeItems={transactionRangeItems} />
               <ProfitLossSummary transactions={transactions} currency={currency} />
             </Card>

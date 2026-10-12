@@ -1,11 +1,12 @@
-import type { CategoryCode, Transaction } from '@/types'
-import { ALL_CATEGORIES } from '@/common'
-import { Big } from '@/lib/w-big'
+import type { CategoryCode, GradientColorsLightDark, ParentCategoryCode, Transaction } from '@/types'
+import { ALL_CATEGORIES, PARENT_CATEGORY_COLORS } from '@/common'
+import { isExpense } from '@/utils/Stats'
 
 import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './keyword-rules'
 
 export const getCategoryCode = (row: Transaction): CategoryCode => {
-  const isIncome = Big(row.value).gte(0)
+  // Zero amounts are categorised as income
+  const isIncome = !isExpense(row)
   const keywordRules = isIncome ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
 
   const description = row.description.toLowerCase()
@@ -35,8 +36,7 @@ export const getSubcategoryLabel = (code: CategoryCode | null): string => {
     return 'Uncategorised'
   }
 
-  const parentCode = code.split('_')[0] as CategoryCode
-  const category = ALL_CATEGORIES[parentCode]
+  const category = ALL_CATEGORIES[getParentCategoryCode(code)]
 
   if (!category) {
     return code
@@ -44,4 +44,19 @@ export const getSubcategoryLabel = (code: CategoryCode | null): string => {
 
   const subcategory = category.subcategories[code]
   return subcategory?.label ?? code
+}
+
+/**
+ * E.g. "INC" for "INC_01"
+ */
+export const getParentCategoryCode = (code: CategoryCode): ParentCategoryCode => {
+  return code.split('_')[0]
+}
+
+export const getCategoryColor = (code: CategoryCode | null): GradientColorsLightDark | undefined => {
+  if (!code) {
+    return
+  }
+
+  return PARENT_CATEGORY_COLORS[getParentCategoryCode(code)]
 }

@@ -21,10 +21,8 @@ const Component = ({ onAddFiles, onAddFolder }: FileToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
-  const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
+  const { files, checkedIds, isAllChecked, toggleAll, setSelectedFileIds } = useFileHelper()
   const { mutate: removeFiles, isPending: isRemoving } = useMutateRemoveFiles()
-  const checkedIds = files.filter((file) => selectedFileIds.includes(file.id)).map((file) => file.id)
-  const isAllChecked = files.length > 0 && checkedIds.length === files.length
 
   const toIds = (list: typeof files) => list.map((file) => file.id)
 
@@ -76,7 +74,7 @@ const Component = ({ onAddFiles, onAddFolder }: FileToolbarProps) => {
           checked={isAllChecked}
           disabled={!files.length}
           indeterminate={checkedIds.length > 0 && !isAllChecked}
-          onChange={() => setSelectedFileIds(checkedIds.length ? [] : files.map((file) => file.id))}
+          onChange={toggleAll}
           sx={sx.checkbox}
         />
         <IconButton

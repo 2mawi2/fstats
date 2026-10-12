@@ -1,11 +1,13 @@
 'use client'
 
 import { InfoOutlined } from '@mui/icons-material'
-import { Box, Card, FormControlLabel, Switch, Typography } from '@mui/material'
+import { Box, FormControlLabel, Switch, Typography } from '@mui/material'
 import type { ChangeEvent } from 'react'
 
 import { useIsMobile, useUserPreferences } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
+
+import SettingsCard from '../SettingsCard'
 
 const Component = () => {
   const { t } = useTranslation()
@@ -17,11 +19,7 @@ const Component = () => {
   }
 
   return (
-    <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        {t('SETTINGS_PAGE.DEVICE.TITLE')}
-      </Typography>
-
+    <SettingsCard title={t('SETTINGS_PAGE.DEVICE.TITLE')}>
       <Box sx={{ mb: 2, display: 'flex', gap: 0.5, alignItems: 'center' }}>
         <FormControlLabel
           control={<Switch checked={persistData} onChange={onChange} />}
@@ -41,7 +39,7 @@ const Component = () => {
           {persistData ? t('SETTINGS_PAGE.DEVICE.PERSIST_ON') : t('SETTINGS_PAGE.DEVICE.PERSIST_OFF')}
         </Typography>
       </Box>
-    </Card>
+    </SettingsCard>
   )
 }
 

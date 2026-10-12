@@ -1,11 +1,12 @@
 'use client'
 
-import { Box, ButtonBase, Card, Typography } from '@mui/material'
+import { Box, ButtonBase, Typography } from '@mui/material'
 
 import type { OptionSwitcherTriggerProps } from '@/components'
 import { DateFormatSwitcher, LanguageSwitcher, ThemeSwitcher } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
+import SettingsCard from '../SettingsCard'
 import { ui } from './styled'
 
 type PreferenceTileProps = OptionSwitcherTriggerProps & {
@@ -33,11 +34,7 @@ const Component = () => {
   const { t } = useTranslation()
 
   return (
-    <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        {t('SETTINGS_PAGE.PREFERENCES.TITLE')}
-      </Typography>
-
+    <SettingsCard title={t('SETTINGS_PAGE.PREFERENCES.TITLE')}>
       <Box sx={sx.tiles}>
         <ThemeSwitcher
           renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.THEME_SWITCHER.THEME')} {...props} />}
@@ -49,7 +46,7 @@ const Component = () => {
           renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.DATE_FORMAT_SWITCHER.TITLE')} {...props} />}
         />
       </Box>
-    </Card>
+    </SettingsCard>
   )
 }
 

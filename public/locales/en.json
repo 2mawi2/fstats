@@ -78,7 +78,7 @@
     "ALSO_IN": "Also in {{files}}",
     "DROP_FILES_HERE": "Drop your files here",
     "DROP_FILES_ANYWHERE": "Drop files anywhere",
-    "CLICK_TO_SELECT": "or click to select files {{dot}} <link>select a folder</link>",
+    "CLICK_TO_SELECT": "or <files>select files</files> {{dot}} <link>select a folder</link>",
     "FILE_RESTRICTIONS": "CSV files only, max 5MB each",
     "DROP_TIP": "Tip: Drop files anywhere to add them",
     "PARSING": "Parsing…",

@@ -24,14 +24,14 @@ import { useMemo, useState } from 'react'
 import type { Transaction } from '@/types'
 import { Currency } from '@/types-enums'
 import { useIsMobile, useUserPreferences } from '@/hooks'
-import { getCurrencySymbol, getMaxDecimalsForCurrency } from '@/utils/Currency'
+import { getCurrencySymbol } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
-import { toFixedLocale } from '@/utils/Number'
-import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { toFixedLocaleAmount } from '@/utils/Number'
+import { isIncome } from '@/utils/Stats'
+import { getCategoryColor, getSubcategoryLabel } from '@/utils/TransactionParser'
 import { useTranslation } from '@/lib/i18n'
-import { Big } from '@/lib/w-big'
 
-import { getCategoryColor } from './actions'
+import CardTitle from '../CardTitle'
 import { ui } from './styled'
 
 type TransactionsTableProps = {
@@ -97,9 +97,7 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
 
   return (
     <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="h6" color="secondary" sx={{ mb: 3 }}>
-        {t('MISC.TRANSACTIONS')}
-      </Typography>
+      <CardTitle sx={{ mb: 3 }}>{t('MISC.TRANSACTIONS')}</CardTitle>
 
       <Box sx={sx.searchContainer}>
         <TextField
@@ -196,14 +194,13 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
                       variant="body2"
                       sx={{
                         mb: 0,
-                        color: Big(row.value).gte(0) ? green[600] : 'text.primary',
-                        fontWeight: Big(row.value).gte(0) ? 600 : 400,
+                        color: isIncome(row) ? green[600] : 'text.primary',
+                        fontWeight: isIncome(row) ? 600 : 400,
                         fontSize: isMobile ? '0.75rem' : '0.875rem',
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {Big(row.value).gte(0) ? '+' : ''}
-                      {toFixedLocale(row.value, getMaxDecimalsForCurrency(row.currency), locale)}
+                      {toFixedLocaleAmount(row.value, row.currency, locale, { showPlusSign: true })}
                     </Typography>
                   </TableCell>
                 </TableRow>

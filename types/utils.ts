@@ -31,6 +31,10 @@ export type FixedLocaleOptions = {
   trimTrailingZeros?: boolean
 }
 
+export type FixedLocaleAmountOptions = FixedLocaleOptions & {
+  showPlusSign?: boolean
+}
+
 export type KeywordRule = {
   keywords: string[]
   category: CategoryCode

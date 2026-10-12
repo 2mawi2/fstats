@@ -4,8 +4,8 @@ import { useTheme } from '@mui/material/styles'
 import type { GradientColorsLightDark, NumberString } from '@/types'
 import { Currency } from '@/types-enums'
 import { useUserPreferences } from '@/hooks'
-import { getMaxDecimalsForCurrency } from '@/utils/Currency'
-import { toFixedLocale } from '@/utils/Number'
+import { toFixedLocale, toFixedLocaleAmount } from '@/utils/Number'
+import { getPercentage } from '@/utils/Stats'
 import { Big } from '@/lib/w-big'
 
 import { COL_SPACING, COL1, COL2, COL3, COL4 } from '../../actions'
@@ -26,8 +26,8 @@ const Component = ({ label, total: rawTotal, parentCategoryTotal, currency, colo
   const sx = ui(theme, size)
   const { locale } = useUserPreferences()
   const total = Big(rawTotal).abs()
-  const percentage = total.div(total.eq(0) ? 1 : parentCategoryTotal).times(100)
-  const totalDisplay = toFixedLocale(total.toString(), getMaxDecimalsForCurrency(currency), locale)
+  const percentage = getPercentage(total, parentCategoryTotal)
+  const totalDisplay = toFixedLocaleAmount(total.toString(), currency, locale)
   const percentageDisplay = toFixedLocale(percentage.toString(), 1, locale)
   const hasTotal = total.gt(0)
 

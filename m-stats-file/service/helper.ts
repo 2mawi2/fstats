@@ -1,9 +1,8 @@
-import { uniqBy } from 'lodash'
-
 import type { ParsedStatsFile, StatsFile, Transaction } from '@/types'
-import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
+import { Currency, StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
 import { parseFiles } from '@/utils/FileParser'
-import { getParserCurrency, PARSER_VERSION } from '@/utils/Parser'
+import type { BankAccountId } from '@/utils/Parser'
+import { getBankAccountId, getBankAccountName, getParserCurrency, PARSER_VERSION } from '@/utils/Parser'
 
 import { getFiles, updateFiles } from '../api'
 
@@ -33,11 +32,57 @@ export const getFileCurrency = (file: ParsedStatsFile) => {
   return getParserCurrency(file.sections[0].parserId)
 }
 
+export type FileBankAccount = {
+  bankAccountId: BankAccountId
+  label: string
+  currency: Currency
+  fileIds: string[]
+}
+
 /**
- * IDs are content hashes, so this removes identical transactions (e.g. from overlapping statements). Keeps the first.
+ * Bank accounts of the files' sections, with the files they're in, sorted by label.
  */
-export const getUniqueTransactions = <T extends Transaction>(transactions: T[]) => {
-  return uniqBy(transactions, 'id')
+export const getFileBankAccounts = (files: ParsedStatsFile[]): FileBankAccount[] => {
+  const accounts = new Map<BankAccountId, FileBankAccount>()
+
+  files.forEach((file) => {
+    file.sections.forEach(({ parserId }) => {
+      const bankAccountId = getBankAccountId(parserId)
+      const account = accounts.get(bankAccountId) ?? {
+        bankAccountId,
+        label: getBankAccountName(parserId).alt,
+        currency: getParserCurrency(parserId),
+        fileIds: [],
+      }
+
+      if (!account.fileIds.includes(file.id)) {
+        accounts.set(bankAccountId, { ...account, fileIds: [...account.fileIds, file.id] })
+      }
+    })
+  })
+
+  return Array.from(accounts.values()).sort((a, b) => a.label.localeCompare(b.label))
+}
+
+/**
+ * IDs are content hashes, so identical transactions (e.g. from overlapping statements) are duplicates. The first
+ * occurrence is unique, any later ones are duplicates.
+ */
+export const splitDuplicates = <T extends Transaction>(transactions: T[]) => {
+  const seenIds = new Set<string>()
+  const unique: T[] = []
+  const duplicates: T[] = []
+
+  transactions.forEach((transaction) => {
+    if (seenIds.has(transaction.id)) {
+      duplicates.push(transaction)
+    } else {
+      seenIds.add(transaction.id)
+      unique.push(transaction)
+    }
+  })
+
+  return { unique, duplicates }
 }
 
 /**

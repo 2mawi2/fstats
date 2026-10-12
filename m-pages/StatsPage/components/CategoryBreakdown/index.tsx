@@ -1,4 +1,4 @@
-import { Box, Card, FormControlLabel, Switch, Typography } from '@mui/material'
+import { Box, Card, FormControlLabel, Switch } from '@mui/material'
 import { useState } from 'react'
 
 import type { Transaction } from '@/types'
@@ -7,6 +7,7 @@ import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
 import { getStats } from '@/utils/Stats'
 import { useTranslation } from '@/lib/i18n'
 
+import CardTitle from '../CardTitle'
 import { getTransactionsGroupedByCategory } from './actions'
 import { BreakdownTable } from './components'
 
@@ -26,9 +27,7 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
   return (
     <Card sx={{ height: '100%' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6" color="secondary">
-          {t('STATS_PAGE.BREAKDOWN_BY_CATEGORY')}
-        </Typography>
+        <CardTitle>{t('STATS_PAGE.BREAKDOWN_BY_CATEGORY')}</CardTitle>
 
         <FormControlLabel
           control={<Switch color="primary" value={showAll} onChange={() => setShowAll(!showAll)} />}

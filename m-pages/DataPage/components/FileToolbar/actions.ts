@@ -1,6 +1,5 @@
 import type { StatsFile } from '@/types'
-import { isParsed } from '@/m-stats-file/service'
-import { AVAILABLE_PARSERS, getBankAccountName } from '@/utils/Parser'
+import { getFileBankAccounts, isParsed } from '@/m-stats-file/service'
 
 export type BankAccountOption = {
   value: string
@@ -12,24 +11,11 @@ export type BankAccountOption = {
  * One option per bank account of the parsed files, sorted by label.
  */
 export const getBankAccountOptions = (files: StatsFile[]): BankAccountOption[] => {
-  const options = new Map<string, BankAccountOption>()
-
-  files.filter(isParsed).forEach((file) => {
-    file.sections.forEach(({ parserId }) => {
-      const { bankAccountId } = AVAILABLE_PARSERS[parserId]
-      const option = options.get(bankAccountId) ?? {
-        value: bankAccountId,
-        label: getBankAccountName(parserId).alt,
-        fileIds: [],
-      }
-
-      if (!option.fileIds.includes(file.id)) {
-        options.set(bankAccountId, { ...option, fileIds: [...option.fileIds, file.id] })
-      }
-    })
-  })
-
-  return Array.from(options.values()).sort((a, b) => a.label.localeCompare(b.label))
+  return getFileBankAccounts(files.filter(isParsed)).map(({ bankAccountId, label, fileIds }) => ({
+    value: bankAccountId,
+    label,
+    fileIds,
+  }))
 }
 
 /**

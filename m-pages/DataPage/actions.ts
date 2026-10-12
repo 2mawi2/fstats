@@ -3,8 +3,9 @@ import { uniq } from 'lodash'
 import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
-import { getFileTransactions, getUniqueTransactions, isParsed, isUnknown } from '@/m-stats-file/service'
+import { getFileTransactions, isParsed, isUnknown, splitDuplicates } from '@/m-stats-file/service'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
+import { isExpense, isIncome } from '@/utils/Stats'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
@@ -105,9 +106,9 @@ export const getAmountFilterOptions = () => [
 export const filterTransactions = <T extends Transaction>(transactions: T[], filter: AmountFilter) => {
   switch (filter) {
     case AmountFilter.IN:
-      return transactions.filter((transaction) => Big(transaction.value).gt(0))
+      return transactions.filter(isIncome)
     case AmountFilter.OUT:
-      return transactions.filter((transaction) => Big(transaction.value).lt(0))
+      return transactions.filter(isExpense)
     default:
       return transactions
   }
@@ -117,8 +118,7 @@ export const filterTransactions = <T extends Transaction>(transactions: T[], fil
  * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount filter.
  */
 export const getDuplicateCount = (files: ParsedStatsFile[], amountFilter: AmountFilter) => {
-  const transactions = filterTransactions(files.flatMap(getFileTransactions), amountFilter)
-  return transactions.length - getUniqueTransactions(transactions).length
+  return splitDuplicates(filterTransactions(files.flatMap(getFileTransactions), amountFilter)).duplicates.length
 }
 
 export const MIN_COLUMN_WIDTH = 10 // %

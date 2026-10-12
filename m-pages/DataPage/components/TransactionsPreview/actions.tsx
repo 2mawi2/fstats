@@ -5,7 +5,7 @@ import { groupBy, uniq } from 'lodash'
 
 import type { ParsedStatsFile, Transaction } from '@/types'
 import type { Currency } from '@/types-enums'
-import { getFileCurrency, getFileTransactions, getUniqueTransactions } from '@/m-stats-file/service'
+import { getFileCurrency, getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 import { getCurrencySymbol } from '@/utils/Currency'
 
 import { AmountFilter } from '../../actions'
@@ -37,14 +37,14 @@ export const getSourcedTransactions = (files: ParsedStatsFile[]): SourcedTransac
   const transactions = files.flatMap((file) =>
     getFileTransactions(file).map((transaction) => ({ ...transaction, source: file.file.name })),
   )
-  const originals = new Set(getUniqueTransactions(transactions))
+  const duplicates = new Set(splitDuplicates(transactions).duplicates)
   const sourcesById = groupBy(transactions, 'id')
 
   return transactions
     .map((transaction) => ({
       ...transaction,
       sources: sourcesById[transaction.id].map(({ source }) => source),
-      isDuplicate: !originals.has(transaction),
+      isDuplicate: duplicates.has(transaction),
     }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 }

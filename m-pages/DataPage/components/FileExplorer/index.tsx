@@ -19,14 +19,10 @@ type FileExplorerProps = {
 const Component = ({ onAddFiles, onAddFolder }: FileExplorerProps) => {
   const sx = ui()
   const { t } = useTranslation()
-  const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
+  const { files, isChecked, toggleFile } = useFileHelper()
   const panesRef = useRef<HTMLDivElement>(null)
   const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
   const startResize = useResizeHandle(panesRef, 'y')
-
-  const toggleFile = (fileId: string) => {
-    setSelectedFileIds((prev) => (prev.includes(fileId) ? prev.filter((id) => id !== fileId) : [...prev, fileId]))
-  }
 
   return (
     <Box sx={sx.explorer}>
@@ -35,7 +31,7 @@ const Component = ({ onAddFiles, onAddFolder }: FileExplorerProps) => {
           <FileToolbar onAddFiles={onAddFiles} onAddFolder={onAddFolder} />
           <List disablePadding>
             {files.map((file) => (
-              <FileRow key={file.id} file={file} isChecked={selectedFileIds.includes(file.id)} onToggle={toggleFile} />
+              <FileRow key={file.id} file={file} isChecked={isChecked(file.id)} onToggle={toggleFile} />
             ))}
           </List>
           {files.length ? (

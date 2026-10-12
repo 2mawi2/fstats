@@ -23,3 +23,19 @@ export const sxMenuItem = (isLastItem = false) => {
     whiteSpace: 'normal',
   }
 }
+
+/**
+ * Bordered, clickable tile, e.g. for settings options.
+ */
+export const sxTile = (isSelected = false) => {
+  return {
+    display: 'block',
+    p: 2,
+    textAlign: 'left',
+    border: 1,
+    borderColor: isSelected ? 'primary.main' : 'divider',
+    borderRadius: 2,
+    transition: 'border-color 0.2s',
+    '&:hover': { borderColor: isSelected ? 'primary.main' : 'text.secondary' },
+  }
+}

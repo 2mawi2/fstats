@@ -20,6 +20,10 @@ export const getBankAccountId = (parserId: ParserId): BankAccountId => {
   return AVAILABLE_PARSERS[parserId].bankAccountId
 }
 
+export const getBankAccountCurrency = (bankAccountId: BankAccountId) => {
+  return Object.values(AVAILABLE_PARSERS).find((parser) => parser.bankAccountId === bankAccountId)?.currency
+}
+
 type BankAccountName = {
   short: string
   long: string

@@ -1,3 +1,5 @@
+import { sxTile } from '@/styles/styled'
+
 export const ui = () => {
   return {
     tiles: {
@@ -9,15 +11,8 @@ export const ui = () => {
     },
 
     tile: (isSelected: boolean) => ({
+      ...sxTile(isSelected),
       position: 'relative',
-      display: 'block',
-      p: 2,
-      textAlign: 'left',
-      border: 1,
-      borderColor: isSelected ? 'primary.main' : 'divider',
-      borderRadius: 2,
-      transition: 'border-color 0.2s',
-      '&:hover': { borderColor: isSelected ? 'primary.main' : 'text.secondary' },
     }),
 
     check: {

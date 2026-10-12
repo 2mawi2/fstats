@@ -1,57 +1,51 @@
 'use client'
 
 import { CloudUploadOutlined } from '@mui/icons-material'
-import { Box, Link, Typography } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { Link } from '@mui/material'
 
 import { MISC } from '@/common'
-import { useIsDarkMode, useIsMobile } from '@/hooks'
 import { Trans, useTranslation } from '@/lib/i18n'
 
-import { ui } from './styled'
+import EmptyDisplay from '../EmptyDisplay'
 
 type DropZoneDisplayProps = {
-  isDragActive: boolean
   onAddFiles: () => void
   onAddFolder: () => void
 }
 
-const Component = ({ isDragActive, onAddFiles, onAddFolder }: DropZoneDisplayProps) => {
+/**
+ * Shown in place of the data when there are no files. The whole page is the drop zone.
+ */
+const Component = ({ onAddFiles, onAddFolder }: DropZoneDisplayProps) => {
   const { t } = useTranslation()
-  const isMobile = useIsMobile()
-  const isDarkMode = useIsDarkMode()
-  const theme = useTheme()
-  const sx = ui(theme, isMobile, isDarkMode)
+
+  // Don't also trigger the click of the whole display
+  const renderLink = (onClick: () => void) => (
+    <Link
+      component="button"
+      variant="body2"
+      onClick={(event) => {
+        event.stopPropagation()
+        onClick()
+      }}
+      sx={{ verticalAlign: 'baseline', mb: 0 }}
+    />
+  )
 
   return (
-    <Box sx={sx.wrapper}>
-      <Box sx={{ ...sx.dropZoneBox(isDragActive), ...sx.dropZone }} onClick={onAddFiles}>
-        <CloudUploadOutlined sx={sx.uploadIcon} />
-        <Typography variant="h5">{t('DATA_PAGE.DROP_FILES_ANYWHERE')}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={sx.subtitle}>
-          <Trans
-            i18nKey="DATA_PAGE.CLICK_TO_SELECT"
-            values={{ dot: MISC.CENTER_DOT }}
-            components={{
-              link: (
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onAddFolder()
-                  }}
-                  sx={sx.folderLink}
-                />
-              ),
-            }}
-          />
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {t('DATA_PAGE.FILE_RESTRICTIONS')}
-        </Typography>
-      </Box>
-    </Box>
+    <EmptyDisplay
+      icon={CloudUploadOutlined}
+      title={t('DATA_PAGE.DROP_FILES_ANYWHERE')}
+      subtitle={
+        <Trans
+          i18nKey="DATA_PAGE.CLICK_TO_SELECT"
+          values={{ dot: MISC.CENTER_DOT }}
+          components={{ files: renderLink(onAddFiles), link: renderLink(onAddFolder) }}
+        />
+      }
+      caption={t('DATA_PAGE.FILE_RESTRICTIONS')}
+      onClick={onAddFiles}
+    />
   )
 }
 

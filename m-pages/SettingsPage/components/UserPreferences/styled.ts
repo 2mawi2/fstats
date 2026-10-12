@@ -1,3 +1,5 @@
+import { sxTile } from '@/styles/styled'
+
 export const ui = () => {
   return {
     tiles: {
@@ -6,16 +8,7 @@ export const ui = () => {
       gap: 2,
     },
 
-    tile: {
-      display: 'block',
-      p: 2,
-      textAlign: 'left',
-      border: 1,
-      borderColor: 'divider',
-      borderRadius: 2,
-      transition: 'border-color 0.2s',
-      '&:hover': { borderColor: 'text.secondary' },
-    },
+    tile: sxTile(),
 
     tileHeader: {
       display: 'flex',

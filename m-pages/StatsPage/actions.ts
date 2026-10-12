@@ -1,8 +1,7 @@
-import { uniqBy } from 'lodash'
-
 import type { BankSelectOption, ParsedStatsFile, SelectOptionBankAccountId, Transaction } from '@/types'
 import { MISC } from '@/common'
-import { AVAILABLE_PARSERS, getBankAccountName } from '@/utils/Parser'
+import { getFileBankAccounts } from '@/m-stats-file/service'
+import { getBankAccountCurrency } from '@/utils/Parser'
 import { i18n } from '@/lib/i18n'
 
 export const getCurrencyForSelection = (selectedId: SelectOptionBankAccountId, transactions: Transaction[]) => {
@@ -10,36 +9,20 @@ export const getCurrencyForSelection = (selectedId: SelectOptionBankAccountId, t
     return transactions.length ? transactions[0].currency : MISC.DEFAULT_CURRENCY
   }
 
-  const parser = Object.values(AVAILABLE_PARSERS).find((parser) => parser.bankAccountId === selectedId)
-
-  return parser?.currency ?? MISC.DEFAULT_CURRENCY
+  return getBankAccountCurrency(selectedId) ?? MISC.DEFAULT_CURRENCY
 }
 
 export const getBankSelectOptions = (selectedFiles: ParsedStatsFile[]): BankSelectOption[] => {
-  const banks = selectedFiles
-    .flatMap((file) => file.sections)
-    .map(({ parserId }) => {
-      const parser = AVAILABLE_PARSERS[parserId]
-      return {
-        bankAccountId: parser.bankAccountId,
-        label: getBankAccountName(parserId).alt,
-        currency: parser.currency,
-      }
-    })
-
-  const uniqueBanks = uniqBy(banks, 'bankAccountId')
-
-  const options: BankSelectOption[] = uniqueBanks.map((bank) => ({
-    value: bank.bankAccountId,
-    label: bank.label,
+  const accounts = getFileBankAccounts(selectedFiles)
+  const options: BankSelectOption[] = accounts.map((account) => ({
+    value: account.bankAccountId,
+    label: account.label,
   }))
 
-  options.sort((a, b) => a.value.localeCompare(b.value))
-
-  // Only add "All / Combined" when uniqueBanks have exactly the same currency
+  // Only add "All / Combined" when the accounts have exactly the same currency
   // TODO: Once we have currency conversion logic "All" should always be available
-  if (uniqueBanks.length > 1) {
-    const sameCurrency = uniqueBanks.every((bank) => bank.currency === uniqueBanks[0].currency)
+  if (accounts.length > 1) {
+    const sameCurrency = accounts.every((account) => account.currency === accounts[0].currency)
     if (sameCurrency) {
       options.unshift({
         value: 'all',

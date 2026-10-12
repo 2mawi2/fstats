@@ -1,3 +1,5 @@
+import { mapValues } from 'lodash'
+
 import type {
   CategoryCode,
   CategoryWithTransactions,
@@ -8,6 +10,8 @@ import type {
   Transaction,
 } from '@/types'
 import { ALL_CATEGORIES } from '@/common'
+import { sumValues } from '@/utils/Stats'
+import { getParentCategoryCode } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
 
 export const COL_SPACING = { xs: 1, sm: 2 }
@@ -42,8 +46,7 @@ export const getTransactionsGroupedByCategory = (transactions: Transaction[]): P
       return
     }
 
-    const parentCode = transaction.category.split('_')[0]
-    const parentCategory = categories[parentCode]
+    const parentCategory = categories[getParentCategoryCode(transaction.category)]
     if (!parentCategory) {
       console.warn(`Unknown category code "${transaction.category}":`, transaction)
       return
@@ -55,13 +58,17 @@ export const getTransactionsGroupedByCategory = (transactions: Transaction[]): P
     }
 
     parentCategory.transactions.push(transaction)
-    parentCategory.total = Big(parentCategory.total).plus(transaction.value).toString()
-
     category.transactions.push(transaction)
-    category.total = Big(category.total).plus(transaction.value).toString()
   })
 
-  return Object.values(categories)
+  return Object.values(categories).map((category) => ({
+    ...category,
+    total: sumValues(category.transactions).toString(),
+    subcategories: mapValues(category.subcategories, (subcategory) => ({
+      ...subcategory,
+      total: sumValues(subcategory.transactions).toString(),
+    })),
+  }))
 }
 
 const sortByName = (a: string, b: string, dir: 'asc' | 'desc') => {

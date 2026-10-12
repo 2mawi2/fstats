@@ -1,8 +1,9 @@
 export const ui = () => {
   return {
-    group: {
+    group: (disabled = false) => ({
       height: 28,
-    },
+      opacity: disabled ? 0.5 : 1,
+    }),
     button: {
       px: 1.25,
       py: 0,

@@ -43,7 +43,7 @@ const Component = ({ category, parentCategoryTotal, currency }: BreakdownRowProp
               total={subcategory.total}
               parentCategoryTotal={Big(category.total).abs().toString()}
               currency={currency}
-              color={PARENT_CATEGORY_COLORS[subcategory.code.split('_')[0]]}
+              color={color}
               size="sm"
             />
           ))

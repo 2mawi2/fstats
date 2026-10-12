@@ -1,4 +1,4 @@
-import type { FixedLocaleOptions, NumberString } from '@/types'
+import type { FixedLocaleAmountOptions, FixedLocaleOptions, NumberString } from '@/types'
 import { Currency, UserLocale } from '@/types-enums'
 import { getCurrencySymbol, getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { Big } from '@/lib/w-big'
@@ -91,17 +91,33 @@ export const toFixedLocale = (
 }
 
 /**
- * Like `toFixedLocale`, rounded to the currency's decimals and prefixed with its symbol, e.g. "-€1.00"
+ * Like `toFixedLocale`, rounded to the currency's decimals, e.g. "-1.00"
+ *
+ * @param options.showPlusSign - Whether to prefix positive values with "+", e.g. "+1.00"
+ */
+export const toFixedLocaleAmount = (
+  value: NumberString,
+  currency: Currency,
+  locale: UserLocale,
+  { showPlusSign = false, ...options }: FixedLocaleAmountOptions = {},
+): string => {
+  const formatted = toFixedLocale(value, getMaxDecimalsForCurrency(currency), locale, options)
+
+  return showPlusSign && Big(value).gt(0) ? `+${formatted}` : formatted
+}
+
+/**
+ * Like `toFixedLocaleAmount`, prefixed with the currency symbol, e.g. "-€1.00"
  */
 export const toFixedLocaleCurrency = (
   value: NumberString,
   currency: Currency,
   locale: UserLocale,
-  options: FixedLocaleOptions = {},
+  options: FixedLocaleAmountOptions = {},
 ): string => {
-  const formatted = toFixedLocale(value, getMaxDecimalsForCurrency(currency), locale, options)
-  const isNegative = formatted.startsWith('-')
+  const formatted = toFixedLocaleAmount(value, currency, locale, options)
+  const sign = formatted.startsWith('-') || formatted.startsWith('+') ? formatted[0] : ''
   const symbol = getCurrencySymbol(currency)
 
-  return isNegative ? `-${symbol}${formatted.slice(1)}` : `${symbol}${formatted}`
+  return `${sign}${symbol}${formatted.slice(sign.length)}`
 }

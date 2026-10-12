@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Card, Typography } from '@mui/material'
+import { Box, Card } from '@mui/material'
 import type { ChartData, ChartDataset } from 'chart.js'
 import { useRef, useState } from 'react'
 import type { RefObject } from 'react'
@@ -14,6 +14,7 @@ import { toDisplayDate } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
+import CardTitle from '../CardTitle'
 import { getBackgroundColour, getBarThickness, getBorderRadius, getChartOptions } from './actions'
 import { ui } from './styled'
 
@@ -53,9 +54,7 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
 
   return (
     <Card>
-      <Typography variant="h6" color="secondary">
-        {t('STATS_PAGE.CASHFLOW')}
-      </Typography>
+      <CardTitle>{t('STATS_PAGE.CASHFLOW')}</CardTitle>
 
       <Box sx={sx.chartCard} ref={ref}>
         {/* @ts-expect-error Type '"line"' is not assignable to type '"bar"'. */}

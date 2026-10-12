@@ -78,7 +78,7 @@
     "ALSO_IN": "Auch in {{files}}",
     "DROP_FILES_HERE": "Dateien hier ablegen",
     "DROP_FILES_ANYWHERE": "Dateien irgendwo ablegen",
-    "CLICK_TO_SELECT": "oder klicken, um Dateien auszuwählen {{dot}} <link>Ordner auswählen</link>",
+    "CLICK_TO_SELECT": "oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
     "FILE_RESTRICTIONS": "Nur CSV-Dateien, max. 5 MB pro Datei",
     "DROP_TIP": "Tipp: Dateien einfach irgendwo ablegen, um sie hinzuzufügen",
     "PARSING": "Wird ausgewertet…",

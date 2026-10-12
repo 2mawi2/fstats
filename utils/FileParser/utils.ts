@@ -4,6 +4,7 @@ import type { PPRowData, RowData, StatsFile, StatsFileSection, StatsFileState } 
 import { zStatsFileState } from '@/types'
 import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
 import { findSections, PARSER_VERSION } from '@/utils/Parser'
+import { formatZodIssues } from '@/lib/zod'
 
 export const parseFiles = async (files: StatsFile[]): Promise<{ id: string; state: StatsFileState }[]> => {
   return Promise.all(files.map(async (file) => ({ id: file.id, state: await parseFile(file.file) })))
@@ -44,7 +45,7 @@ const parseFile = async (file: File): Promise<StatsFileState> => {
 
   if (!res.success) {
     const parserIds = parsedSections.map((section) => section.parserId).join(', ')
-    const errors = res.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join(', ')
+    const errors = formatZodIssues(res.error)
     console.error(`Validation failed for parser "${parserIds}":`, errors)
     return _toError(StatsFileErrorCode.INVALID_DATA, `Validating "${parserIds}" failed: ${errors}`)
   }

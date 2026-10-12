@@ -1,12 +1,13 @@
 'use client'
 
 import { DeleteOutlined, FolderOutlined, StorageRounded } from '@mui/icons-material'
-import { Box, Button, Card, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 
 import { useFiles, useMutateRemoveAllFiles, useStorageSize } from '@/m-stats-file/service'
 import { formatFileSize } from '@/utils/File'
 import { useTranslation } from '@/lib/i18n'
 
+import SettingsCard from '../SettingsCard'
 import { ui } from './styled'
 
 const Component = () => {
@@ -21,11 +22,7 @@ const Component = () => {
   const hasFiles = fileCount > 0
 
   return (
-    <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        {t('SETTINGS_PAGE.STORAGE.TITLE')}
-      </Typography>
-
+    <SettingsCard title={t('SETTINGS_PAGE.STORAGE.TITLE')}>
       <Box sx={sx.statsContainer}>
         <Box sx={sx.statItem}>
           <FolderOutlined sx={sx.statIcon} />
@@ -62,7 +59,7 @@ const Component = () => {
       >
         {t('SETTINGS_PAGE.STORAGE.CLEAR_ALL_DATA')}
       </Button>
-    </Card>
+    </SettingsCard>
   )
 }
 

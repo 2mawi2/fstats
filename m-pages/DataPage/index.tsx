@@ -1,7 +1,7 @@
 'use client'
 
 import { CloudUploadOutlined } from '@mui/icons-material'
-import { Box, FormControlLabel, Skeleton, Switch, Typography } from '@mui/material'
+import { Box, FormControlLabel, Switch, Typography } from '@mui/material'
 import type { SxProps, Theme } from '@mui/material'
 import type { ReactNode } from 'react'
 import { Fragment, useCallback, useRef, useState } from 'react'
@@ -69,9 +69,7 @@ const Component = () => {
   const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
   const { mutateAsync: addFiles } = useMutateAddFiles()
   const { mutateAsync: updateFiles } = useMutateUpdateFiles()
-  const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
-  const checkedFiles = files.filter((file) => selectedFileIds.includes(file.id))
-  const checkedParsedFiles = checkedFiles.filter(isParsed)
+  const { files, checkedFiles, selectedFiles: checkedParsedFiles, setSelectedFileIds } = useFileHelper()
   // Multiple parsed files are shown as one, with combined stats above the stats per file
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
@@ -129,10 +127,9 @@ const Component = () => {
       content: (
         <>
           {/* Outside the scroll container, so it stays in place */}
-          {!files.length ? null : !checkedFiles.length ? (
+          {!checkedFiles.length ? (
             <Box sx={sx.middleToolbar}>
-              <Skeleton variant="rounded" animation={false} width={56} height={22} />
-              <Skeleton variant="rounded" animation={false} width={88} height={22} />
+              <SegmentedToggle value={tableView} options={getTableViewOptions()} onChange={setTableView} disabled />
             </Box>
           ) : (
             <Box sx={sx.middleToolbar}>
@@ -167,11 +164,7 @@ const Component = () => {
             {/* Single child, observed by the tables for layout changes above them */}
             <div>
               {!files.length ? (
-                <DropZoneDisplay
-                  isDragActive={dropzone.isDragActive}
-                  onAddFiles={dropzone.open}
-                  onAddFolder={addFolder}
-                />
+                <DropZoneDisplay onAddFiles={dropzone.open} onAddFolder={addFolder} />
               ) : !checkedFiles.length ? (
                 <NoSelectionDisplay />
               ) : tableView === TableView.TRANSACTIONS ? (
@@ -222,9 +215,9 @@ const Component = () => {
             ))}
           </StatsCard>
         </>
-      ) : files.length ? (
+      ) : (
         <StatsSkeleton />
-      ) : null,
+      ),
     },
   ]
 
@@ -244,7 +237,7 @@ const Component = () => {
           </Fragment>
         ))}
       </Box>
-      {dropzone.isDragActive && files.length ? (
+      {dropzone.isDragActive ? (
         <Box sx={sx.dropOverlay}>
           <CloudUploadOutlined sx={{ fontSize: 48 }} />
           <Typography variant="h5">{t('DATA_PAGE.DROP_FILES_HERE')}</Typography>

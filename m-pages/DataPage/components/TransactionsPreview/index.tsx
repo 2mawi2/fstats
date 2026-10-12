@@ -5,9 +5,8 @@ import { useMemo } from 'react'
 import type { StatsFile } from '@/types'
 import { isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
-import { getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
-import { toFixedLocale, toFixedLocaleCurrency } from '@/utils/Number'
+import { toFixedLocaleAmount, toFixedLocaleCurrency } from '@/utils/Number'
 import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
@@ -52,18 +51,16 @@ const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: Tr
 
   const getCells = (index: number) => {
     const transaction = transactions[index]
-    const value = Big(transaction.value)
     // Signs are redundant when only one direction is shown
     const isSigned = amountFilter === AmountFilter.ALL
-    const displayValue = isSigned ? transaction.value : value.abs().toString()
-    const amount = currency
-      ? toFixedLocale(displayValue, getMaxDecimalsForCurrency(transaction.currency), locale)
-      : toFixedLocaleCurrency(displayValue, transaction.currency, locale)
+    const displayValue = isSigned ? transaction.value : Big(transaction.value).abs().toString()
+    const formatAmount = currency ? toFixedLocaleAmount : toFixedLocaleCurrency
+    const amount = formatAmount(displayValue, transaction.currency, locale, { showPlusSign: isSigned })
 
     return [
       toDisplayDate(transaction.date, locale, { formatTo: dateFormat }),
       transaction.description,
-      isSigned && value.gt(0) ? `+${amount}` : amount,
+      amount,
       getSubcategoryLabel(transaction.category),
       ...(isCombined ? [getSourceLabel(transaction, t)] : []),
     ]

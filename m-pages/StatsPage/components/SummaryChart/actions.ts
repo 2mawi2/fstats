@@ -4,6 +4,7 @@ import type { Theme } from '@mui/material/styles'
 import type { ChartOptions } from 'chart.js'
 
 import type { TransactionRangeItem } from '@/types'
+import { getBaseChartOptions } from '@/utils/Chart'
 import { Big } from '@/lib/w-big'
 
 export const getChartColors = (isDarkMode: boolean) => {
@@ -16,13 +17,7 @@ export const getChartColors = (isDarkMode: boolean) => {
 }
 
 export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      intersect: false,
-      mode: 'index',
-    },
+  return getBaseChartOptions<'line'>({
     plugins: {
       legend: {
         position: 'bottom',
@@ -46,21 +41,14 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
     },
     scales: {
       x: {
-        border: {
-          display: false,
-        },
         grid: {
           display: true,
         },
         ticks: {
           display: true,
-          maxTicksLimit: 12,
         },
       },
       y: {
-        border: {
-          display: false,
-        },
         grid: {
           display: true,
           color: (ctx) => {
@@ -76,7 +64,7 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
         },
       },
     },
-  }
+  })
 }
 
 export const accumulateValues = (transactionRangeItems: TransactionRangeItem[]): number[] => {

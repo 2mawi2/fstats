@@ -1,13 +1,14 @@
 'use client'
 
 import { CheckCircle } from '@mui/icons-material'
-import { Box, ButtonBase, Card, Typography } from '@mui/material'
+import { Box, ButtonBase, Typography } from '@mui/material'
 import { Fragment } from 'react'
 
 import { MISC } from '@/common'
 import { DataLayout, DEFAULT_DATA_COLUMN_WIDTHS, DEFAULT_DATA_EXPLORER_SPLIT, useDataLayout } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
+import SettingsCard from '../SettingsCard'
 import { ui } from './styled'
 
 type LayoutPreviewProps = {
@@ -78,11 +79,7 @@ const Component = () => {
     customColumnWidths.every((width, index) => !isChanged(width, DEFAULT_DATA_COLUMN_WIDTHS[index]))
 
   return (
-    <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        {t('SETTINGS_PAGE.LAYOUT.TITLE')}
-      </Typography>
-
+    <SettingsCard title={t('SETTINGS_PAGE.LAYOUT.TITLE')}>
       <Box sx={sx.tiles}>
         <LayoutPreview
           title={t('SETTINGS_PAGE.LAYOUT.DEFAULT')}
@@ -106,7 +103,7 @@ const Component = () => {
       <Typography variant="caption" component="p" color="text.secondary" sx={sx.hint}>
         {t('SETTINGS_PAGE.LAYOUT.HINT')}
       </Typography>
-    </Card>
+    </SettingsCard>
   )
 }
 
