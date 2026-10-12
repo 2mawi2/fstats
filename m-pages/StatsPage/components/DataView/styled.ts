@@ -1,11 +1,11 @@
 export const ui = () => {
   return {
-    middleScroll: {
+    middleScroll: (isEmpty: boolean) => ({
       flexGrow: 1,
       minHeight: 0,
       overflowY: 'auto',
-      p: 2,
-    },
+      p: isEmpty ? 0 : 2,
+    }),
     duplicatesSwitch: {
       ml: 'auto',
       mr: 0,

@@ -34,6 +34,7 @@ export type NavItem = {
   route: string
   labelKey: string
   icon: SvgIconComponent
+  iconActive: SvgIconComponent
 }
 
 export type SortingPref = 'asc' | 'desc' | 'totalAsc' | 'totalDesc'

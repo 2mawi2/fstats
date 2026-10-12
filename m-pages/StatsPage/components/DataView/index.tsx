@@ -51,6 +51,7 @@ const Component = () => {
     },
   )
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
+  const isEmpty = !files.length || !checkedFiles.length
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && tableView === TableView.TRANSACTIONS
   // Multiple parsed files are shown as one, with combined stats above the stats per file
@@ -94,7 +95,7 @@ const Component = () => {
           />
         ) : null}
       </ViewToolbar>
-      <Box ref={setMiddleColumn} sx={sx.middleScroll}>
+      <Box ref={setMiddleColumn} sx={sx.middleScroll(isEmpty)}>
         {/* Single child, observed by the tables for layout changes above them */}
         <div>
           {!files.length ? (
