@@ -10,6 +10,7 @@ import { getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
 import { toFixedLocale } from '@/utils/Number'
 import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
 import { AmountFilter } from '../../actions'
@@ -25,6 +26,7 @@ type TransactionsPreviewProps = {
 
 const Component = ({ file, amountFilter, scrollElement }: TransactionsPreviewProps) => {
   const theme = useTheme()
+  const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const parsedFile = isParsed(file) ? file : null
   const transactions = useMemo(
@@ -32,8 +34,8 @@ const Component = ({ file, amountFilter, scrollElement }: TransactionsPreviewPro
     [parsedFile, amountFilter],
   )
   const columns = useMemo(
-    () => (parsedFile ? getTransactionColumns(parsedFile, amountFilter, theme.vars.palette.success.main) : []),
-    [parsedFile, amountFilter, theme],
+    () => (parsedFile ? getTransactionColumns(parsedFile, amountFilter, theme.vars.palette.success.main, t) : []),
+    [parsedFile, amountFilter, theme, t],
   )
 
   const getCells = (index: number) => {
@@ -59,7 +61,7 @@ const Component = ({ file, amountFilter, scrollElement }: TransactionsPreviewPro
     <PreviewSection
       title={file.file.name}
       rowCount={parsedFile ? transactions.length : undefined}
-      error={parsedFile ? null : 'No transactions, this file was not parsed.'}
+      error={parsedFile ? null : t('DATA_PAGE.FILE_NOT_PARSED')}
     >
       <VirtualTable
         columns={columns}

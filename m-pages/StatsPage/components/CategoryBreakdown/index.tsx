@@ -5,6 +5,7 @@ import type { Transaction } from '@/types'
 import { Currency } from '@/types-enums'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
 import { getStats } from '@/utils/Stats'
+import { useTranslation } from '@/lib/i18n'
 
 import { getTransactionsGroupedByCategory } from './actions'
 import { ExpensesBreakdown, IncomeBreakdown } from './components'
@@ -15,6 +16,7 @@ type CategoryBreakdownProps = {
 }
 
 const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
+  const { t } = useTranslation()
   const { totalIncome, totalExpense } = getStats(transactions)
   const groupedTransactions = Object.values(getTransactionsGroupedByCategory(transactions))
   const income = groupedTransactions.filter((cat) => Object.keys(INCOME_CATEGORIES).includes(cat.code))
@@ -25,12 +27,12 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
     <Card sx={{ height: '100%' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="h6" color="secondary">
-          Breakdown by category
+          {t('STATS_PAGE.BREAKDOWN_BY_CATEGORY')}
         </Typography>
 
         <FormControlLabel
           control={<Switch color="primary" value={showAll} onChange={() => setShowAll(!showAll)} />}
-          label="Show all categories"
+          label={t('STATS_PAGE.SHOW_ALL_CATEGORIES')}
           sx={{ color: showAll ? 'text.primary' : 'text.secondary' }}
         />
       </Box>

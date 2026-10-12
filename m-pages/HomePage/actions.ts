@@ -3,35 +3,29 @@ import { LockOutlined, PersonOffOutlined, Public } from '@mui/icons-material'
 export const CARD_ITEMS = [
   {
     Icon: LockOutlined,
-    title: '100% on-device',
-    description: 'All parsing and storage happens in your browser. Your data never touches a server.',
+    key: 'ON_DEVICE',
   },
   {
     Icon: Public,
-    title: 'Runs in your browser',
-    description: 'Use it like a normal website while your data still stays on your device.',
+    key: 'IN_BROWSER',
   },
   {
     Icon: PersonOffOutlined,
-    title: 'No account needed',
-    description: 'No sign-up, no login, no cloud sync. Everything stays local.',
+    key: 'NO_ACCOUNT',
   },
-]
+] as const
 
 export const STEPS = [
   {
     step: 1,
-    title: 'Add your files',
-    description: 'Drag & drop or browse for your bank statements',
+    key: 'ADD_FILES',
   },
   {
     step: 2,
-    title: 'Click "Continue"',
-    description: 'Files are automatically parsed on your device',
+    key: 'CONTINUE',
   },
   {
     step: 3,
-    title: 'View your stats',
-    description: 'Gain insights into your spending habits',
+    key: 'VIEW_STATS',
   },
-]
+] as const

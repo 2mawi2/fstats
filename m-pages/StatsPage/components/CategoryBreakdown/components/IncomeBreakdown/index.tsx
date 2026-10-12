@@ -8,6 +8,7 @@ import { useState } from 'react'
 import type { NumberString, ParentCategoryWithTransactions, SortingPref } from '@/types'
 import { Currency } from '@/types-enums'
 import { getCurrencySymbol } from '@/utils/Currency'
+import { useTranslation } from '@/lib/i18n'
 
 import { COL_SPACING, COL1, COL2, COL3, getSortedParentCategoriesWithTransactions } from '../../actions'
 import { ui } from '../../styled'
@@ -21,6 +22,7 @@ type ExpensesBreakdownProps = {
 }
 
 const Component = ({ transactionsGrouped, total, currency, showAll = false }: ExpensesBreakdownProps) => {
+  const { t } = useTranslation()
   const theme = useTheme()
   const sx = ui(theme)
   const [sortingPref, setSortingPref] = useState<SortingPref>('totalDesc')
@@ -38,7 +40,7 @@ const Component = ({ transactionsGrouped, total, currency, showAll = false }: Ex
         <Grid size={{ xs: COL1[0], sm: COL1[1] }}>
           <Box sx={sx.tableHeader} onClick={() => setSortingPref(sortingPref === 'asc' ? 'desc' : 'asc')}>
             <Box sx={sx.tableHeaderContent}>
-              Income
+              {t('MISC.INCOME')}
               {sortingPref === 'asc' ? <ArrowUpward sx={{ fontSize: 13 }} /> : null}
               {sortingPref === 'desc' ? <ArrowDownward sx={{ fontSize: 13 }} /> : null}
             </Box>
@@ -50,7 +52,7 @@ const Component = ({ transactionsGrouped, total, currency, showAll = false }: Ex
             onClick={() => setSortingPref(sortingPref === 'totalDesc' ? 'totalAsc' : 'totalDesc')}
           >
             <Box sx={sx.tableHeaderContent}>
-              Total ({getCurrencySymbol(currency)})
+              {t('MISC.TOTAL_WITH_CURRENCY', { currency: getCurrencySymbol(currency) })}
               {sortingPref === 'totalAsc' ? <ArrowUpward sx={{ fontSize: 13 }} /> : null}
               {sortingPref === 'totalDesc' ? <ArrowDownward sx={{ fontSize: 13 }} /> : null}
             </Box>
@@ -71,7 +73,7 @@ const Component = ({ transactionsGrouped, total, currency, showAll = false }: Ex
         })
       ) : (
         <Typography variant="body2" noWrap sx={{ fontSize: 15, mb: 0, color: 'text.secondary', ml: 1 }}>
-          No income for the selected period
+          {t('STATS_PAGE.NO_INCOME')}
         </Typography>
       )}
     </>

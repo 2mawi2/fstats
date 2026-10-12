@@ -6,6 +6,7 @@ import { Box, Checkbox, CircularProgress, ListItem, ListItemButton, Tooltip, Typ
 import type { StatsFile } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { isError, isParsed, isUnknown } from '@/m-stats-file/service'
+import { useTranslation } from '@/lib/i18n'
 
 import { getFileFormat } from '../../actions'
 import { ui } from './styled'
@@ -18,6 +19,8 @@ type FileRowProps = {
 
 const Component = ({ file, isChecked, onToggle }: FileRowProps) => {
   const sx = ui()
+  // Re-render on language change, the format label is translated
+  useTranslation()
   const isUnknownFile = isUnknown(file)
   const isErrorFile = isError(file)
   const nameColor = isUnknownFile ? 'warning.main' : isErrorFile ? 'error.main' : 'text.primary'

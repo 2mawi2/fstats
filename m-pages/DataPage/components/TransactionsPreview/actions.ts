@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next'
+
 import type { ParsedStatsFile, Transaction } from '@/types'
 import { getCurrencySymbol } from '@/utils/Currency'
 import { getParserCurrency } from '@/utils/Parser'
@@ -13,11 +15,12 @@ export const getTransactionColumns = (
   file: ParsedStatsFile,
   amountFilter: AmountFilter,
   incomeColor: string,
+  t: TFunction,
 ): VirtualTableColumn[] => [
-  { label: 'Date', width: 100, getStyle: () => TABULAR_NUMS },
-  { label: 'Description', width: 320 },
+  { label: t('MISC.DATE'), width: 100, getStyle: () => TABULAR_NUMS },
+  { label: t('MISC.DESCRIPTION'), width: 320 },
   {
-    label: `Amount (${getCurrencySymbol(getParserCurrency(file.parserId))})`,
+    label: t('MISC.AMOUNT_WITH_CURRENCY', { currency: getCurrencySymbol(getParserCurrency(file.parserId)) }),
     width: 120,
     align: 'right',
     // Only highlight money in when both directions are shown
@@ -26,7 +29,7 @@ export const getTransactionColumns = (
         ? { ...TABULAR_NUMS, color: incomeColor, fontWeight: 600 }
         : TABULAR_NUMS,
   },
-  { label: 'Category', width: 160 },
+  { label: t('MISC.CATEGORY'), width: 160 },
 ]
 
 export const filterTransactions = (transactions: Transaction[], filter: AmountFilter) => {

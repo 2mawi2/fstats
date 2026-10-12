@@ -11,6 +11,7 @@ import { formatFileSize } from '@/utils/File'
 import { toFixedLocale, toFixedLocaleCurrency } from '@/utils/Number'
 import { getParserCurrency } from '@/utils/Parser'
 import { getStats } from '@/utils/Stats'
+import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
 import { getFileFormat } from '../../actions'
@@ -24,6 +25,7 @@ type Detail = { label: string; value: string; color?: string }
 
 const Component = ({ file }: FileDetailsProps) => {
   const sx = ui()
+  const { t } = useTranslation()
   const { locale } = useUserPreferences()
   const format = getFileFormat(file)
 
@@ -36,15 +38,15 @@ const Component = ({ file }: FileDetailsProps) => {
     const { totalIncome, totalExpense, profit, profitMargin } = getStats(file.transactions)
 
     return [
-      { label: 'Transactions', value: String(file.transactions.length) },
-      { label: 'Income', value: toFixedLocaleCurrency(totalIncome, currency, locale), color: 'success.main' },
-      { label: 'Expenses', value: toFixedLocaleCurrency(totalExpense, currency, locale), color: 'error.main' },
+      { label: t('MISC.TRANSACTIONS'), value: String(file.transactions.length) },
+      { label: t('MISC.INCOME'), value: toFixedLocaleCurrency(totalIncome, currency, locale), color: 'success.main' },
+      { label: t('MISC.EXPENSES'), value: toFixedLocaleCurrency(totalExpense, currency, locale), color: 'error.main' },
       {
-        label: 'Balance',
+        label: t('MISC.BALANCE'),
         value: toFixedLocaleCurrency(profit, currency, locale),
         color: Big(profit).gte(0) ? 'success.main' : 'error.main',
       },
-      { label: 'Profit margin', value: `${toFixedLocale(profitMargin, 1, locale, { trimTrailingZeros: true })}%` },
+      { label: t('MISC.PROFIT_MARGIN'), value: `${toFixedLocale(profitMargin, 1, locale, { trimTrailingZeros: true })}%` },
     ]
   }
 

@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/common'
 import { PageWrapper } from '@/components'
 import { useIsDarkMode, useIsMobile } from '@/hooks'
+import { Trans, useTranslation } from '@/lib/i18n'
 import { Color } from '@/styles/colors'
 
 const Component = () => {
   const router = useRouter()
+  const { t } = useTranslation()
   const isMobile = useIsMobile()
   const isDarkMode = useIsDarkMode()
 
@@ -22,16 +24,16 @@ const Component = () => {
           style={{ width: isMobile ? 96 : 128, height: 'auto', marginBottom: 24 }}
         />
         <Typography variant="h4" sx={{ fontWeight: 800, lineHeight: 1.2, mb: 2 }}>
-          No data to{' '}
-          <Box component="span" sx={{ color: isDarkMode ? Color.cyan : Color.cyanDark }}>
-            analyse
-          </Box>
+          <Trans
+            i18nKey="EMPTY_STATS_PAGE.TITLE"
+            components={{ accent: <Box component="span" sx={{ color: isDarkMode ? Color.cyan : Color.cyanDark }} /> }}
+          />
         </Typography>
         <Typography
           variant="body2"
           sx={{ color: 'text.secondary', fontSize: isMobile ? 15 : 17, lineHeight: 1.7, mb: 4 }}
         >
-          Upload a CSV file and then come back to view your stats.
+          {t('EMPTY_STATS_PAGE.BLURB')}
         </Typography>
 
         <Box
@@ -50,7 +52,7 @@ const Component = () => {
             onMouseEnter={() => router.prefetch(ROUTES.DATA)}
             onClick={() => router.push(ROUTES.DATA)}
           >
-            Upload files
+            {t('EMPTY_STATS_PAGE.UPLOAD_FILES')}
           </Button>
 
           <Button
@@ -71,7 +73,7 @@ const Component = () => {
             onMouseEnter={() => router.prefetch(`${ROUTES.STATS}?demo=true`)}
             onClick={() => router.push(`${ROUTES.STATS}?demo=true`)}
           >
-            View demo
+            {t('MISC.VIEW_DEMO')}
           </Button>
         </Box>
       </Grid>

@@ -6,6 +6,7 @@ import { Fragment } from 'react'
 
 import { MISC } from '@/common'
 import { DataLayout, DEFAULT_DATA_COLUMN_WIDTHS, DEFAULT_DATA_EXPLORER_SPLIT, useDataLayout } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
 import { ui } from './styled'
 
@@ -28,6 +29,7 @@ const isChanged = (value: number, defaultValue: number | undefined) =>
 
 const LayoutPreview = ({ title, columnWidths, explorerSplit, isSelected, onSelect, compareTo }: LayoutPreviewProps) => {
   const sx = ui()
+  const { t } = useTranslation()
   const [leftWidth, ...otherWidths] = columnWidths
   const isSplitChanged = isChanged(explorerSplit, compareTo?.explorerSplit)
 
@@ -52,7 +54,7 @@ const LayoutPreview = ({ title, columnWidths, explorerSplit, isSelected, onSelec
         ))}
       </Box>
       <Typography variant="caption" component="p" sx={sx.tileCaption}>
-        Columns{' '}
+        {t('SETTINGS_PAGE.LAYOUT.COLUMNS')}{' '}
         {columnWidths.map((width, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <Fragment key={index}>
@@ -69,17 +71,18 @@ const LayoutPreview = ({ title, columnWidths, explorerSplit, isSelected, onSelec
 
 const Component = () => {
   const sx = ui()
+  const { t } = useTranslation()
   const { customColumnWidths, customExplorerSplit, activeLayout, setActiveLayout } = useDataLayout()
 
   return (
     <Card sx={{ borderRadius: 2, p: 3 }}>
       <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        Data page layout
+        {t('SETTINGS_PAGE.LAYOUT.TITLE')}
       </Typography>
 
       <Box sx={sx.tiles}>
         <LayoutPreview
-          title="Custom"
+          title={t('SETTINGS_PAGE.LAYOUT.CUSTOM')}
           columnWidths={customColumnWidths}
           explorerSplit={customExplorerSplit}
           isSelected={activeLayout === DataLayout.CUSTOM}
@@ -87,7 +90,7 @@ const Component = () => {
           compareTo={{ columnWidths: DEFAULT_DATA_COLUMN_WIDTHS, explorerSplit: DEFAULT_DATA_EXPLORER_SPLIT }}
         />
         <LayoutPreview
-          title="Default"
+          title={t('SETTINGS_PAGE.LAYOUT.DEFAULT')}
           columnWidths={DEFAULT_DATA_COLUMN_WIDTHS}
           explorerSplit={DEFAULT_DATA_EXPLORER_SPLIT}
           isSelected={activeLayout === DataLayout.DEFAULT}
@@ -96,7 +99,7 @@ const Component = () => {
       </Box>
 
       <Typography variant="caption" component="p" color="text.secondary" sx={sx.hint}>
-        Resizing columns while the default layout is selected starts a new custom layout.
+        {t('SETTINGS_PAGE.LAYOUT.HINT')}
       </Typography>
     </Card>
   )

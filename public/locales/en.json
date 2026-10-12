@@ -1,7 +1,19 @@
 {
   "MISC": {
     "VERSION": "Version",
-    "ALL_RIGHTS_RESERVED": "All rights reserved."
+    "ALL_RIGHTS_RESERVED": "All rights reserved.",
+    "VIEW_DEMO": "View demo",
+    "LOADING": "Loading…",
+    "TRANSACTIONS": "Transactions",
+    "INCOME": "Income",
+    "EXPENSES": "Expenses",
+    "BALANCE": "Balance",
+    "PROFIT_MARGIN": "Profit margin",
+    "DATE": "Date",
+    "DESCRIPTION": "Description",
+    "CATEGORY": "Category",
+    "AMOUNT_WITH_CURRENCY": "Amount ({{currency}})",
+    "TOTAL_WITH_CURRENCY": "Total ({{currency}})"
   },
   "NAVIGATION": {
     "HOME": "Home",
@@ -11,6 +23,137 @@
     "ABOUT": "About",
     "EXPAND_MENU": "Expand menu",
     "COLLAPSE_MENU": "Collapse menu"
+  },
+  "HOME_PAGE": {
+    "HERO_TITLE": "Analyse bank statements <accent>privately</accent>",
+    "HERO_SUBTITLE": "Add CSV statements and get instant insights. All processing happens entirely on your device — no uploads, no accounts, no tracking.",
+    "GET_STARTED": "Get started",
+    "GET_STARTED_NOW": "Get started now",
+    "HOW_IT_WORKS": "How it works",
+    "SUPPORTED_BANKS": "Supported banks",
+    "CARDS": {
+      "ON_DEVICE": {
+        "TITLE": "100% on-device",
+        "DESCRIPTION": "All parsing and storage happens in your browser. Your data never touches a server."
+      },
+      "IN_BROWSER": {
+        "TITLE": "Runs in your browser",
+        "DESCRIPTION": "Use it like a normal website while your data still stays on your device."
+      },
+      "NO_ACCOUNT": {
+        "TITLE": "No account needed",
+        "DESCRIPTION": "No sign-up, no login, no cloud sync. Everything stays local."
+      }
+    },
+    "STEPS": {
+      "ADD_FILES": {
+        "TITLE": "Add your files",
+        "DESCRIPTION": "Drag & drop or browse for your bank statements"
+      },
+      "CONTINUE": {
+        "TITLE": "Click \"Continue\"",
+        "DESCRIPTION": "Files are automatically parsed on your device"
+      },
+      "VIEW_STATS": {
+        "TITLE": "View your stats",
+        "DESCRIPTION": "Gain insights into your spending habits"
+      }
+    }
+  },
+  "DATA_PAGE": {
+    "CHECK_FILE_FOR_DATA": "Check a file to see its data.",
+    "CHECK_FILE_FOR_DETAILS": "Check a file to see its details.",
+    "DROP_FILES_HERE": "Drop your files here",
+    "DROP_FILES_ANYWHERE": "Drop files anywhere",
+    "CLICK_TO_SELECT": "or click to select files {{dot}} <link>select a folder</link>",
+    "FILE_RESTRICTIONS": "CSV files only, max 5MB each",
+    "DROP_TIP": "Tip: Drop files anywhere to add them",
+    "PARSING": "Parsing…",
+    "UNSUPPORTED_FORMAT": "Unsupported format",
+    "ROW_COUNT_one": "{{count}} row",
+    "ROW_COUNT_other": "{{count}} rows",
+    "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
+    "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
+    "FOLDER_NOT_SUPPORTED": "Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).",
+    "FOLDER_EMPTY": "No files found in the selected folder.",
+    "FOLDER_ACCESS_FAILED": "Failed to access the folder. Please try again.",
+    "TABLE_VIEW": {
+      "RAW": "Raw CSV",
+      "TRANSACTIONS": "Transactions"
+    },
+    "AMOUNT_FILTER": {
+      "ALL": "All",
+      "ALL_TITLE": "All amounts",
+      "IN": "In",
+      "IN_TITLE": "Money in only",
+      "OUT": "Out",
+      "OUT_TITLE": "Money out only"
+    },
+    "TOOLBAR": {
+      "SELECT_ALL": "All",
+      "SELECT_NONE": "None",
+      "SELECT_PARSED": "Parsed",
+      "SELECT_UNSUPPORTED": "Unsupported",
+      "SELECT_INVALID": "Invalid",
+      "BANK_ACCOUNTS": "Bank accounts",
+      "REMOVE_SELECTED": "Remove selected",
+      "ADD_FILES": "Add files",
+      "ADD_FOLDER": "Add folder",
+      "SELECTED_COUNT": "{{selected}} of {{total}}",
+      "FILE_COUNT_one": "{{count}} file",
+      "FILE_COUNT_other": "{{count}} files"
+    }
+  },
+  "STATS_PAGE": {
+    "AT_A_GLANCE": "At a glance",
+    "CASHFLOW": "Cashflow",
+    "ALL_ACCOUNTS": "All accounts",
+    "DEMO_BANNER": "You are viewing demo data",
+    "UPLOAD_YOUR_DATA": "Upload your data",
+    "TRANSACTION_COUNT_one": "{{count}} Transaction",
+    "TRANSACTION_COUNT_other": "{{count}} Transactions",
+    "DUPLICATES_REMOVED_one": "{{count}} duplicate removed",
+    "DUPLICATES_REMOVED_other": "{{count}} duplicates removed",
+    "BREAKDOWN_BY_CATEGORY": "Breakdown by category",
+    "SHOW_ALL_CATEGORIES": "Show all categories",
+    "NO_INCOME": "No income for the selected period",
+    "NO_EXPENSES": "No expenses for the selected period",
+    "SEARCH_TRANSACTIONS": "Search transactions...",
+    "NO_TRANSACTIONS_FOUND": "No transactions found",
+    "ROWS_PER_PAGE": "Rows per page:",
+    "DISPLAYED_ROWS": "{{from}}-{{to}} of {{total}}"
+  },
+  "EMPTY_STATS_PAGE": {
+    "TITLE": "No data to <accent>analyse</accent>",
+    "BLURB": "Upload a CSV file and then come back to view your stats.",
+    "UPLOAD_FILES": "Upload files"
+  },
+  "SETTINGS_PAGE": {
+    "DEVICE": {
+      "TITLE": "Device settings",
+      "PERSIST_DATA": "Persist data",
+      "PERSIST_ON": "Files will be kept in your browser storage until manually deleted.",
+      "PERSIST_OFF": "Files will be automatically cleared when you close the tab or app."
+    },
+    "STORAGE": {
+      "TITLE": "Storage details",
+      "FILES_one": "File",
+      "FILES_other": "Files",
+      "STORAGE_USED": "Storage used",
+      "FAILED_TO_CALCULATE": "Failed to calculate",
+      "CONFIRM_CLEAR": "Are you sure you want to clear all data?",
+      "CLEAR_ALL_DATA": "Clear all data"
+    },
+    "LAYOUT": {
+      "TITLE": "Data page layout",
+      "CUSTOM": "Custom",
+      "DEFAULT": "Default",
+      "COLUMNS": "Columns",
+      "HINT": "Resizing columns while the default layout is selected starts a new custom layout."
+    },
+    "PREFERENCES": {
+      "TITLE": "Preferences"
+    }
   },
   "ABOUT_PAGE": {
     "TITLE": "About",
@@ -24,6 +167,10 @@
     "TITLE": "The URL in the address bar does not exist!",
     "BLURB": "The content you are looking for might have moved and is possibly available at a different URL. Alternatively, check the URL for typos.",
     "BACK_TO_HOMEPAGE": "Back to homepage"
+  },
+  "ERROR_PAGE": {
+    "TITLE": "An unknown error has occurred.",
+    "BLURB": "If the problem persists, please contact support."
   },
   "COMPONENTS": {
     "THEME_SWITCHER": {

@@ -6,6 +6,7 @@ import type { TransactionRangeItem } from '@/types'
 import { LineChart } from '@/components'
 import { useIsDarkMode } from '@/hooks'
 import { getGradient } from '@/utils/Chart'
+import { useTranslation } from '@/lib/i18n'
 
 import { accumulateValues, getChartColors, getChartOptions } from './actions'
 import { ui } from './styled'
@@ -15,6 +16,7 @@ type SummaryChartProps = {
 }
 
 const Component = ({ transactionRangeItems }: SummaryChartProps) => {
+  const { t } = useTranslation()
   const isDarkMode = useIsDarkMode()
   const theme = useTheme()
   const sx = ui()
@@ -49,7 +51,7 @@ const Component = ({ transactionRangeItems }: SummaryChartProps) => {
       //   borderWidth: 1,
       // },
       {
-        label: 'Balance',
+        label: t('MISC.BALANCE'),
         data: both,
         borderColor: (context: ScriptableContext<'line'>) => getGradient({ context, colors: chartColors.both }),
         // backgroundColor: (context: ScriptableContext<'line'>) => {

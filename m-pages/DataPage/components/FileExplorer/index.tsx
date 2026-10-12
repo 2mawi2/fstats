@@ -5,6 +5,7 @@ import type { PointerEvent } from 'react'
 import { useRef } from 'react'
 
 import { useDataLayout, useFileHelper } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
 import FileRow from '../FileRow'
 import FileToolbar from '../FileToolbar'
@@ -17,6 +18,7 @@ type FileExplorerProps = {
 
 const Component = ({ onAddFiles }: FileExplorerProps) => {
   const sx = ui()
+  const { t } = useTranslation()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const panesRef = useRef<HTMLDivElement>(null)
   const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
@@ -62,7 +64,7 @@ const Component = ({ onAddFiles }: FileExplorerProps) => {
           </List>
           {files.length ? (
             <Typography variant="caption" color="text.secondary" sx={sx.dropTip}>
-              Tip: Drop files anywhere to add them
+              {t('DATA_PAGE.DROP_TIP')}
             </Typography>
           ) : null}
         </Box>

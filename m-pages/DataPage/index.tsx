@@ -14,8 +14,9 @@ import { MISC } from '@/common'
 import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-file/service'
 import { useDataLayout, useFileHelper, useUserPreferences } from '@/hooks'
 import { parseFiles } from '@/utils/FileParser'
+import { useTranslation } from '@/lib/i18n'
 
-import { AMOUNT_FILTER_OPTIONS, AmountFilter, resizeColumns, TABLE_VIEW_OPTIONS, TableView } from './actions'
+import { AmountFilter, getAmountFilterOptions, getTableViewOptions, resizeColumns, TableView } from './actions'
 import {
   CsvPreview,
   DropZoneDisplay,
@@ -28,6 +29,7 @@ import { ui } from './styled'
 
 const Component = () => {
   const sx = ui()
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   // State rather than a ref, so the previews re-render once the scroll element exists
   const [middleColumn, setMiddleColumn] = useState<HTMLDivElement | null>(null)
@@ -124,9 +126,9 @@ const Component = () => {
           ) : checkedFiles.length ? (
             <>
               <Box sx={sx.middleToolbar}>
-                <SegmentedToggle value={tableView} options={TABLE_VIEW_OPTIONS} onChange={changeTableView} />
+                <SegmentedToggle value={tableView} options={getTableViewOptions()} onChange={changeTableView} />
                 {tableView === TableView.TRANSACTIONS ? (
-                  <SegmentedToggle value={amountFilter} options={AMOUNT_FILTER_OPTIONS} onChange={setAmountFilter} />
+                  <SegmentedToggle value={amountFilter} options={getAmountFilterOptions()} onChange={setAmountFilter} />
                 ) : null}
               </Box>
               {checkedFiles.map((file) =>
@@ -143,7 +145,7 @@ const Component = () => {
               )}
             </>
           ) : (
-            <p>Check a file to see its data.</p>
+            <p>{t('DATA_PAGE.CHECK_FILE_FOR_DATA')}</p>
           )}
         </div>
       ),
@@ -155,7 +157,7 @@ const Component = () => {
         checkedFiles.map((file) => <FileDetails key={file.id} file={file} />)
       ) : files.length ? (
         <Typography variant="body2" color="text.secondary">
-          Check a file to see its details.
+          {t('DATA_PAGE.CHECK_FILE_FOR_DETAILS')}
         </Typography>
       ) : null,
     },
@@ -177,7 +179,7 @@ const Component = () => {
       {dropzone.isDragActive && files.length ? (
         <Box sx={sx.dropOverlay}>
           <CloudUploadOutlined sx={{ fontSize: 48 }} />
-          <Typography variant="h5">Drop your files here</Typography>
+          <Typography variant="h5">{t('DATA_PAGE.DROP_FILES_HERE')}</Typography>
         </Box>
       ) : null}
     </Box>

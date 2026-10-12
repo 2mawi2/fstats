@@ -2,6 +2,7 @@ import type { StatsFile } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { isParsed, isUnknown } from '@/m-stats-file/service'
 import { getBankAccountName } from '@/utils/Parser'
+import { i18n } from '@/lib/i18n'
 
 /**
  * What a file was parsed as, or why it wasn't.
@@ -12,11 +13,11 @@ export const getFileFormat = (file: StatsFile) => {
   }
 
   if (file.status === StatsFileStatus.PARSING) {
-    return { value: 'Parsing…', color: 'text.secondary' }
+    return { value: i18n.t('DATA_PAGE.PARSING'), color: 'text.secondary' }
   }
 
   if (isUnknown(file)) {
-    return { value: 'Unsupported format', color: 'warning.main' }
+    return { value: i18n.t('DATA_PAGE.UNSUPPORTED_FORMAT'), color: 'warning.main' }
   }
 
   return { value: file.status === StatsFileStatus.ERROR ? file.error.message : '-', color: 'error.main' }
@@ -29,9 +30,9 @@ export const TableView = {
 
 export type TableView = (typeof TableView)[keyof typeof TableView]
 
-export const TABLE_VIEW_OPTIONS = [
-  { value: TableView.RAW, label: 'Raw CSV' },
-  { value: TableView.TRANSACTIONS, label: 'Transactions' },
+export const getTableViewOptions = () => [
+  { value: TableView.RAW, label: i18n.t('DATA_PAGE.TABLE_VIEW.RAW') },
+  { value: TableView.TRANSACTIONS, label: i18n.t('DATA_PAGE.TABLE_VIEW.TRANSACTIONS') },
 ]
 
 export const AmountFilter = {
@@ -42,10 +43,22 @@ export const AmountFilter = {
 
 export type AmountFilter = (typeof AmountFilter)[keyof typeof AmountFilter]
 
-export const AMOUNT_FILTER_OPTIONS = [
-  { value: AmountFilter.ALL, label: 'All', title: 'All amounts' },
-  { value: AmountFilter.IN, label: 'In', title: 'Money in only' },
-  { value: AmountFilter.OUT, label: 'Out', title: 'Money out only' },
+export const getAmountFilterOptions = () => [
+  {
+    value: AmountFilter.ALL,
+    label: i18n.t('DATA_PAGE.AMOUNT_FILTER.ALL'),
+    title: i18n.t('DATA_PAGE.AMOUNT_FILTER.ALL_TITLE'),
+  },
+  {
+    value: AmountFilter.IN,
+    label: i18n.t('DATA_PAGE.AMOUNT_FILTER.IN'),
+    title: i18n.t('DATA_PAGE.AMOUNT_FILTER.IN_TITLE'),
+  },
+  {
+    value: AmountFilter.OUT,
+    label: i18n.t('DATA_PAGE.AMOUNT_FILTER.OUT'),
+    title: i18n.t('DATA_PAGE.AMOUNT_FILTER.OUT_TITLE'),
+  },
 ]
 
 export const MIN_COLUMN_WIDTH = 10 // %
@@ -68,9 +81,7 @@ export const resizeColumns = (widths: number[], index: number, delta: number) =>
 export const openFolderPicker = async () => {
   try {
     if (!('showDirectoryPicker' in window)) {
-      alert(
-        'Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).',
-      )
+      alert(i18n.t('DATA_PAGE.FOLDER_NOT_SUPPORTED'))
       return
     }
 
@@ -97,7 +108,7 @@ export const openFolderPicker = async () => {
     filesToAdd.push(...files)
 
     if (!filesToAdd.length) {
-      alert('No files found in the selected folder.')
+      alert(i18n.t('DATA_PAGE.FOLDER_EMPTY'))
       return
     }
 
@@ -113,7 +124,7 @@ export const openFolderPicker = async () => {
     const err = error as Error
     if (err.name !== 'AbortError') {
       console.error('Error selecting folder:', error)
-      alert('Failed to access the folder. Please try again.')
+      alert(i18n.t('DATA_PAGE.FOLDER_ACCESS_FAILED'))
     }
   }
 }

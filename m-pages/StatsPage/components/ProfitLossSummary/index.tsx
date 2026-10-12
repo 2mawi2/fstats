@@ -8,6 +8,7 @@ import { Currency } from '@/types-enums'
 import { useIsDarkMode, useUserPreferences } from '@/hooks'
 import { toFixedLocale, toFixedLocaleCurrency } from '@/utils/Number'
 import { getProfitLossColors, getStats } from '@/utils/Stats'
+import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
 import { ui } from './styled'
@@ -18,6 +19,7 @@ type ProfitLossSummaryProps = {
 }
 
 const Component = ({ transactions, currency }: ProfitLossSummaryProps) => {
+  const { t } = useTranslation()
   const { locale } = useUserPreferences()
   const isDarkMode = useIsDarkMode()
   const theme = useTheme()
@@ -40,7 +42,7 @@ const Component = ({ transactions, currency }: ProfitLossSummaryProps) => {
             <Box sx={sx.statHeader}>
               {/* <TrendingUp sx={{ color: incomeTextColor, fontSize: 20 }} /> */}
               <Typography variant="caption" sx={sx.caption(incomeTextColor)}>
-                Income
+                {t('MISC.INCOME')}
               </Typography>
             </Box>
             <Typography color="primary" variant="h4" sx={sx.amount(incomeTextColor)}>
@@ -54,7 +56,7 @@ const Component = ({ transactions, currency }: ProfitLossSummaryProps) => {
             <Box sx={sx.statHeader}>
               {/* <TrendingDown sx={{ color: expensesTextColor, fontSize: 20 }} /> */}
               <Typography variant="caption" sx={sx.caption(expensesTextColor)}>
-                Expenses
+                {t('MISC.EXPENSES')}
               </Typography>
             </Box>
             <Typography variant="h4" sx={sx.amount(expensesTextColor)}>
@@ -67,7 +69,7 @@ const Component = ({ transactions, currency }: ProfitLossSummaryProps) => {
           <Box sx={sx.profitCard(profitBgColor)}>
             <Box sx={sx.statHeader}>
               <Typography variant="caption" sx={sx.caption(profitTextColor)}>
-                Balance
+                {t('MISC.BALANCE')}
               </Typography>
             </Box>
             <Typography variant="h4" sx={sx.amount(profitTextColor)}>
@@ -80,7 +82,7 @@ const Component = ({ transactions, currency }: ProfitLossSummaryProps) => {
           <Box sx={sx.profitCard(profitBgColor)}>
             <Box sx={sx.statHeader}>
               <Typography variant="caption" sx={sx.caption(profitTextColor)}>
-                Profit margin
+                {t('MISC.PROFIT_MARGIN')}
               </Typography>
             </Box>
             <Typography variant="h4" sx={sx.amount(profitTextColor)}>

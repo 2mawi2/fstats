@@ -7,6 +7,7 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import type { StatsPageForm } from '@/types'
 import { PageWrapper } from '@/components'
 import { useFileHelper, useTransactionHelper, useUserPreferences } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
 import { getBankSelectOptions, getCurrencyForSelection } from './actions'
 import {
@@ -21,6 +22,7 @@ import {
 } from './components'
 
 const Component = () => {
+  const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const { selectedFiles } = useFileHelper()
   const searchParams = useSearchParams()
@@ -77,7 +79,7 @@ const Component = () => {
           <Grid size={12}>
             <Card>
               <Typography variant="h6" color="secondary">
-                At a glance
+                {t('STATS_PAGE.AT_A_GLANCE')}
               </Typography>
               <SummaryChart transactionRangeItems={transactionRangeItems} />
               <ProfitLossSummary transactions={transactions} currency={currency} />

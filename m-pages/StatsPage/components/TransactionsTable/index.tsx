@@ -29,6 +29,7 @@ import { getCurrencySymbol, getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
 import { toFixedLocale } from '@/utils/Number'
 import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
 import { getCategoryColor } from './actions'
@@ -40,6 +41,7 @@ type TransactionsTableProps = {
 }
 
 const Component = ({ transactions, currency }: TransactionsTableProps) => {
+  const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const theme = useTheme()
   const isMobile = useIsMobile()
@@ -101,13 +103,13 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
   return (
     <Card sx={{ borderRadius: 2, p: 3 }}>
       <Typography variant="h6" color="secondary" sx={{ mb: 3 }}>
-        Transactions
+        {t('MISC.TRANSACTIONS')}
       </Typography>
 
       <Box sx={sx.searchContainer}>
         <TextField
           fullWidth
-          placeholder="Search transactions..."
+          placeholder={t('STATS_PAGE.SEARCH_TRANSACTIONS')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           slotProps={{
@@ -128,11 +130,11 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
         <Table size="small" sx={{ minWidth: isMobile ? 200 : 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={sx.tableHeader}>Date</TableCell>
-              <TableCell sx={sx.tableHeader}>Description</TableCell>
-              {!isMobile && <TableCell sx={sx.tableHeader}>Category</TableCell>}
+              <TableCell sx={sx.tableHeader}>{t('MISC.DATE')}</TableCell>
+              <TableCell sx={sx.tableHeader}>{t('MISC.DESCRIPTION')}</TableCell>
+              {!isMobile && <TableCell sx={sx.tableHeader}>{t('MISC.CATEGORY')}</TableCell>}
               <TableCell sx={sx.tableHeader} align="right">
-                Amount ({getCurrencySymbol(currency)})
+                {t('MISC.AMOUNT_WITH_CURRENCY', { currency: getCurrencySymbol(currency) })}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -141,7 +143,7 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
               <TableRow>
                 <TableCell colSpan={isMobile ? 3 : 5} sx={{ textAlign: 'center', py: 6 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0 }}>
-                    No transactions found
+                    {t('STATS_PAGE.NO_TRANSACTIONS_FOUND')}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -221,8 +223,8 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Rows per page:"
-        labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
+        labelRowsPerPage={t('STATS_PAGE.ROWS_PER_PAGE')}
+        labelDisplayedRows={({ from, to, count }) => t('STATS_PAGE.DISPLAYED_ROWS', { from, to, total: count })}
       />
     </Card>
   )

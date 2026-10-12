@@ -3,8 +3,10 @@ import { useRouter } from 'next/navigation'
 
 import { ROUTES } from '@/common'
 import { useIsMobile } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
 const Component = () => {
+  const { t } = useTranslation()
   const router = useRouter()
   const isMobile = useIsMobile()
 
@@ -24,7 +26,7 @@ const Component = () => {
       }}
     >
       <Typography variant="body2" sx={{ fontWeight: 500, mb: 0 }}>
-        You are viewing demo data
+        {t('STATS_PAGE.DEMO_BANNER')}
       </Typography>
       <Button
         variant="outlined"
@@ -39,7 +41,7 @@ const Component = () => {
         }}
         onClick={() => router.push(ROUTES.DATA)}
       >
-        Upload your data
+        {t('STATS_PAGE.UPLOAD_YOUR_DATA')}
       </Button>
     </Box>
   )

@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { MISC } from '@/common'
 import { isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-file/service'
 import { useFileHelper } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
 import { openFolderPicker } from '../../actions'
 import { getBankAccountOptions, isSameSelection } from './actions'
@@ -18,6 +19,7 @@ type FileToolbarProps = {
 
 const Component = ({ onAddFiles }: FileToolbarProps) => {
   const sx = ui()
+  const { t } = useTranslation()
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const { mutate: removeFiles, isPending: isRemoving } = useMutateRemoveFiles()
@@ -27,11 +29,15 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
   const toIds = (list: typeof files) => list.map((file) => file.id)
 
   const selectOptions = [
-    { label: 'All', fileIds: toIds(files) },
-    { label: 'None', fileIds: [] },
-    { label: 'Parsed', fileIds: toIds(files.filter(isParsed)) },
-    { label: 'Unsupported', fileIds: toIds(files.filter(isUnknown)) },
-    { label: 'Invalid', fileIds: toIds(files.filter((file) => isError(file) && !isUnknown(file))) },
+    { id: 'all', label: t('DATA_PAGE.TOOLBAR.SELECT_ALL'), fileIds: toIds(files) },
+    { id: 'none', label: t('DATA_PAGE.TOOLBAR.SELECT_NONE'), fileIds: [] },
+    { id: 'parsed', label: t('DATA_PAGE.TOOLBAR.SELECT_PARSED'), fileIds: toIds(files.filter(isParsed)) },
+    { id: 'unsupported', label: t('DATA_PAGE.TOOLBAR.SELECT_UNSUPPORTED'), fileIds: toIds(files.filter(isUnknown)) },
+    {
+      id: 'invalid',
+      label: t('DATA_PAGE.TOOLBAR.SELECT_INVALID'),
+      fileIds: toIds(files.filter((file) => isError(file) && !isUnknown(file))),
+    },
   ]
 
   const bankOptions = getBankAccountOptions(files)
@@ -39,7 +45,7 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
   // Derived from the selection, so it stays correct when files are (un)checked by hand
   const isActive = (fileIds: string[]) => isSameSelection(fileIds, checkedIds)
   const activeLabel = checkedIds.length
-    ? [...bankOptions, ...selectOptions.filter((option) => !['All', 'None'].includes(option.label))].find((option) =>
+    ? [...bankOptions, ...selectOptions.filter((option) => !['all', 'none'].includes(option.id))].find((option) =>
         isActive(option.fileIds),
       )?.label
     : undefined
@@ -86,17 +92,17 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
       <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)} sx={sx.menu}>
         {selectOptions.map((option) => (
           <MenuItem
-            key={option.label}
-            disabled={option.label !== 'None' && !option.fileIds.length}
+            key={option.id}
+            disabled={option.id !== 'none' && !option.fileIds.length}
             onClick={() => selectFiles(option.fileIds)}
             selected={isActive(option.fileIds)}
             sx={sx.menuItem}
           >
-            {renderItemContent(option.label, option.label === 'None' ? null : option.fileIds.length)}
+            {renderItemContent(option.label, option.id === 'none' ? null : option.fileIds.length)}
           </MenuItem>
         ))}
         {bankOptions.length ? <Divider sx={sx.menuDivider} /> : null}
-        {bankOptions.length ? <ListSubheader sx={sx.menuSubheader}>Bank accounts</ListSubheader> : null}
+        {bankOptions.length ? <ListSubheader sx={sx.menuSubheader}>{t('DATA_PAGE.TOOLBAR.BANK_ACCOUNTS')}</ListSubheader> : null}
         {bankOptions.map((option) => (
           <MenuItem
             key={option.value}
@@ -111,7 +117,7 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
 
       {checkedIds.length ? (
         <>
-          <Tooltip title="Remove selected">
+          <Tooltip title={t('DATA_PAGE.TOOLBAR.REMOVE_SELECTED')}>
             <IconButton size="small" disabled={isRemoving} onClick={() => removeFiles(checkedIds)} sx={sx.actionButton}>
               <DeleteOutlined />
             </IconButton>
@@ -121,16 +127,18 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
       ) : null}
 
       <Typography variant="caption" sx={sx.count} title={activeLabel}>
-        {checkedIds.length ? `${checkedIds.length} of ${files.length}` : `${files.length} files`}
+        {checkedIds.length
+          ? t('DATA_PAGE.TOOLBAR.SELECTED_COUNT', { selected: checkedIds.length, total: files.length })
+          : t('DATA_PAGE.TOOLBAR.FILE_COUNT', { count: files.length })}
         {activeLabel ? ` ${MISC.CENTER_DOT} ${activeLabel}` : null}
       </Typography>
 
-      <Tooltip title="Add files">
+      <Tooltip title={t('DATA_PAGE.TOOLBAR.ADD_FILES')}>
         <IconButton size="small" onClick={onAddFiles} sx={sx.actionButton}>
           <NoteAddOutlined />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Add folder">
+      <Tooltip title={t('DATA_PAGE.TOOLBAR.ADD_FOLDER')}>
         <IconButton size="small" onClick={openFolderPicker} sx={sx.actionButton}>
           <CreateNewFolderOutlined />
         </IconButton>

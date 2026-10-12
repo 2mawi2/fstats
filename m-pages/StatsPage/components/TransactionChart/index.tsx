@@ -11,6 +11,7 @@ import { Currency } from '@/types-enums'
 import { BarChart } from '@/components'
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
+import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
 import { getBackgroundColour, getBarThickness, getBorderRadius, getChartOptions } from './actions'
@@ -22,6 +23,7 @@ type TransactionChartProps = {
 }
 
 const Component = ({ transactions, currency }: TransactionChartProps) => {
+  const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const sx = ui()
   const ref = useRef<HTMLDivElement>(null)
@@ -34,7 +36,7 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
 
   const dataset: ChartDataset<'bar'> = {
     type: 'bar',
-    label: 'Transactions',
+    label: t('MISC.TRANSACTIONS'),
     data: transactions.map((row) => Big(row.value).toNumber()),
     backgroundColor: getBackgroundColour,
     borderRadius: getBorderRadius,
@@ -52,7 +54,7 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
   return (
     <Card>
       <Typography variant="h6" color="secondary">
-        Cashflow
+        {t('STATS_PAGE.CASHFLOW')}
       </Typography>
 
       <Box sx={sx.chartCard} ref={ref}>

@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import type { StatsFile } from '@/types'
 import { useFileRows } from '@/m-stats-file/service'
+import { useTranslation } from '@/lib/i18n'
 
 import PreviewSection from '../PreviewSection'
 import VirtualTable from '../VirtualTable'
@@ -15,6 +16,7 @@ type CsvPreviewProps = {
 }
 
 const Component = ({ file, scrollElement }: CsvPreviewProps) => {
+  const { t } = useTranslation()
   const { data, isLoading, error } = useFileRows(file)
   const header = data?.header ?? null
   const rows = useMemo(() => data?.rows ?? [], [data])
@@ -26,7 +28,7 @@ const Component = ({ file, scrollElement }: CsvPreviewProps) => {
       title={file.file.name}
       rowCount={data ? rows.length : undefined}
       isLoading={isLoading}
-      error={error ? `Failed to read file: ${error.message}` : null}
+      error={error ? t('DATA_PAGE.FAILED_TO_READ_FILE', { message: error.message }) : null}
     >
       {data ? (
         <VirtualTable

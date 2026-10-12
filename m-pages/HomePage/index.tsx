@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/common'
 import { PageWrapper } from '@/components'
 import { useIsDarkMode, useIsMobile } from '@/hooks'
+import { Trans, useTranslation } from '@/lib/i18n'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
 
 import { CARD_ITEMS, STEPS } from './actions'
@@ -18,6 +19,7 @@ const Page = () => {
   const theme = useTheme()
   const sx = ui(theme, isMobile, isDarkMode)
   const router = useRouter()
+  const { t } = useTranslation()
 
   return (
     <PageWrapper>
@@ -29,15 +31,11 @@ const Page = () => {
         />
 
         <Typography variant="h1" sx={sx.heroTitle}>
-          Analyse bank statements{' '}
-          <Box component="span" sx={sx.heroTitleAccent}>
-            privately
-          </Box>
+          <Trans i18nKey="HOME_PAGE.HERO_TITLE" components={{ accent: <Box component="span" sx={sx.heroTitleAccent} /> }} />
         </Typography>
 
         <Typography variant="body1" component="p" sx={sx.heroSubtitle}>
-          Add CSV statements and get instant insights. All processing happens entirely on your device — no uploads, no
-          accounts, no tracking.
+          {t('HOME_PAGE.HERO_SUBTITLE')}
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 2, flexDirection: isMobile ? 'column' : 'row' }}>
@@ -48,7 +46,7 @@ const Page = () => {
             onMouseEnter={() => router.prefetch(ROUTES.DATA)}
             onClick={() => router.push(ROUTES.DATA)}
           >
-            Get started
+            {t('HOME_PAGE.GET_STARTED')}
           </Button>
 
           <Button
@@ -64,21 +62,21 @@ const Page = () => {
             onMouseEnter={() => router.prefetch(`${ROUTES.STATS}?demo=true`)}
             onClick={() => router.push(`${ROUTES.STATS}?demo=true`)}
           >
-            View demo
+            {t('MISC.VIEW_DEMO')}
           </Button>
         </Box>
       </Box>
 
       <Grid container spacing={isMobile ? 2 : 3} sx={sx.trustSection}>
-        {CARD_ITEMS.map(({ Icon, title, description }) => (
-          <Grid size={isMobile ? 12 : 4} key={title}>
+        {CARD_ITEMS.map(({ Icon, key }) => (
+          <Grid size={isMobile ? 12 : 4} key={key}>
             <Box sx={sx.trustCard}>
               <Icon sx={sx.trustIcon} />
               <Typography variant="h6" sx={sx.trustTitle}>
-                {title}
+                {t(`HOME_PAGE.CARDS.${key}.TITLE`)}
               </Typography>
               <Typography variant="body2" sx={sx.trustDescription}>
-                {description}
+                {t(`HOME_PAGE.CARDS.${key}.DESCRIPTION`)}
               </Typography>
             </Box>
           </Grid>
@@ -87,19 +85,19 @@ const Page = () => {
 
       <Box sx={sx.section}>
         <Typography variant="h5" sx={sx.sectionTitle}>
-          How it works
+          {t('HOME_PAGE.HOW_IT_WORKS')}
         </Typography>
 
         <Grid container spacing={isMobile ? 3 : 4} sx={{ mb: 6 }}>
-          {STEPS.map(({ step, title, description }) => (
+          {STEPS.map(({ step, key }) => (
             <Grid size={isMobile ? 12 : 4} key={step}>
               <Box sx={sx.stepCard}>
                 <Box sx={sx.stepBadge}>{step}</Box>
                 <Typography variant="h6" sx={sx.stepTitle}>
-                  {title}
+                  {t(`HOME_PAGE.STEPS.${key}.TITLE`)}
                 </Typography>
                 <Typography variant="body2" sx={sx.stepDescription}>
-                  {description}
+                  {t(`HOME_PAGE.STEPS.${key}.DESCRIPTION`)}
                 </Typography>
               </Box>
             </Grid>
@@ -113,13 +111,13 @@ const Page = () => {
           onMouseEnter={() => router.prefetch(ROUTES.DATA)}
           onClick={() => router.push(ROUTES.DATA)}
         >
-          Get started now
+          {t('HOME_PAGE.GET_STARTED_NOW')}
         </Button>
       </Box>
 
       <Box sx={sx.banksSection}>
         <Typography variant="h6" sx={sx.sectionTitle}>
-          Supported banks
+          {t('HOME_PAGE.SUPPORTED_BANKS')}
         </Typography>
         <Box sx={sx.bankGrid}>
           {Array.from(new Set(Object.values(AVAILABLE_PARSERS).map((parser) => parser.bankName))).map((bankName) => (

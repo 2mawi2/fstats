@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles'
 
 import { MISC } from '@/common'
 import { useIsDarkMode, useIsMobile } from '@/hooks'
+import { Trans, useTranslation } from '@/lib/i18n'
 
 import { openFolderPicker } from '../../actions'
 import { ui } from './styled'
@@ -16,6 +17,7 @@ type DropZoneDisplayProps = {
 }
 
 const Component = ({ isDragActive, onAddFiles }: DropZoneDisplayProps) => {
+  const { t } = useTranslation()
   const isMobile = useIsMobile()
   const isDarkMode = useIsDarkMode()
   const theme = useTheme()
@@ -25,23 +27,28 @@ const Component = ({ isDragActive, onAddFiles }: DropZoneDisplayProps) => {
     <Box sx={sx.wrapper}>
       <Box sx={{ ...sx.dropZoneBox(isDragActive), ...sx.dropZone }} onClick={onAddFiles}>
         <CloudUploadOutlined sx={sx.uploadIcon} />
-        <Typography variant="h5">Drop files anywhere</Typography>
+        <Typography variant="h5">{t('DATA_PAGE.DROP_FILES_ANYWHERE')}</Typography>
         <Typography variant="body2" color="text.secondary" sx={sx.subtitle}>
-          or click to select files {MISC.CENTER_DOT}{' '}
-          <Link
-            component="button"
-            variant="body2"
-            onClick={(event) => {
-              event.stopPropagation()
-              openFolderPicker()
+          <Trans
+            i18nKey="DATA_PAGE.CLICK_TO_SELECT"
+            values={{ dot: MISC.CENTER_DOT }}
+            components={{
+              link: (
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    openFolderPicker()
+                  }}
+                  sx={sx.folderLink}
+                />
+              ),
             }}
-            sx={sx.folderLink}
-          >
-            select a folder
-          </Link>
+          />
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          CSV files only, max 5MB each
+          {t('DATA_PAGE.FILE_RESTRICTIONS')}
         </Typography>
       </Box>
     </Box>

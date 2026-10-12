@@ -3,6 +3,7 @@ import { uniqBy } from 'lodash'
 import type { BankSelectOption, ParsedStatsFile, SelectOptionBankAccountId, Transaction } from '@/types'
 import { MISC } from '@/common'
 import { AVAILABLE_PARSERS, getBankAccountName } from '@/utils/Parser'
+import { i18n } from '@/lib/i18n'
 
 export const getCurrencyForSelection = (selectedId: SelectOptionBankAccountId, transactions: Transaction[]) => {
   if (!selectedId || selectedId === 'all') {
@@ -40,7 +41,7 @@ export const getBankSelectOptions = (selectedFiles: ParsedStatsFile[]): BankSele
     if (sameCurrency) {
       options.unshift({
         value: 'all',
-        label: 'All accounts',
+        label: i18n.t('STATS_PAGE.ALL_ACCOUNTS'),
       })
     }
   }
