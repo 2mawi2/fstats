@@ -3,7 +3,9 @@
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
-import { initStorage } from '@/lib/localforage'
+import { MISC } from '@/common'
+import { db, initStorage } from '@/lib/localforage'
+import { ensureUserExists } from '@/m-user/service'
 
 type StorageProps = {
   children: ReactNode
@@ -14,7 +16,15 @@ const Component = ({ children }: StorageProps) => {
 
   useEffect(() => {
     const init = async () => {
-      await initStorage()
+      initStorage()
+      const user = await ensureUserExists()
+
+      if (!user.persistData && !sessionStorage.getItem(MISC.SS_SESSION_KEY)) {
+        await db.filesStore.clear()
+        window.localStorage.removeItem(MISC.LS_SELECTED_FILE_IDS_KEY)
+      }
+
+      sessionStorage.setItem(MISC.SS_SESSION_KEY, 'true')
       setIsLoading(false)
     }
     init()

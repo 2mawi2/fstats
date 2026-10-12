@@ -30,19 +30,15 @@ const Component = () => {
   const bankOptions = getBankSelectOptions(isDemoMode ? [] : selectedFiles)
   const values: StatsPageForm = {
     selectedId: bankOptions.length ? bankOptions[0].value : '',
-    groupDataBy: 'day',
-    includeEmptyRangeItems: true,
   }
   const methods = useForm<StatsPageForm>({
     defaultValues: values,
     values,
   })
   const selectedId = useWatch({ control: methods.control, name: 'selectedId' })
-  const groupDataBy = useWatch({ control: methods.control, name: 'groupDataBy' })
   const { transactions, duplicates, transactionRangeItems } = useTransactionHelper({
     isDemoMode,
     selectedId,
-    groupDataBy,
     files: selectedFiles,
     locale,
     dateFormat,

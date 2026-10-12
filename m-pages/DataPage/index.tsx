@@ -3,7 +3,7 @@
 import { CloudUploadOutlined } from '@mui/icons-material'
 import { Box, Typography } from '@mui/material'
 import type { SxProps, Theme } from '@mui/material'
-import type { PointerEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Fragment, useCallback, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useLocalStorage } from 'usehooks-ts'
@@ -12,11 +12,19 @@ import type { NewStatsFile, RDZFileRejection, RDZFileWithPath } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
 import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-file/service'
-import { useDataLayout, useFileHelper, useUserPreferences } from '@/hooks'
+import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
 import { parseFiles } from '@/utils/FileParser'
 import { useTranslation } from '@/lib/i18n'
 
-import { AmountFilter, getAmountFilterOptions, getTableViewOptions, resizeColumns, TableView } from './actions'
+import {
+  AmountFilter,
+  getAmountFilterOptions,
+  getTableViewOptions,
+  openFolderPicker,
+  resizeColumns,
+  setInputFiles,
+  TableView,
+} from './actions'
 import {
   CsvPreview,
   DropZoneDisplay,
@@ -48,7 +56,6 @@ const Component = () => {
   const { mutateAsync: updateFiles } = useMutateUpdateFiles()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const checkedFiles = files.filter((file) => selectedFileIds.includes(file.id))
-  const { locale, dateFormat } = useUserPreferences()
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: RDZFileRejection[]) => {
@@ -58,15 +65,11 @@ const Component = () => {
       ]
 
       const addedFiles = await addFiles(newFiles)
-      const parseResults = await parseFiles(
-        addedFiles.filter((file) => file.status === StatsFileStatus.PARSING),
-        locale,
-        dateFormat,
-      )
+      const parseResults = await parseFiles(addedFiles.filter((file) => file.status === StatsFileStatus.PARSING))
       const updatedFiles = await updateFiles(parseResults)
       setSelectedFileIds((prev) => [...prev, ...updatedFiles.filter(isParsed).map((file) => file.id)])
     },
-    [addFiles, updateFiles, setSelectedFileIds, locale, dateFormat],
+    [addFiles, updateFiles, setSelectedFileIds],
   )
 
   const dropzone = useDropzone({
@@ -78,31 +81,16 @@ const Component = () => {
     noKeyboard: true,
   })
 
-  const onPointerDown = (index: number) => (event: PointerEvent<HTMLDivElement>) => {
-    const container = containerRef.current
+  // Run picked folders through the dropzone input, so they are validated like dropped files
+  const addFolder = async () => {
+    const pickedFiles = await openFolderPicker()
 
-    if (!container) {
-      return
+    if (pickedFiles && dropzone.inputRef.current) {
+      setInputFiles(dropzone.inputRef.current, pickedFiles)
     }
-
-    event.currentTarget.setPointerCapture(event.pointerId)
-    const startX = event.clientX
-    const startWidths = widths
-    const containerWidth = container.getBoundingClientRect().width
-
-    const onMove = (moveEvent: globalThis.PointerEvent) => {
-      const delta = ((moveEvent.clientX - startX) / containerWidth) * 100
-      setWidths(resizeColumns(startWidths, index, delta))
-    }
-
-    const onUp = () => {
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-    }
-
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
   }
+
+  const startResize = useResizeHandle(containerRef, 'x')
 
   const columns: {
     id: string
@@ -113,7 +101,7 @@ const Component = () => {
     {
       id: 'left',
       sx: { ...sx.stickyColumn, ...sx.leftColumn },
-      content: <FileExplorer onAddFiles={dropzone.open} />,
+      content: <FileExplorer onAddFiles={dropzone.open} onAddFolder={addFolder} />,
     },
     {
       id: 'middle',
@@ -122,7 +110,7 @@ const Component = () => {
       content: (
         <div>
           {!files.length ? (
-            <DropZoneDisplay isDragActive={dropzone.isDragActive} onAddFiles={dropzone.open} />
+            <DropZoneDisplay isDragActive={dropzone.isDragActive} onAddFiles={dropzone.open} onAddFolder={addFolder} />
           ) : checkedFiles.length ? (
             <>
               <Box sx={sx.middleToolbar}>
@@ -165,11 +153,16 @@ const Component = () => {
 
   return (
     <Box {...dropzone.getRootProps()} sx={sx.dropzone}>
-      <input id="dropzone-file-input" {...dropzone.getInputProps()} />
+      <input {...dropzone.getInputProps()} />
       <Box ref={containerRef} sx={sx.container}>
         {columns.map((column, index) => (
           <Fragment key={column.id}>
-            {index > 0 ? <Box sx={sx.divider} onPointerDown={onPointerDown(index - 1)} /> : null}
+            {index > 0 ? (
+              <Box
+                sx={sx.divider}
+                onPointerDown={startResize((delta) => setWidths(resizeColumns(widths, index - 1, delta)))}
+              />
+            ) : null}
             <Box ref={column.ref} sx={{ ...sx.column, ...column.sx, flexBasis: `${widths[index]}%` }}>
               {column.content}
             </Box>

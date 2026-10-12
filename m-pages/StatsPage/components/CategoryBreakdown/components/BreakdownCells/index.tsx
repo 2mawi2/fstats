@@ -1,52 +1,55 @@
 import { Grid, LinearProgress, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
-import type { CategoryWithTransactions, NumberString } from '@/types'
+import type { GradientColorsLightDark, NumberString } from '@/types'
 import { Currency } from '@/types-enums'
-import { PARENT_CATEGORY_COLORS } from '@/common'
 import { useUserPreferences } from '@/hooks'
 import { getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { toFixedLocale } from '@/utils/Number'
 import { Big } from '@/lib/w-big'
 
 import { COL_SPACING, COL1, COL2, COL3, COL4 } from '../../actions'
+import type { BreakdownCellsSize } from './styled'
 import { ui } from './styled'
 
-type SubBreakdownRowProps = {
-  category: CategoryWithTransactions
+type BreakdownCellsProps = {
+  label: string
+  total: NumberString
   parentCategoryTotal: NumberString
   currency: Currency
+  color: GradientColorsLightDark
+  size: BreakdownCellsSize
 }
 
-const Component = ({ category, parentCategoryTotal, currency }: SubBreakdownRowProps) => {
+const Component = ({ label, total: rawTotal, parentCategoryTotal, currency, color, size }: BreakdownCellsProps) => {
   const theme = useTheme()
-  const sx = ui(theme)
+  const sx = ui(theme, size)
   const { locale } = useUserPreferences()
-  const total = Big(category.total).abs()
+  const total = Big(rawTotal).abs()
   const percentage = total.div(total.eq(0) ? 1 : parentCategoryTotal).times(100)
   const totalDisplay = toFixedLocale(total.toString(), getMaxDecimalsForCurrency(currency), locale)
   const percentageDisplay = toFixedLocale(percentage.toString(), 1, locale)
-  const color = PARENT_CATEGORY_COLORS[category.code.split('_')[0]]
+  const hasTotal = total.gt(0)
 
   return (
-    <Grid container spacing={COL_SPACING} sx={{ mt: 0.5 }}>
+    <Grid container spacing={COL_SPACING} sx={sx.container}>
       <Grid size={{ xs: COL1[0], sm: COL1[1] }}>
-        <Typography variant="body2" noWrap sx={{ ...sx.text(total.gt(0)), ml: 2 }}>
-          {category.label}
+        <Typography variant="body2" noWrap sx={{ ...sx.text(hasTotal), ...sx.label }}>
+          {label}
         </Typography>
       </Grid>
       <Grid size={{ xs: COL2[0], sm: COL2[1] }}>
-        <Typography variant="body2" align="right" sx={sx.text(total.gt(0))}>
+        <Typography variant="body2" align="right" sx={sx.text(hasTotal)}>
           {totalDisplay}
         </Typography>
       </Grid>
       <Grid size={{ xs: COL3[0], sm: COL3[1] }}>
-        <Typography variant="body2" align="right" sx={sx.text(total.gt(0))}>
+        <Typography variant="body2" align="right" sx={sx.text(hasTotal)}>
           {percentageDisplay}%
         </Typography>
       </Grid>
       <Grid size={{ xs: COL4[0], sm: COL4[1] }} sx={{ alignSelf: 'center' }}>
-        <LinearProgress variant="determinate" value={percentage.toNumber()} sx={sx.progress(total.gt(0), color)} />
+        <LinearProgress variant="determinate" value={percentage.toNumber()} sx={sx.progress(hasTotal, color)} />
       </Grid>
     </Grid>
   )

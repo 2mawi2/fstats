@@ -40,13 +40,7 @@ export const StatsFileStatus = {
   ERROR: 'error',
 } as const
 
-export const zStatsFileStatus = z.enum([
-  StatsFileStatus.PARSING,
-  StatsFileStatus.PARSED,
-  StatsFileStatus.ERROR,
-] as const)
-
-export type StatsFileStatus = z.infer<typeof zStatsFileStatus>
+export type StatsFileStatus = (typeof StatsFileStatus)[keyof typeof StatsFileStatus]
 
 // -------------------------------------------------------
 
@@ -109,38 +103,6 @@ export type DateFormat = z.infer<typeof zDateFormat>
 // -------------------------------------------------------
 
 /**
- * The user's chosen preference which determines on what day the week starts.
- *
- * @remarks
- * The index of the first day of the week (0 - Sunday, 1 - Monday).
- */
-export const WeekStartsOn = {
-  SUNDAY: 'SUNDAY',
-  MONDAY: 'MONDAY',
-} as const
-
-export const zWeekStartsOn = z.enum([WeekStartsOn.SUNDAY, WeekStartsOn.MONDAY] as const)
-
-export type WeekStartsOn = z.infer<typeof zWeekStartsOn>
-
-// -------------------------------------------------------
-
-/**
- * The WeekStartsOnValue can only be a number between 0 - 6 and in our case we only use Sunday or Monday,
- * i.e. 0 or 1.
- */
-export const WeekStartsOnValue = {
-  SUNDAY: 0,
-  MONDAY: 1,
-} as const
-
-export const zWeekStartsOnValue = z.union([z.literal(WeekStartsOnValue.SUNDAY), z.literal(WeekStartsOnValue.MONDAY)])
-
-export type WeekStartsOnValue = z.infer<typeof zWeekStartsOnValue>
-
-// -------------------------------------------------------
-
-/**
  * The user's chosen display currency preference.
  */
 export const Currency = {
@@ -184,9 +146,7 @@ export const AccountType = {
   CREDIT_CARD: 'credit_card',
 } as const
 
-export const zAccountType = z.enum([AccountType.CURRENT, AccountType.SAVINGS, AccountType.CREDIT_CARD] as const)
-
-export type AccountType = z.infer<typeof zAccountType>
+export type AccountType = (typeof AccountType)[keyof typeof AccountType]
 
 // -------------------------------------------------------
 
@@ -195,8 +155,6 @@ export const SortOrder = {
   DESC: 'desc',
 } as const
 
-export const zSortOrder = z.enum([SortOrder.ASC, SortOrder.DESC] as const)
-
-export type SortOrder = z.infer<typeof zSortOrder>
+export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 // -------------------------------------------------------

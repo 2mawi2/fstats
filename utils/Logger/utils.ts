@@ -37,10 +37,6 @@ const _logMessage = (category: 'warn' | 'info' | 'success' | 'error', group: str
   )
 }
 
-export const loggerProd = (category: 'warn' | 'info' | 'success' | 'error', group: string, ...message: any[]) => {
-  _logMessage(category, group, ...message)
-}
-
 export const logger = (category: 'warn' | 'info' | 'success' | 'error', group: string, ...message: any[]) => {
   if (!CONFIG.ENABLE_CONSOLE_LOGGING) {
     return

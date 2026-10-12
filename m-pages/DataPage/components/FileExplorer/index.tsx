@@ -1,10 +1,9 @@
 'use client'
 
 import { Box, List, Skeleton, Typography } from '@mui/material'
-import type { PointerEvent } from 'react'
 import { useRef } from 'react'
 
-import { useDataLayout, useFileHelper } from '@/hooks'
+import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import FileRow from '../FileRow'
@@ -14,49 +13,26 @@ import { ui } from './styled'
 
 type FileExplorerProps = {
   onAddFiles: () => void
+  onAddFolder: () => void
 }
 
-const Component = ({ onAddFiles }: FileExplorerProps) => {
+const Component = ({ onAddFiles, onAddFolder }: FileExplorerProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const panesRef = useRef<HTMLDivElement>(null)
   const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
+  const startResize = useResizeHandle(panesRef, 'y')
 
   const toggleFile = (fileId: string) => {
     setSelectedFileIds((prev) => (prev.includes(fileId) ? prev.filter((id) => id !== fileId) : [...prev, fileId]))
-  }
-
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    const panes = panesRef.current
-
-    if (!panes) {
-      return
-    }
-
-    event.currentTarget.setPointerCapture(event.pointerId)
-    const startY = event.clientY
-    const startSplit = split
-    const panesHeight = panes.getBoundingClientRect().height
-
-    const onMove = (moveEvent: globalThis.PointerEvent) => {
-      setSplit(clampSplit(startSplit + ((moveEvent.clientY - startY) / panesHeight) * 100))
-    }
-
-    const onUp = () => {
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-    }
-
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
   }
 
   return (
     <Box sx={sx.explorer}>
       <Box ref={panesRef} sx={sx.panes}>
         <Box sx={{ ...sx.pane, ...sx.filesPane, flexBasis: `${split}%` }}>
-          <FileToolbar onAddFiles={onAddFiles} />
+          <FileToolbar onAddFiles={onAddFiles} onAddFolder={onAddFolder} />
           <List disablePadding>
             {files.map((file) => (
               <FileRow key={file.id} file={file} isChecked={selectedFileIds.includes(file.id)} onToggle={toggleFile} />
@@ -69,7 +45,7 @@ const Component = ({ onAddFiles }: FileExplorerProps) => {
           ) : null}
         </Box>
 
-        <Box sx={sx.splitDivider} onPointerDown={onPointerDown} />
+        <Box sx={sx.splitDivider} onPointerDown={startResize((delta) => setSplit(clampSplit(split + delta)))} />
 
         <Box sx={{ ...sx.pane, flexBasis: `${100 - split}%` }}>
           {files.length ? (

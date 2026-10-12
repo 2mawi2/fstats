@@ -8,15 +8,15 @@ import { MISC } from '@/common'
 import { useIsDarkMode, useIsMobile } from '@/hooks'
 import { Trans, useTranslation } from '@/lib/i18n'
 
-import { openFolderPicker } from '../../actions'
 import { ui } from './styled'
 
 type DropZoneDisplayProps = {
   isDragActive: boolean
   onAddFiles: () => void
+  onAddFolder: () => void
 }
 
-const Component = ({ isDragActive, onAddFiles }: DropZoneDisplayProps) => {
+const Component = ({ isDragActive, onAddFiles, onAddFolder }: DropZoneDisplayProps) => {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
   const isDarkMode = useIsDarkMode()
@@ -39,7 +39,7 @@ const Component = ({ isDragActive, onAddFiles }: DropZoneDisplayProps) => {
                   variant="body2"
                   onClick={(event) => {
                     event.stopPropagation()
-                    openFolderPicker()
+                    onAddFolder()
                   }}
                   sx={sx.folderLink}
                 />

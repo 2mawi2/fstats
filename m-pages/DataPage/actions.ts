@@ -76,7 +76,7 @@ export const resizeColumns = (widths: number[], index: number, delta: number) =>
 }
 
 /**
- * Opens the browser's folder picker and feeds all files (recursively) into the dropzone file input.
+ * Opens the browser's folder picker and returns all files in it (recursively), or `undefined` if nothing was picked.
  */
 export const openFolderPicker = async () => {
   try {
@@ -88,38 +88,26 @@ export const openFolderPicker = async () => {
     // @ts-expect-error showDirectoryPicker not in TS types
     const directoryHandle = await window.showDirectoryPicker()
 
-    const filesToAdd: File[] = []
-
     const getFilesRecursively = async (dirHandle: any): Promise<File[]> => {
       const files: File[] = []
       for await (const entry of dirHandle.values()) {
         if (entry.kind === 'file') {
-          const file = await entry.getFile()
-          files.push(file)
+          files.push(await entry.getFile())
         } else if (entry.kind === 'directory') {
-          const subFiles = await getFilesRecursively(entry)
-          files.push(...subFiles)
+          files.push(...(await getFilesRecursively(entry)))
         }
       }
       return files
     }
 
     const files = await getFilesRecursively(directoryHandle)
-    filesToAdd.push(...files)
 
-    if (!filesToAdd.length) {
+    if (!files.length) {
       alert(i18n.t('DATA_PAGE.FOLDER_EMPTY'))
       return
     }
 
-    const input = document.getElementById('dropzone-file-input') as HTMLInputElement
-    if (input) {
-      const dataTransfer = new DataTransfer()
-      filesToAdd.forEach((file) => dataTransfer.items.add(file))
-      input.files = dataTransfer.files
-      const event = new Event('change', { bubbles: true })
-      input.dispatchEvent(event)
-    }
+    return files
   } catch (error) {
     const err = error as Error
     if (err.name !== 'AbortError') {
@@ -127,4 +115,14 @@ export const openFolderPicker = async () => {
       alert(i18n.t('DATA_PAGE.FOLDER_ACCESS_FAILED'))
     }
   }
+}
+
+/**
+ * Sets the files of a file input and fires its change event, as if the user had picked them.
+ */
+export const setInputFiles = (input: HTMLInputElement, files: File[]) => {
+  const dataTransfer = new DataTransfer()
+  files.forEach((file) => dataTransfer.items.add(file))
+  input.files = dataTransfer.files
+  input.dispatchEvent(new Event('change', { bubbles: true }))
 }

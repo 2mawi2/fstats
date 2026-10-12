@@ -2,70 +2,31 @@
 
 import { Box, Button, Chip, Grid, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { ROUTES } from '@/common'
 import { PageWrapper } from '@/components'
-import { useIsDarkMode, useIsMobile } from '@/hooks'
-import { Trans, useTranslation } from '@/lib/i18n'
+import { useIsMobile } from '@/hooks'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
+import { useTranslation } from '@/lib/i18n'
 
 import { CARD_ITEMS, STEPS } from './actions'
-import { ui } from './styled'
+import { Hero } from './components'
+import { ctaButton, ui } from './styled'
 
 const Page = () => {
   const isMobile = useIsMobile()
-  const isDarkMode = useIsDarkMode()
   const theme = useTheme()
-  const sx = ui(theme, isMobile, isDarkMode)
-  const router = useRouter()
+  const sx = ui(theme, isMobile)
   const { t } = useTranslation()
 
   return (
     <PageWrapper>
-      <Box sx={sx.hero}>
-        <img
-          src={isDarkMode ? '/img/logo-dark.svg' : '/img/logo.svg'}
-          alt="fstats"
-          style={{ width: isMobile ? 96 : 128, height: 'auto', marginBottom: 24 }}
-        />
-
-        <Typography variant="h1" sx={sx.heroTitle}>
-          <Trans i18nKey="HOME_PAGE.HERO_TITLE" components={{ accent: <Box component="span" sx={sx.heroTitleAccent} /> }} />
-        </Typography>
-
-        <Typography variant="body1" component="p" sx={sx.heroSubtitle}>
-          {t('HOME_PAGE.HERO_SUBTITLE')}
-        </Typography>
-
-        <Box sx={{ display: 'flex', gap: 2, flexDirection: isMobile ? 'column' : 'row' }}>
-          <Button
-            variant="contained"
-            size="large"
-            sx={sx.ctaButton}
-            onMouseEnter={() => router.prefetch(ROUTES.DATA)}
-            onClick={() => router.push(ROUTES.DATA)}
-          >
-            {t('HOME_PAGE.GET_STARTED')}
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              ...sx.ctaButton,
-              borderWidth: 2,
-              '&:hover': {
-                borderWidth: 2,
-              },
-            }}
-            onMouseEnter={() => router.prefetch(`${ROUTES.STATS}?demo=true`)}
-            onClick={() => router.push(`${ROUTES.STATS}?demo=true`)}
-          >
-            {t('MISC.VIEW_DEMO')}
-          </Button>
-        </Box>
-      </Box>
+      <Hero
+        titleKey="HOME_PAGE.HERO_TITLE"
+        subtitle={t('HOME_PAGE.HERO_SUBTITLE')}
+        ctaLabel={t('HOME_PAGE.GET_STARTED')}
+      />
 
       <Grid container spacing={isMobile ? 2 : 3} sx={sx.trustSection}>
         {CARD_ITEMS.map(({ Icon, key }) => (
@@ -104,13 +65,7 @@ const Page = () => {
           ))}
         </Grid>
 
-        <Button
-          variant="contained"
-          size="large"
-          sx={sx.ctaButton}
-          onMouseEnter={() => router.prefetch(ROUTES.DATA)}
-          onClick={() => router.push(ROUTES.DATA)}
-        >
+        <Button component={Link} href={ROUTES.DATA} variant="contained" size="large" sx={ctaButton}>
           {t('HOME_PAGE.GET_STARTED_NOW')}
         </Button>
       </Box>

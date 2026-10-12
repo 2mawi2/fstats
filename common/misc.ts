@@ -2,12 +2,8 @@ import { ColorMode, Currency, DateFormat, UserLocale } from '@/types-enums'
 
 export const MISC = {
   CENTER_DOT: '·',
-  CENTER_DOT_XL: '•',
-  M_DASH: '—',
-  M_DASH_ALT: '–',
   GLASS_EFFECT: 0.8,
   MAX_UPLOAD_FILE_SIZE: 5 * 1024 * 1024,
-  SYSTEM_DATE_FORMAT: DateFormat.YMD_DASH,
   DEFAULT_DATE_FORMAT: DateFormat.YMD_DASH,
   DEFAULT_LOCALE: UserLocale.EN,
   DEFAULT_CURRENCY: Currency.EUR,

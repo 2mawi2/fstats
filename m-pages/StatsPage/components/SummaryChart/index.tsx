@@ -23,33 +23,15 @@ const Component = ({ transactionRangeItems }: SummaryChartProps) => {
   const chartOptions = getChartOptions(theme)
   const chartColors = getChartColors(isDarkMode)
   const labels = transactionRangeItems.map(({ label }) => label)
-  const income = accumulateValues(transactionRangeItems, 'income')
-  const expenses = accumulateValues(transactionRangeItems, 'expenses')
-  const both = accumulateValues(transactionRangeItems, 'both')
+  const both = accumulateValues(transactionRangeItems)
 
   // Add a "zero" data entry so the chart always begins from zero
   labels.unshift('')
-  income.unshift(0)
-  expenses.unshift(0)
   both.unshift(0)
 
   const chartData = {
     labels,
     datasets: [
-      // {
-      //   label: 'Income',
-      //   data: income,
-      //   borderColor: (context: ScriptableContext<'line'>) => getGradient({ context, colors: chartColors.income }),
-      //   lineTension: 0.1,
-      //   borderWidth: 1,
-      // },
-      // {
-      //   label: 'Expenses',
-      //   data: expenses,
-      //   borderColor: (context: ScriptableContext<'line'>) => getGradient({ context, colors: chartColors.expenses }),
-      //   lineTension: 0.1,
-      //   borderWidth: 1,
-      // },
       {
         label: t('MISC.BALANCE'),
         data: both,

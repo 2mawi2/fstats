@@ -1,11 +1,9 @@
 import { green, red } from '@mui/material/colors'
-import stringify from 'fast-json-stable-stringify'
-import { memoize } from 'lodash'
 
 import type { NumberString, Transaction } from '@/types'
 import { Big } from '@/lib/w-big'
 
-const _getStats = (
+export const getStats = (
   transactions: Transaction[],
 ): {
   totalIncome: NumberString
@@ -36,8 +34,6 @@ const _getStats = (
     expenseRatio: expenseRatio.toString(),
   }
 }
-
-export const getStats = memoize(_getStats, (args) => stringify(args))
 
 export const getProfitLossColors = (
   hasProfit: boolean,

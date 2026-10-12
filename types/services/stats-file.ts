@@ -10,16 +10,12 @@ import type { RDZFileWithPath } from '../lib/react-dropzone'
 import { zRDZFileWithPath } from '../lib/react-dropzone'
 import { zTransaction, zTransactionAtRest } from './transaction'
 
-export const zRowData = z.array(z.string())
+export type RowData = string[]
 
-export type RowData = z.infer<typeof zRowData>
-
-export const zStatsFileError = z.object({
+const zStatsFileError = z.object({
   code: zStatsFileErrorCode,
   message: z.string(),
 })
-
-export type StatsFileError = z.infer<typeof zStatsFileError>
 
 const zStatsFileMeta = z.object({
   id: zIdString,
@@ -60,7 +56,7 @@ export type NewStatsFile = {
   rejection?: string
 }
 
-export const zStatsFileAtRest = z.intersection(
+const zStatsFileAtRest = z.intersection(
   zStatsFileMeta,
   z.discriminatedUnion('status', [
     zStatsFileParsing,

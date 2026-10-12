@@ -14,7 +14,7 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 ### Data Access Rules
 
-- Components use service hooks from `m-*/service/` (e.g., `useFiles`, `useMutateAddFile`)
+- Components use service hooks from `m-*/service/` (e.g., `useFiles`, `useMutateAddFiles`)
 - Components must NOT import API layer directly
 - Don't use React Context for async state — use TanStack Query
 - LocalStorage for ephemeral state only (e.g., selected file IDs)

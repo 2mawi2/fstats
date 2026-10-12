@@ -2,7 +2,6 @@
 
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material'
 import { Box, Divider, Grid, Typography } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import { useState } from 'react'
 
 import type { NumberString, ParentCategoryWithTransactions, SortingPref } from '@/types'
@@ -10,27 +9,31 @@ import { Currency } from '@/types-enums'
 import { getCurrencySymbol } from '@/utils/Currency'
 import { useTranslation } from '@/lib/i18n'
 
-import { COL_SPACING, COL1, COL2, COL3, getSortedParentCategoriesWithTransactions } from '../../actions'
+import { COL_SPACING, COL1, COL2, COL3, getSortedCategories } from '../../actions'
 import { ui } from '../../styled'
 import BreakdownRow from '../BreakdownRow'
 
-type ExpensesBreakdownProps = {
+type BreakdownTableProps = {
+  title: string
+  emptyText: string
   transactionsGrouped: ParentCategoryWithTransactions[]
   total: NumberString
   currency: Currency
   showAll?: boolean
 }
 
-const Component = ({ transactionsGrouped, total, currency, showAll = false }: ExpensesBreakdownProps) => {
+const Component = ({
+  title,
+  emptyText,
+  transactionsGrouped,
+  total,
+  currency,
+  showAll = false,
+}: BreakdownTableProps) => {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const sx = ui(theme)
+  const sx = ui()
   const [sortingPref, setSortingPref] = useState<SortingPref>('totalDesc')
-  const sortedCategories = getSortedParentCategoriesWithTransactions(
-    transactionsGrouped,
-    transactionsGrouped.map((category) => category.code),
-    sortingPref,
-  )
+  const sortedCategories = getSortedCategories(transactionsGrouped, sortingPref)
   const categoriesWithTransactions = sortedCategories.filter((category) => category.transactions.length)
   const categoriesToShow = showAll ? sortedCategories : categoriesWithTransactions
 
@@ -40,7 +43,7 @@ const Component = ({ transactionsGrouped, total, currency, showAll = false }: Ex
         <Grid size={{ xs: COL1[0], sm: COL1[1] }}>
           <Box sx={sx.tableHeader} onClick={() => setSortingPref(sortingPref === 'asc' ? 'desc' : 'asc')}>
             <Box sx={sx.tableHeaderContent}>
-              {t('MISC.EXPENSES')}
+              {title}
               {sortingPref === 'asc' ? <ArrowUpward sx={{ fontSize: 13 }} /> : null}
               {sortingPref === 'desc' ? <ArrowDownward sx={{ fontSize: 13 }} /> : null}
             </Box>
@@ -73,7 +76,7 @@ const Component = ({ transactionsGrouped, total, currency, showAll = false }: Ex
         })
       ) : (
         <Typography variant="body2" noWrap sx={{ fontSize: 15, mb: 0, color: 'text.secondary', ml: 1 }}>
-          {t('STATS_PAGE.NO_EXPENSES')}
+          {emptyText}
         </Typography>
       )}
     </>

@@ -12,7 +12,7 @@ import { useTranslation } from '@/lib/i18n'
 
 import SwipeableDrawer from '../SwipeableDrawer'
 import { FULL_WIDTH_ROUTES } from './actions'
-import { Header, MenuDrawer, Sidebar } from './components'
+import { MainMenu, MenuDrawer, Sidebar } from './components'
 
 type LayoutProps = {
   children: ReactNode
@@ -56,7 +56,7 @@ const Component = ({ children }: LayoutProps) => {
 
   return (
     <>
-      <Header onMenuClick={() => setOpen(!open)} />
+      <MainMenu onMenuClick={() => setOpen(!open)} />
 
       <Container maxWidth={isFullWidth ? false : LAYOUT.CONTAINER_MAX_WIDTH} disableGutters={isFullWidth}>
         {children}

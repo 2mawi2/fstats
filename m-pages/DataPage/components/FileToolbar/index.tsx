@@ -9,15 +9,15 @@ import { isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-fi
 import { useFileHelper } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
-import { openFolderPicker } from '../../actions'
 import { getBankAccountOptions, isSameSelection } from './actions'
 import { ui } from './styled'
 
 type FileToolbarProps = {
   onAddFiles: () => void
+  onAddFolder: () => void
 }
 
-const Component = ({ onAddFiles }: FileToolbarProps) => {
+const Component = ({ onAddFiles, onAddFolder }: FileToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
@@ -36,7 +36,7 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
     {
       id: 'invalid',
       label: t('DATA_PAGE.TOOLBAR.SELECT_INVALID'),
-      fileIds: toIds(files.filter((file) => isError(file) && !isUnknown(file))),
+      fileIds: toIds(files.filter(isError)),
     },
   ]
 
@@ -102,7 +102,9 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
           </MenuItem>
         ))}
         {bankOptions.length ? <Divider sx={sx.menuDivider} /> : null}
-        {bankOptions.length ? <ListSubheader sx={sx.menuSubheader}>{t('DATA_PAGE.TOOLBAR.BANK_ACCOUNTS')}</ListSubheader> : null}
+        {bankOptions.length ? (
+          <ListSubheader sx={sx.menuSubheader}>{t('DATA_PAGE.TOOLBAR.BANK_ACCOUNTS')}</ListSubheader>
+        ) : null}
         {bankOptions.map((option) => (
           <MenuItem
             key={option.value}
@@ -139,7 +141,7 @@ const Component = ({ onAddFiles }: FileToolbarProps) => {
         </IconButton>
       </Tooltip>
       <Tooltip title={t('DATA_PAGE.TOOLBAR.ADD_FOLDER')}>
-        <IconButton size="small" onClick={openFolderPicker} sx={sx.actionButton}>
+        <IconButton size="small" onClick={onAddFolder} sx={sx.actionButton}>
           <CreateNewFolderOutlined />
         </IconButton>
       </Tooltip>

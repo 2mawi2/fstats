@@ -1,4 +1,4 @@
-import { formatISO, parseISO } from 'date-fns'
+import { formatISO, isValid, parse, parseISO } from 'date-fns'
 
 import type { BankDef, DetectResult, ExtraField, FormatDef, Parser, RowData, Transaction } from '@/types'
 import { SortOrder } from '@/types-enums'
@@ -18,7 +18,6 @@ const HEADER_SEARCH_LIMIT = 30
 const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
 
 type Row = {
-  has: (header: string) => boolean
   get: (header: string) => string
 }
 
@@ -37,14 +36,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 
   const toNumber = (value: string) => (numberFormat === 'de' ? parseGermanNumber(value) : value)
 
-  const isValidDate = (value: string) => {
-    try {
-      toDate(value, { formatFrom: dateFormat })
-      return true
-    } catch {
-      return false
-    }
-  }
+  const isValidDate = (value: string) => isValid(parse(value, dateFormat, new Date()))
 
   const getValue = (row: Row): string => {
     switch (amount.type) {
@@ -67,13 +59,14 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
     }
 
     const fields = (Object.entries(extraColumns) as [ExtraField, string][])
-      .filter(([, header]) => row.has(header))
-      .map(([field, header]) => {
+      .map(([field, header]): [ExtraField, string] => {
         const value = row.get(header)
-        return [field, NUMERIC_EXTRA_FIELDS.includes(field) ? toNumber(value) || '0' : value]
+        return [field, value && NUMERIC_EXTRA_FIELDS.includes(field) ? toNumber(value) : value]
       })
+      // Empty cells are omitted rather than stored as '' or '0'
+      .filter(([, value]) => value)
 
-    return buildExtra(Object.fromEntries(fields))
+    return fields.length ? Object.fromEntries(fields) : null
   }
 
   const locateRows = (data: RowData[]): LocatedRows => {
@@ -104,7 +97,6 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
     const indexes = new Map(headers.map((header) => [header, best.headers.indexOf(normalizeHeader(header))]))
 
     const toRow = (row: RowData): Row => ({
-      has: (header) => (indexes.get(header) ?? -1) !== -1,
       get: (header) => row[indexes.get(header) ?? -1]?.trim() ?? '',
     })
 
@@ -136,10 +128,8 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
     id: toParserId(bank, format) as ParserId,
     bankAccountId: toAccountId(bank, format) as BankAccountId,
     bankName: bank.name,
-    accountType: format.accountType,
     accountName: format.accountName,
     currency: bank.currency,
-    dateFormat,
 
     detect: (rows) => {
       const located = locateRows(rows)
@@ -188,7 +178,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
  * IDs are a hash of the transaction content (excluding the derived `category`), so they are stable across
  * re-parses. Identical transactions within a file (only possible with second precision dates) get a counter suffix.
  */
-export const createTransactionIdGenerator = () => {
+const createTransactionIdGenerator = () => {
   const seen = new Map<string, number>()
 
   return ({ date, description, value, currency, extra }: Omit<Transaction, 'id' | 'category'>): string => {
@@ -198,11 +188,6 @@ export const createTransactionIdGenerator = () => {
     seen.set(id, count)
     return count === 1 ? id : `${id}-${count}`
   }
-}
-
-// Strips empty fields from object
-export const buildExtra = (fields: Record<string, string>): Transaction['extra'] => {
-  return Object.fromEntries(Object.entries(fields).filter(([, value]) => value)) as Transaction['extra']
 }
 
 /**
@@ -218,7 +203,7 @@ export const normalizeHeader = (value: string) => {
     .replace(/[^\x20-\x7E]/g, '?')
 }
 
-export const getCsvSortOrder = (dates: Date[]): SortOrder => {
+const getCsvSortOrder = (dates: Date[]): SortOrder => {
   let asc = 0
   let desc = 0
 

@@ -2,13 +2,11 @@
 
 import { DeleteOutlined, FolderOutlined, StorageRounded } from '@mui/icons-material'
 import { Box, Button, Card, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
 
-import { useFiles, useMutateRemoveAllFiles } from '@/m-stats-file/service'
+import { useFiles, useMutateRemoveAllFiles, useStorageSize } from '@/m-stats-file/service'
 import { formatFileSize } from '@/utils/File'
 import { useTranslation } from '@/lib/i18n'
 
-import { calculateStorageSize } from './actions'
 import { ui } from './styled'
 
 const Component = () => {
@@ -16,24 +14,8 @@ const Component = () => {
   const { t } = useTranslation()
   const { data: files = [], isLoading: isLoadingFiles } = useFiles()
   const { mutate: removeAllFiles, isPending: isRemovingFiles } = useMutateRemoveAllFiles()
-  const [storageSize, setStorageSize] = useState<string>(formatFileSize(0))
-  const [isCalculating, setIsCalculating] = useState(true)
-
-  useEffect(() => {
-    const calculateInfo = async () => {
-      setIsCalculating(true)
-      try {
-        const size = await calculateStorageSize()
-        setStorageSize(formatFileSize(size))
-      } catch {
-        setStorageSize(t('SETTINGS_PAGE.STORAGE.FAILED_TO_CALCULATE'))
-      } finally {
-        setIsCalculating(false)
-      }
-    }
-
-    calculateInfo()
-  }, [files.length, t])
+  const { data: size = 0, isLoading: isCalculating, isError } = useStorageSize()
+  const storageSize = isError ? t('SETTINGS_PAGE.STORAGE.FAILED_TO_CALCULATE') : formatFileSize(size)
 
   const fileCount = files.length
   const hasFiles = fileCount > 0

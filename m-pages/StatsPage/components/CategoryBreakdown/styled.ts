@@ -1,6 +1,4 @@
-import type { Theme } from '@mui/material/styles'
-
-export const ui = (theme: Theme) => {
+export const ui = () => {
   return {
     tableHeader: {
       display: 'flex',

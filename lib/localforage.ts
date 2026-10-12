@@ -1,8 +1,5 @@
 import localforage from 'localforage'
 
-import { MISC } from '@/common'
-import { ensureUserExists } from '@/m-user/service'
-
 const baseConfig = {
   name: 'fstats',
   driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE],
@@ -11,7 +8,7 @@ const baseConfig = {
 let filesStore: LocalForage | null = null
 let userStore: LocalForage | null = null
 
-export const initStorage = async () => {
+export const initStorage = () => {
   filesStore = localforage.createInstance({
     ...baseConfig,
     storeName: 'fstats__files',
@@ -23,15 +20,6 @@ export const initStorage = async () => {
     storeName: 'fstats__user',
     description: 'User store',
   })
-
-  const user = await ensureUserExists()
-
-  if (!user.persistData && !sessionStorage.getItem(MISC.SS_SESSION_KEY)) {
-    await db.filesStore.clear()
-    window.localStorage.removeItem(MISC.LS_SELECTED_FILE_IDS_KEY)
-  }
-
-  sessionStorage.setItem(MISC.SS_SESSION_KEY, 'true')
 }
 
 export const db = {

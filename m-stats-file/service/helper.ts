@@ -15,13 +15,3 @@ export const isError = (file: StatsFile) => {
 export const isUnknown = (file: StatsFile) => {
   return file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.UNSUPPORTED_FORMAT
 }
-
-/**
- * Rejected and duplicate files can't become valid by parsing them (again).
- */
-export const canParse = (file: StatsFile) => {
-  return !(
-    file.status === StatsFileStatus.ERROR &&
-    (file.error.code === StatsFileErrorCode.REJECTED || file.error.code === StatsFileErrorCode.DUPLICATE)
-  )
-}

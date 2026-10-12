@@ -10,6 +10,4 @@ export const zRDZFileWithPath = z.custom<FileWithPath>((val) => {
 
 export type RDZFileWithPath = z.infer<typeof zRDZFileWithPath>
 
-export const zRDZFileRejection = z.custom<FileRejection>()
-
-export type RDZFileRejection = z.infer<typeof zRDZFileRejection>
+export type RDZFileRejection = FileRejection

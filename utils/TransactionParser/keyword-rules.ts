@@ -1,6 +1,6 @@
 import type { KeywordRule } from '@/types'
 
-export const RAW_INCOME_KEYWORD_RULES: KeywordRule[] = [
+const RAW_INCOME_KEYWORD_RULES: KeywordRule[] = [
   {
     category: 'PAS_03',
     keywords: ['Interest Received', 'INTEREST ON CREDIT BALANCE'],
@@ -17,7 +17,7 @@ export const RAW_INCOME_KEYWORD_RULES: KeywordRule[] = [
   },
 ]
 
-export const RAW_EXPENSE_KEYWORD_RULES: KeywordRule[] = [
+const RAW_EXPENSE_KEYWORD_RULES: KeywordRule[] = [
   {
     category: 'HOU_03',
     keywords: ['TELEKOM'],

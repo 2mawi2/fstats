@@ -8,7 +8,7 @@ import { getStats } from '@/utils/Stats'
 import { useTranslation } from '@/lib/i18n'
 
 import { getTransactionsGroupedByCategory } from './actions'
-import { ExpensesBreakdown, IncomeBreakdown } from './components'
+import { BreakdownTable } from './components'
 
 type CategoryBreakdownProps = {
   transactions: Transaction[]
@@ -18,7 +18,7 @@ type CategoryBreakdownProps = {
 const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
   const { t } = useTranslation()
   const { totalIncome, totalExpense } = getStats(transactions)
-  const groupedTransactions = Object.values(getTransactionsGroupedByCategory(transactions))
+  const groupedTransactions = getTransactionsGroupedByCategory(transactions)
   const income = groupedTransactions.filter((cat) => Object.keys(INCOME_CATEGORIES).includes(cat.code))
   const expenses = groupedTransactions.filter((cat) => Object.keys(EXPENSE_CATEGORIES).includes(cat.code))
   const [showAll, setShowAll] = useState(false)
@@ -38,10 +38,24 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
       </Box>
 
       <Box sx={{ mb: 4 }}>
-        <IncomeBreakdown transactionsGrouped={income} total={totalIncome} currency={currency} showAll={showAll} />
+        <BreakdownTable
+          title={t('MISC.INCOME')}
+          emptyText={t('STATS_PAGE.NO_INCOME')}
+          transactionsGrouped={income}
+          total={totalIncome}
+          currency={currency}
+          showAll={showAll}
+        />
       </Box>
 
-      <ExpensesBreakdown transactionsGrouped={expenses} total={totalExpense} currency={currency} showAll={showAll} />
+      <BreakdownTable
+        title={t('MISC.EXPENSES')}
+        emptyText={t('STATS_PAGE.NO_EXPENSES')}
+        transactionsGrouped={expenses}
+        total={totalExpense}
+        currency={currency}
+        showAll={showAll}
+      />
     </Card>
   )
 }

@@ -1,7 +1,7 @@
 import type { Parser } from '@/types'
 import { MISC } from '@/common'
 
-import { createParser } from './helper'
+import { createParser } from './create-parser'
 import type { BankAccountId, ParserId } from './registry'
 import { BANKS } from './registry'
 

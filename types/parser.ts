@@ -1,4 +1,4 @@
-import { AccountType, Currency, DateFormat, UserLocale } from '@/types-enums'
+import { AccountType, Currency } from '@/types-enums'
 import type { BankAccountId, ParserId } from '@/utils/Parser/registry'
 
 import type { RowData } from './services/stats-file'
@@ -19,16 +19,14 @@ export type Parser = {
   id: ParserId
   bankAccountId: BankAccountId
   bankName: string
-  accountType: AccountType
   accountName: string
   currency: Currency
-  dateFormat: string
   detect: (rows: RowData[]) => DetectResult
   /**
    * The header row and transaction rows as is, without preambles, footers or other sections.
    */
   extractRows: (rows: RowData[]) => { header: RowData; rows: RowData[] } | null
-  parse: (rows: RowData[], locale: UserLocale, dateFormat: DateFormat) => Transaction[]
+  parse: (rows: RowData[]) => Transaction[]
 }
 
 // Bank definitions

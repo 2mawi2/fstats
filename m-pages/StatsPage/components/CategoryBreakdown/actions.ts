@@ -64,47 +64,36 @@ export const getTransactionsGroupedByCategory = (transactions: Transaction[]): P
   return Object.values(categories)
 }
 
-export const sortByName = (a: string, b: string, dir: 'asc' | 'desc') => {
+const sortByName = (a: string, b: string, dir: 'asc' | 'desc') => {
   return dir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
 }
 
-export const sortByTotal = (a: NumberString, b: NumberString, dir: 'asc' | 'desc') => {
+const sortByTotal = (a: NumberString, b: NumberString, dir: 'asc' | 'desc') => {
   return dir === 'asc'
     ? Big(Big(a).abs()).minus(Big(b).abs()).toNumber()
     : Big(Big(b).abs()).minus(Big(a).abs()).toNumber()
 }
 
-const sortCategoriesByPref = <T extends ParentCategoryWithTransactions | CategoryWithTransactions>(
+export const getSortedCategories = <T extends ParentCategoryWithTransactions | CategoryWithTransactions>(
   items: T[],
   sortingPref: SortingPref,
 ): T[] => {
-  return items.sort((a, b) => {
-    if (sortingPref === 'asc') {
-      return sortByName(a.label, b.label, 'asc')
-    }
-    if (sortingPref === 'desc') {
-      return sortByName(a.label, b.label, 'desc')
-    }
-    if (sortingPref === 'totalAsc') {
-      return sortByTotal(a.total, b.total, 'asc')
-    }
-    if (sortingPref === 'totalDesc') {
-      return sortByTotal(a.total, b.total, 'desc')
-    }
-    return 0
-  })
-}
-
-export const getSortedParentCategoriesWithTransactions = (
-  transactions: ParentCategoryWithTransactions[],
-  categoriesToInclude: CategoryCode[],
-  sortingPref: SortingPref,
-): ParentCategoryWithTransactions[] => {
   // Always sort alphabetically first to ensure consistent sorting when totals are the same
-  const sorted = transactions.sort((a, b) => a.label.localeCompare(b.label))
-
-  return sortCategoriesByPref(
-    sorted.filter((category) => categoriesToInclude.includes(category.code)),
-    sortingPref,
-  )
+  return [...items]
+    .sort((a, b) => sortByName(a.label, b.label, 'asc'))
+    .sort((a, b) => {
+      if (sortingPref === 'asc') {
+        return sortByName(a.label, b.label, 'asc')
+      }
+      if (sortingPref === 'desc') {
+        return sortByName(a.label, b.label, 'desc')
+      }
+      if (sortingPref === 'totalAsc') {
+        return sortByTotal(a.total, b.total, 'asc')
+      }
+      if (sortingPref === 'totalDesc') {
+        return sortByTotal(a.total, b.total, 'desc')
+      }
+      return 0
+    })
 }

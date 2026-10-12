@@ -9,14 +9,5 @@ export const syncUser = (dataToSync: User): UserAtRest => {
     throw new Error(`Cannot sync User: ${errors}`)
   }
 
-  return {
-    ...res.data,
-  }
-}
-
-export const parseUser = (dataToParse: UserAtRest): User => {
-  const res: User = {
-    ...dataToParse,
-  }
-  return res
+  return res.data
 }

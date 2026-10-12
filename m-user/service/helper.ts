@@ -1,5 +1,5 @@
 import type { User } from '@/types'
-import { ColorMode, UserLocale } from '@/types-enums'
+import { UserLocale } from '@/types-enums'
 import { MISC } from '@/common'
 import { i18n } from '@/lib/i18n'
 import { getQueryClient } from '@/lib/tanstack-query'
@@ -12,7 +12,6 @@ export const getUserDefaults = (): User => ({
   modified: '',
   id: '',
   locale: MISC.DEFAULT_LOCALE,
-  colorMode: MISC.DEFAULT_COLOR_MODE,
   persistData: MISC.DEFAULT_PERSIST_DATA,
   dateFormat: MISC.DEFAULT_DATE_FORMAT,
 })
@@ -33,18 +32,16 @@ export const ensureUserExists = async (): Promise<User> => {
       user = await updateUser({ dateFormat: MISC.DEFAULT_DATE_FORMAT })
     }
 
+    // `colorMode` was removed (MUI's storage is the source of truth), writing strips it
+    if ('colorMode' in user) {
+      user = await updateUser({})
+    }
+
     if (user.locale !== locale) {
       user = await updateUser({ locale })
     }
   } else {
-    const newUser = getUserDefaults()
-    user = await addUser({
-      ...newUser,
-      locale,
-      colorMode: window.localStorage.getItem(MISC.LS_MUI_COLOR_MODE_KEY)
-        ? (window.localStorage.getItem(MISC.LS_MUI_COLOR_MODE_KEY) as ColorMode)
-        : newUser.colorMode,
-    })
+    user = await addUser({ ...getUserDefaults(), locale })
   }
 
   queryClient.setQueryData(userKey.detail(MISC.USER_KEY), user)

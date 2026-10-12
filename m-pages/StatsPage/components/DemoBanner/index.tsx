@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from '@mui/material'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { ROUTES } from '@/common'
 import { useIsMobile } from '@/hooks'
@@ -7,7 +7,6 @@ import { useTranslation } from '@/lib/i18n'
 
 const Component = () => {
   const { t } = useTranslation()
-  const router = useRouter()
   const isMobile = useIsMobile()
 
   return (
@@ -29,6 +28,8 @@ const Component = () => {
         {t('STATS_PAGE.DEMO_BANNER')}
       </Typography>
       <Button
+        component={Link}
+        href={ROUTES.DATA}
         variant="outlined"
         size="small"
         sx={{
@@ -39,7 +40,6 @@ const Component = () => {
             backgroundColor: 'rgba(255, 255, 255, 0.1)',
           },
         }}
-        onClick={() => router.push(ROUTES.DATA)}
       >
         {t('STATS_PAGE.UPLOAD_YOUR_DATA')}
       </Button>

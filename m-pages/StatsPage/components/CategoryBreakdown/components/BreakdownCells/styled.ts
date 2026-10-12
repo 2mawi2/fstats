@@ -4,17 +4,31 @@ import type { Theme } from '@mui/material/styles'
 import { GradientColorsLightDark } from '@/types'
 import { ColorMode } from '@/types-enums'
 
-export const ui = (theme: Theme) => {
+export type BreakdownCellsSize = 'md' | 'sm'
+
+const SIZES = {
+  md: { fontSize: 15, barHeight: 10 },
+  sm: { fontSize: 13, barHeight: 6 },
+} as const
+
+export const ui = (theme: Theme, size: BreakdownCellsSize) => {
+  const { fontSize, barHeight } = SIZES[size]
+  const isSmall = size === 'sm'
+
   return {
+    container: isSmall ? { mt: 0.5 } : {},
+
+    label: isSmall ? { ml: 2 } : {},
+
     text: (disabled: boolean) => ({
       mb: 0,
-      fontSize: 13,
+      fontSize,
       opacity: disabled ? 1 : 0.5,
     }),
 
     progress: (disabled: boolean, color: GradientColorsLightDark) => ({
       opacity: disabled ? 1 : 0.3,
-      height: 6,
+      height: barHeight,
       borderRadius: 100,
       [`&.${linearProgressClasses.colorPrimary}`]: {
         background: theme.vars.palette.grey[200],

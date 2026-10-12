@@ -19,7 +19,6 @@ import {
 } from '@mui/material'
 import { green } from '@mui/material/colors'
 import { useTheme } from '@mui/material/styles'
-import stringify from 'fast-json-stable-stringify'
 import { useMemo, useState } from 'react'
 
 import type { Transaction } from '@/types'
@@ -64,7 +63,7 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
       return text
     }
 
-    const parts = text.split(new RegExp(`(${query})`, 'gi'))
+    const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'))
     return (
       <>
         {parts.map((part, index) =>
@@ -83,21 +82,17 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
   }
 
   const filteredTransactions = useMemo(() => {
-    let filtered = transactions
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter((row) => {
-        const categoryLabel = getSubcategoryLabel(row.category)
-        return (
-          row.description.toLowerCase().includes(query) ||
-          categoryLabel.toLowerCase().includes(query) ||
-          row.date.includes(searchQuery)
-        )
-      })
+    if (!searchQuery.trim()) {
+      return transactions
     }
 
-    return filtered
+    const query = searchQuery.toLowerCase()
+    return transactions.filter(
+      (row) =>
+        row.description.toLowerCase().includes(query) ||
+        getSubcategoryLabel(row.category).toLowerCase().includes(query) ||
+        row.date.includes(searchQuery),
+    )
   }, [searchQuery, transactions])
 
   return (
@@ -111,7 +106,10 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
           fullWidth
           placeholder={t('STATS_PAGE.SEARCH_TRANSACTIONS')}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value)
+            setPage(0)
+          }}
           slotProps={{
             input: {
               startAdornment: (
@@ -141,7 +139,7 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
           <TableBody>
             {!filteredTransactions.length ? (
               <TableRow>
-                <TableCell colSpan={isMobile ? 3 : 5} sx={{ textAlign: 'center', py: 6 }}>
+                <TableCell colSpan={isMobile ? 3 : 4} sx={{ textAlign: 'center', py: 6 }}>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0 }}>
                     {t('STATS_PAGE.NO_TRANSACTIONS_FOUND')}
                   </Typography>
@@ -149,7 +147,7 @@ const Component = ({ transactions, currency }: TransactionsTableProps) => {
               </TableRow>
             ) : (
               filteredTransactions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                <TableRow key={stringify(row)} hover sx={sx.tableRow}>
+                <TableRow key={row.id} hover sx={sx.tableRow}>
                   <TableCell sx={sx.compactCell}>
                     <Typography
                       variant="body2"

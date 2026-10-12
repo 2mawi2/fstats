@@ -34,62 +34,36 @@ const Component = ({ transactions, currency }: ProfitLossSummaryProps) => {
     isDarkMode,
   )
 
+  const cards = [
+    { label: t('MISC.INCOME'), value: totalIncomeDisplay, color: incomeTextColor, md: 3.25, highlight: false },
+    { label: t('MISC.EXPENSES'), value: totalExpenseDisplay, color: expensesTextColor, md: 3.25, highlight: false },
+    { label: t('MISC.BALANCE'), value: profitDisplay, color: profitTextColor, md: 3.25, highlight: true },
+    {
+      label: t('MISC.PROFIT_MARGIN'),
+      value: `${profitMarginDisplay}%`,
+      color: profitTextColor,
+      md: 2.25,
+      highlight: true,
+    },
+  ]
+
   return (
     <Box sx={{ mt: 3 }}>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 3.25 }}>
-          <Box sx={sx.statCard('transparent')}>
-            <Box sx={sx.statHeader}>
-              {/* <TrendingUp sx={{ color: incomeTextColor, fontSize: 20 }} /> */}
-              <Typography variant="caption" sx={sx.caption(incomeTextColor)}>
-                {t('MISC.INCOME')}
+        {cards.map(({ label, value, color, md, highlight }) => (
+          <Grid key={label} size={{ xs: 12, md }}>
+            <Box sx={highlight ? sx.profitCard(profitBgColor) : sx.statCard('transparent')}>
+              <Box sx={sx.statHeader}>
+                <Typography variant="caption" sx={sx.caption(color)}>
+                  {label}
+                </Typography>
+              </Box>
+              <Typography variant="h4" sx={sx.amount(color)}>
+                {value}
               </Typography>
             </Box>
-            <Typography color="primary" variant="h4" sx={sx.amount(incomeTextColor)}>
-              {totalIncomeDisplay}
-            </Typography>
-          </Box>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 3.25 }}>
-          <Box sx={sx.statCard('transparent')}>
-            <Box sx={sx.statHeader}>
-              {/* <TrendingDown sx={{ color: expensesTextColor, fontSize: 20 }} /> */}
-              <Typography variant="caption" sx={sx.caption(expensesTextColor)}>
-                {t('MISC.EXPENSES')}
-              </Typography>
-            </Box>
-            <Typography variant="h4" sx={sx.amount(expensesTextColor)}>
-              {totalExpenseDisplay}
-            </Typography>
-          </Box>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 3.25 }}>
-          <Box sx={sx.profitCard(profitBgColor)}>
-            <Box sx={sx.statHeader}>
-              <Typography variant="caption" sx={sx.caption(profitTextColor)}>
-                {t('MISC.BALANCE')}
-              </Typography>
-            </Box>
-            <Typography variant="h4" sx={sx.amount(profitTextColor)}>
-              {profitDisplay}
-            </Typography>
-          </Box>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 2.25 }}>
-          <Box sx={sx.profitCard(profitBgColor)}>
-            <Box sx={sx.statHeader}>
-              <Typography variant="caption" sx={sx.caption(profitTextColor)}>
-                {t('MISC.PROFIT_MARGIN')}
-              </Typography>
-            </Box>
-            <Typography variant="h4" sx={sx.amount(profitTextColor)}>
-              {profitMarginDisplay}%
-            </Typography>
-          </Box>
-        </Grid>
+          </Grid>
+        ))}
       </Grid>
     </Box>
   )
