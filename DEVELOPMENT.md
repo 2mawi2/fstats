@@ -6,7 +6,7 @@ Start dev server on [localhost](http://localhost:3000/) with:
 pnpm dev
 ```
 
-See `.claude/CLAUDE.md` for architecture and adding a new bank.
+See [AGENTS.md](AGENTS.md) for architecture and adding a new bank.
 
 
 ## Environments

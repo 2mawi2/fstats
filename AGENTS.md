@@ -10,15 +10,21 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 ### Feature Modules (`m-{feature}/`)
 
-- **API Layer** (`api/`) — LocalForage operations, data transformation (At Rest string ↔ In Memory Big), pure async functions
+- **API Layer** (`api/`) — LocalForage operations and persistence/runtime schema synchronization; monetary values stay decimal strings and use `Big` for calculations
 - **Service Layer** (`service/`) — TanStack Query hooks, cache management, business logic
+
+### Page Modules (`m-pages/{Name}Page/`)
+
+- One module per route (`app/{route}/page.tsx` only renders it): `index.tsx`, `actions.ts` (pure helpers), `styled.ts` (`ui()` sx objects), `components/{Component}/` (same structure, nested per component)
+- `StatsPage` (`/stats`) is the main 3-column page: file explorer | data or stats view (`?view=stats`) | file sidebar; demo mode via `?demo=true`. Its `context.ts` holds synchronous UI state only (demo mode, file pickers)
+- Translations in `public/locales/{en,de}.json`, namespaced per page (e.g. `STATS_PAGE.*`); always update both files
 
 ### Data Access Rules
 
-- Components use service hooks from `m-*/service/` (e.g., `useFiles`, `useMutateAddFiles`)
+- Components use the service layer (`m-*/service/`) for data access and business logic (hooks and helpers)
 - Components must NOT import API layer directly
 - Don't use React Context for async state — use TanStack Query
-- LocalStorage for ephemeral state only (e.g., selected file IDs)
+- Use LocalStorage for lightweight preferences and UI state (e.g., view options and selected file IDs); keep imported statement data in IndexedDB via the feature layers
 
 ## Core Constraints
 
@@ -26,6 +32,11 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 - Use `Big` from `@/lib/w-big` for monetary calculations (never native numbers)
 - Dates in storage must be ISO strings (`DateTimeString`)
 - Support light/dark themes and EN/DE locales
+- Never change the values of `MISC.LS_*` keys or persisted IDs (would lose users' stored data/preferences)
+
+## Checks
+
+`pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm exec prettier --check <files>`. Stale route types after moving pages: delete `.next/types`.
 
 ## Adding a New Bank / CSV Format
 
@@ -72,3 +83,4 @@ export const newBank = defineBank({
    - New account type: add it to `AccountType` in `types-enums/index.ts`
    - Update the expected IDs in the "should derive literal ID types" test (`utils/Parser/__tests__/index.test.ts`)
 3. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.
+4. Changing how existing files are parsed (e.g. transaction IDs): bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
