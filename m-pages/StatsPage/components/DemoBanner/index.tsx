@@ -1,46 +1,44 @@
-import { Box, Button, Typography } from '@mui/material'
-import { useRouter } from 'next/navigation'
+'use client'
 
-import { ROUTES } from '@/common'
+import { Close } from '@mui/icons-material'
+import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
+import { useRouter, useSearchParams } from 'next/navigation'
+
 import { useIsMobile } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
+
+import { useWorkspace } from '../../context'
+import { getEndDemoHref } from '../../params'
+import { ui } from './styled'
 
 const Component = () => {
-  const router = useRouter()
+  const { t } = useTranslation()
   const isMobile = useIsMobile()
+  const sx = ui(isMobile)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { onAddFiles } = useWorkspace()
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#000',
-        color: '#fff',
-        py: 1.5,
-        px: 3,
-        borderRadius: 2,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? 1.5 : 0,
-      }}
-    >
-      <Typography variant="body2" sx={{ fontWeight: 500, mb: 0 }}>
-        You are viewing demo data
+    <Box sx={sx.banner}>
+      <Typography variant="body2" sx={sx.text}>
+        {t('STATS_PAGE.DEMO.BANNER')}
       </Typography>
-      <Button
-        variant="outlined"
-        size="small"
-        sx={{
-          color: '#fff',
-          borderColor: '#fff',
-          '&:hover': {
-            borderColor: '#fff',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          },
-        }}
-        onClick={() => router.push(ROUTES.DATA)}
-      >
-        Upload your data
-      </Button>
+      <Box sx={sx.actions}>
+        <Button onClick={onAddFiles} variant="outlined" size="small" sx={sx.uploadButton}>
+          {t('STATS_PAGE.DEMO.UPLOAD_YOUR_DATA')}
+        </Button>
+        <Tooltip title={t('STATS_PAGE.DEMO.END')}>
+          <IconButton
+            edge="end"
+            aria-label={t('STATS_PAGE.DEMO.END')}
+            onClick={() => router.replace(getEndDemoHref(searchParams))}
+            sx={sx.closeButton}
+          >
+            <Close />
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Box>
   )
 }

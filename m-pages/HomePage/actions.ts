@@ -1,37 +1,51 @@
 import { LockOutlined, PersonOffOutlined, Public } from '@mui/icons-material'
 
+import type { Country } from '@/types-enums'
+import { BANKS } from '@/utils/Parser'
+
 export const CARD_ITEMS = [
   {
     Icon: LockOutlined,
-    title: '100% on-device',
-    description: 'All parsing and storage happens in your browser. Your data never touches a server.',
+    key: 'ON_DEVICE',
   },
   {
     Icon: Public,
-    title: 'Runs in your browser',
-    description: 'Use it like a normal website while your data still stays on your device.',
+    key: 'IN_BROWSER',
   },
   {
     Icon: PersonOffOutlined,
-    title: 'No account needed',
-    description: 'No sign-up, no login, no cloud sync. Everything stays local.',
+    key: 'NO_ACCOUNT',
   },
-]
+] as const
 
 export const STEPS = [
   {
     step: 1,
-    title: 'Add your files',
-    description: 'Drag & drop or browse for your bank statements',
+    key: 'ADD_FILES',
   },
   {
     step: 2,
-    title: 'Click "Continue"',
-    description: 'Files are automatically parsed on your device',
+    key: 'SELECT_FILES',
   },
   {
     step: 3,
-    title: 'View your stats',
-    description: 'Gain insights into your spending habits',
+    key: 'VIEW_STATS',
   },
-]
+] as const
+
+/**
+ * Supported bank names per country, in registry order.
+ */
+export const getBanksByCountry = () => {
+  return BANKS.reduce<Partial<Record<Country, string[]>>>((acc, bank) => {
+    acc[bank.country] = [...(acc[bank.country] ?? []), bank.name]
+    return acc
+  }, {})
+}
+
+/**
+ * Flag of an ISO 3166-1 alpha-2 country code, from its regional indicator symbols.
+ */
+export const getFlagEmoji = (country: string) => {
+  return String.fromCodePoint(...[...country.toUpperCase()].map((char) => 0x1f1e6 + char.charCodeAt(0) - 65))
+}

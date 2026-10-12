@@ -3,7 +3,7 @@ import type { ChartOptions, ScriptableContext } from 'chart.js'
 
 import type { Transaction } from '@/types'
 import { Currency, UserLocale } from '@/types-enums'
-import { getGradient } from '@/utils/Chart'
+import { getBaseChartOptions, getGradient } from '@/utils/Chart'
 import { toFixedLocaleCurrency } from '@/utils/Number'
 import { Big } from '@/lib/w-big'
 
@@ -45,13 +45,7 @@ export const getChartOptions = ({
   currency: Currency
   locale: UserLocale
 }): ChartOptions<'bar'> => {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      intersect: false,
-      mode: 'index',
-    },
+  return getBaseChartOptions<'bar'>({
     plugins: {
       legend: {
         display: false,
@@ -70,21 +64,12 @@ export const getChartOptions = ({
     },
     scales: {
       x: {
-        border: {
-          display: false,
-        },
         grid: {
           display: false,
-        },
-        ticks: {
-          maxTicksLimit: 12,
         },
       },
       y: {
         beginAtZero: true,
-        border: {
-          display: false,
-        },
         ticks: {
           callback(value) {
             return toFixedLocaleCurrency(Big(value).toString(), currency, locale, { trimTrailingZeros: true })
@@ -92,5 +77,5 @@ export const getChartOptions = ({
         },
       },
     },
-  }
+  })
 }

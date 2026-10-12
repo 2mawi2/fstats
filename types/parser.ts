@@ -1,30 +1,28 @@
-import { AccountType, Currency, DateFormat, UserLocale } from '@/types-enums'
+import { AccountType, Country, Currency } from '@/types-enums'
 import type { BankAccountId, ParserId } from '@/utils/Parser/registry'
 
 import type { RowData } from './services/stats-file'
 import type { Transaction } from './services/transaction'
 
-export type DetectResult =
-  | { match: true }
-  | {
-      match: false
-      reason: string
-      /**
-       * 0..1 share of required headers found. 1 = header matched but no valid rows.
-       */
-      closeness: number
-    }
-
 export type Parser = {
   id: ParserId
   bankAccountId: BankAccountId
   bankName: string
-  accountType: AccountType
   accountName: string
   currency: Currency
-  dateFormat: string
-  detect: (rows: RowData[]) => DetectResult
-  parse: (rows: RowData[], locale: UserLocale, dateFormat: DateFormat) => Transaction[]
+  /**
+   * Headers that must be present in a header row of this format.
+   */
+  requiredHeaders: string[]
+  /**
+   * Required headers missing from `row`, empty if `row` is a header row of this format.
+   */
+  getMissingHeaders: (row: RowData) => string[]
+  /**
+   * The header row and transaction rows of a section (header in the first row) as is, without footers.
+   */
+  extractRows: (section: RowData[]) => { header: RowData; rows: RowData[] }
+  parse: (section: RowData[]) => Transaction[]
 }
 
 // Bank definitions
@@ -91,6 +89,10 @@ export type BankDef = {
    */
   id: string
   name: string
+  /**
+   * Shown on the home page.
+   */
+  country: Country
   currency: Currency
   formats: readonly FormatDef[]
 }

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { zNumberString } from './global'
 import { zCategory, zCategoryCode, zParentCategory, zTransaction } from './services/transaction'
 
-export const zCategoryWithTransactions = z.object({
+const zCategoryWithTransactions = z.object({
   ...zCategory.shape,
   transactions: z.array(zTransaction),
   total: zNumberString,
@@ -11,7 +11,7 @@ export const zCategoryWithTransactions = z.object({
 
 export type CategoryWithTransactions = z.infer<typeof zCategoryWithTransactions>
 
-export const zParentCategoryWithTransactions = z.object({
+const zParentCategoryWithTransactions = z.object({
   ...zParentCategory.shape,
   subcategories: z.record(zCategoryCode, zCategoryWithTransactions),
   transactions: z.array(zTransaction),

@@ -1,40 +1,54 @@
-import { Box, Card, Typography } from '@mui/material'
+'use client'
 
+import { ChevronRight } from '@mui/icons-material'
+import { Box, ButtonBase, Typography } from '@mui/material'
+
+import type { OptionSwitcherTriggerProps } from '@/components'
 import { DateFormatSwitcher, LanguageSwitcher, ThemeSwitcher } from '@/components'
-import { isFeatureEnabled } from '@/utils/Features'
+import { useTranslation } from '@/lib/i18n'
 
-const Component = () => {
-  const isWip = isFeatureEnabled('wip')
+import SettingsCard from '../SettingsCard'
+import { ui } from './styled'
+
+type PreferenceTileProps = OptionSwitcherTriggerProps & {
+  title: string
+}
+
+const PreferenceTile = ({ title, icon, label, onOpen }: PreferenceTileProps) => {
+  const sx = ui()
 
   return (
-    <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        Preferences
-      </Typography>
-
-      <Box>
-        <Typography component="div" sx={{ fontSize: 14, mb: 1 }}>
-          Theme
+    <ButtonBase onClick={onOpen} sx={sx.tile}>
+      <Box sx={sx.iconCircle}>{icon}</Box>
+      <Box sx={sx.text}>
+        <Typography variant="caption" component="p" sx={sx.tileTitle}>
+          {title}
         </Typography>
-        <ThemeSwitcher showLabel />
+        <Typography sx={sx.value}>{label}</Typography>
       </Box>
+      <ChevronRight sx={sx.chevron} />
+    </ButtonBase>
+  )
+}
 
-      {isWip ? (
-        <Box sx={{ mt: 3 }}>
-          <Typography component="div" sx={{ fontSize: 14, mb: 1 }}>
-            Language
-          </Typography>
-          <LanguageSwitcher showLabel />
-        </Box>
-      ) : null}
+const Component = () => {
+  const sx = ui()
+  const { t } = useTranslation()
 
-      <Box sx={{ mt: 3 }}>
-        <Typography component="div" sx={{ fontSize: 14, mb: 1 }}>
-          Date Format
-        </Typography>
-        <DateFormatSwitcher showLabel />
+  return (
+    <SettingsCard title={t('SETTINGS_PAGE.PREFERENCES.TITLE')}>
+      <Box sx={sx.tiles}>
+        <ThemeSwitcher
+          renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.THEME_SWITCHER.THEME')} {...props} />}
+        />
+        <LanguageSwitcher
+          renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.LANGUAGE_SWITCHER.LANGUAGE')} {...props} />}
+        />
+        <DateFormatSwitcher
+          renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.DATE_FORMAT_SWITCHER.TITLE')} {...props} />}
+        />
       </Box>
-    </Card>
+    </SettingsCard>
   )
 }
 

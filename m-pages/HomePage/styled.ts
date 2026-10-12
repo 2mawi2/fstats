@@ -2,45 +2,31 @@ import type { Theme } from '@mui/material/styles'
 
 import { Color } from '@/styles/colors'
 
-export const ui = (theme: Theme, isMobile: boolean, isDarkMode: boolean) => {
+/**
+ * Styles applied only in dark mode (via CSS, so there's no flash before the colour scheme is known).
+ */
+const darkStyles = (theme: Theme, styles: Record<string, string>) =>
+  theme.applyStyles('dark', styles) as Record<string, typeof styles>
+
+/**
+ * Cyan accent, lighter in dark mode.
+ */
+export const accentColor = (theme: Theme) => ({
+  color: Color.cyanDark,
+  ...darkStyles(theme, { color: Color.cyan }),
+})
+
+export const ctaButton = {
+  minWidth: 200,
+  py: 1.5,
+  px: 5,
+  fontSize: 17,
+  fontWeight: 600,
+  borderRadius: 100,
+}
+
+export const ui = (theme: Theme, isMobile: boolean) => {
   return {
-    hero: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      textAlign: 'center',
-      pt: isMobile ? 2 : 6,
-      pb: isMobile ? 2 : 4,
-    },
-
-    heroTitle: {
-      fontSize: isMobile ? 28 : 40,
-      fontWeight: 800,
-      lineHeight: 1.2,
-      mb: 2,
-    },
-
-    heroTitleAccent: {
-      color: isDarkMode ? Color.cyan : Color.cyanDark,
-    },
-
-    heroSubtitle: {
-      color: 'text.secondary',
-      maxWidth: 540,
-      fontSize: isMobile ? 15 : 17,
-      lineHeight: 1.7,
-      mb: 4,
-    },
-
-    ctaButton: {
-      minWidth: 200,
-      py: 1.5,
-      px: 5,
-      fontSize: 17,
-      fontWeight: 600,
-      borderRadius: 100,
-    },
-
     trustSection: {
       mt: isMobile ? 4 : 6,
     },
@@ -48,18 +34,22 @@ export const ui = (theme: Theme, isMobile: boolean, isDarkMode: boolean) => {
     trustCard: {
       p: isMobile ? 2.5 : 3,
       borderRadius: 2,
-      border: `1px solid ${isDarkMode ? 'rgba(0,188,212,0.18)' : 'rgba(0,96,100,0.15)'}`,
-      backgroundColor: isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,96,100,0.04)',
+      border: '1px solid rgba(0,96,100,0.15)',
+      backgroundColor: 'rgba(0,96,100,0.04)',
       textAlign: 'center',
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      ...darkStyles(theme, {
+        borderColor: 'rgba(0,188,212,0.18)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+      }),
     },
 
     trustIcon: {
       fontSize: 34,
-      color: isDarkMode ? Color.cyan : Color.cyanDark,
+      ...accentColor(theme),
       mb: 1.5,
     },
 
@@ -99,20 +89,15 @@ export const ui = (theme: Theme, isMobile: boolean, isDarkMode: boolean) => {
       alignItems: 'center',
       justifyContent: 'center',
       mx: 'auto',
-      // mb: 1.5,
       mb: 4,
-      background: isDarkMode
-        ? 'linear-gradient(135deg, rgba(0,188,212,0.25), rgba(0,96,100,0.2))'
-        : 'linear-gradient(135deg, rgba(0,188,212,0.18), rgba(0,96,100,0.12))',
-      color: isDarkMode ? Color.cyan : Color.cyanDark,
+      background: 'linear-gradient(135deg, rgba(0,188,212,0.18), rgba(0,96,100,0.12))',
+      color: Color.cyanDark,
       fontWeight: 700,
       fontSize: 18,
-    },
-
-    stepIcon: {
-      fontSize: 28,
-      color: 'text.secondary',
-      mb: 1,
+      ...darkStyles(theme, {
+        background: 'linear-gradient(135deg, rgba(0,188,212,0.25), rgba(0,96,100,0.2))',
+        color: Color.cyan,
+      }),
     },
 
     stepTitle: {
@@ -131,20 +116,30 @@ export const ui = (theme: Theme, isMobile: boolean, isDarkMode: boolean) => {
       mt: isMobile ? 5 : 7,
     },
 
-    bankGrid: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: 1.5,
+    countryGrid: {
       justifyContent: 'center',
     },
 
-    bankChip: {
-      border: `1px solid ${isDarkMode ? 'rgba(0,188,212,0.3)' : 'rgba(0,96,100,0.2)'}`,
-      color: isDarkMode ? Color.cyan : Color.cyanDark,
-      backgroundColor: isDarkMode ? 'rgba(0,188,212,0.08)' : 'rgba(0,96,100,0.05)',
+    countryFlag: {
+      fontSize: 30,
+      lineHeight: 1,
+      mb: 1.5,
+    },
+
+    bankList: {
+      m: 0,
+      p: 0,
+      listStyle: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 0.75,
+    },
+
+    bankItem: {
+      fontSize: 15,
       fontWeight: 600,
-      fontSize: 14,
-      height: 38,
+      ...accentColor(theme),
     },
   }
 }

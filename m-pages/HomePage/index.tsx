@@ -1,84 +1,42 @@
 'use client'
 
-import { Box, Button, Chip, Grid, Typography } from '@mui/material'
+import { Box, Button, Grid, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { ROUTES } from '@/common'
 import { PageWrapper } from '@/components'
-import { useIsDarkMode, useIsMobile } from '@/hooks'
-import { AVAILABLE_PARSERS } from '@/utils/Parser'
+import { useIsMobile } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
-import { CARD_ITEMS, STEPS } from './actions'
-import { ui } from './styled'
+import { CARD_ITEMS, getBanksByCountry, getFlagEmoji, STEPS } from './actions'
+import { Hero } from './components'
+import { ctaButton, ui } from './styled'
 
 const Page = () => {
   const isMobile = useIsMobile()
-  const isDarkMode = useIsDarkMode()
   const theme = useTheme()
-  const sx = ui(theme, isMobile, isDarkMode)
-  const router = useRouter()
+  const sx = ui(theme, isMobile)
+  const { t } = useTranslation()
 
   return (
     <PageWrapper>
-      <Box sx={sx.hero}>
-        <img
-          src={isDarkMode ? '/img/logo-dark.svg' : '/img/logo.svg'}
-          alt="fstats"
-          style={{ width: isMobile ? 96 : 128, height: 'auto', marginBottom: 24 }}
-        />
-
-        <Typography variant="h1" sx={sx.heroTitle}>
-          Analyse bank statements{' '}
-          <Box component="span" sx={sx.heroTitleAccent}>
-            privately
-          </Box>
-        </Typography>
-
-        <Typography variant="body1" component="p" sx={sx.heroSubtitle}>
-          Add CSV statements and get instant insights. All processing happens entirely on your device — no uploads, no
-          accounts, no tracking.
-        </Typography>
-
-        <Box sx={{ display: 'flex', gap: 2, flexDirection: isMobile ? 'column' : 'row' }}>
-          <Button
-            variant="contained"
-            size="large"
-            sx={sx.ctaButton}
-            onMouseEnter={() => router.prefetch(ROUTES.DATA)}
-            onClick={() => router.push(ROUTES.DATA)}
-          >
-            Get started
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              ...sx.ctaButton,
-              borderWidth: 2,
-              '&:hover': {
-                borderWidth: 2,
-              },
-            }}
-            onMouseEnter={() => router.prefetch(`${ROUTES.STATS}?demo=true`)}
-            onClick={() => router.push(`${ROUTES.STATS}?demo=true`)}
-          >
-            View demo
-          </Button>
-        </Box>
-      </Box>
+      <Hero
+        titleKey="HOME_PAGE.HERO_TITLE"
+        subtitle={t('HOME_PAGE.HERO_SUBTITLE')}
+        ctaLabel={t('HOME_PAGE.GET_STARTED')}
+      />
 
       <Grid container spacing={isMobile ? 2 : 3} sx={sx.trustSection}>
-        {CARD_ITEMS.map(({ Icon, title, description }) => (
-          <Grid size={isMobile ? 12 : 4} key={title}>
+        {CARD_ITEMS.map(({ Icon, key }) => (
+          <Grid size={isMobile ? 12 : 4} key={key}>
             <Box sx={sx.trustCard}>
               <Icon sx={sx.trustIcon} />
               <Typography variant="h6" sx={sx.trustTitle}>
-                {title}
+                {t(`HOME_PAGE.CARDS.${key}.TITLE`)}
               </Typography>
               <Typography variant="body2" sx={sx.trustDescription}>
-                {description}
+                {t(`HOME_PAGE.CARDS.${key}.DESCRIPTION`)}
               </Typography>
             </Box>
           </Grid>
@@ -87,45 +45,55 @@ const Page = () => {
 
       <Box sx={sx.section}>
         <Typography variant="h5" sx={sx.sectionTitle}>
-          How it works
+          {t('HOME_PAGE.HOW_IT_WORKS')}
         </Typography>
 
         <Grid container spacing={isMobile ? 3 : 4} sx={{ mb: 6 }}>
-          {STEPS.map(({ step, title, description }) => (
+          {STEPS.map(({ step, key }) => (
             <Grid size={isMobile ? 12 : 4} key={step}>
               <Box sx={sx.stepCard}>
                 <Box sx={sx.stepBadge}>{step}</Box>
                 <Typography variant="h6" sx={sx.stepTitle}>
-                  {title}
+                  {t(`HOME_PAGE.STEPS.${key}.TITLE`)}
                 </Typography>
                 <Typography variant="body2" sx={sx.stepDescription}>
-                  {description}
+                  {t(`HOME_PAGE.STEPS.${key}.DESCRIPTION`)}
                 </Typography>
               </Box>
             </Grid>
           ))}
         </Grid>
 
-        <Button
-          variant="contained"
-          size="large"
-          sx={sx.ctaButton}
-          onMouseEnter={() => router.prefetch(ROUTES.DATA)}
-          onClick={() => router.push(ROUTES.DATA)}
-        >
-          Get started now
+        <Button component={Link} href={ROUTES.STATS} variant="contained" size="large" sx={ctaButton}>
+          {t('HOME_PAGE.GET_STARTED_NOW')}
         </Button>
       </Box>
 
       <Box sx={sx.banksSection}>
         <Typography variant="h6" sx={sx.sectionTitle}>
-          Supported banks
+          {t('HOME_PAGE.SUPPORTED_BANKS')}
         </Typography>
-        <Box sx={sx.bankGrid}>
-          {Array.from(new Set(Object.values(AVAILABLE_PARSERS).map((parser) => parser.bankName))).map((bankName) => (
-            <Chip key={bankName} label={bankName} sx={sx.bankChip} />
+        <Grid container spacing={isMobile ? 2 : 3} sx={sx.countryGrid}>
+          {Object.entries(getBanksByCountry()).map(([country, bankNames]) => (
+            <Grid size={isMobile ? 12 : 4} key={country}>
+              <Box sx={sx.trustCard}>
+                <Box component="span" role="img" aria-hidden sx={sx.countryFlag}>
+                  {getFlagEmoji(country)}
+                </Box>
+                <Typography variant="h6" component="h3" sx={sx.trustTitle}>
+                  {t(`COUNTRY.${country}`)}
+                </Typography>
+                <Box component="ul" sx={sx.bankList}>
+                  {bankNames.map((bankName) => (
+                    <Box component="li" key={bankName} sx={sx.bankItem}>
+                      {bankName}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </Box>
     </PageWrapper>
   )

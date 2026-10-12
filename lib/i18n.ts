@@ -6,25 +6,50 @@ import { initReactI18next, Trans, useTranslation } from 'react-i18next'
 
 import { UserLocale } from '@/types-enums'
 import { MISC } from '@/common'
+import de from '@/public/locales/de.json'
 import en from '@/public/locales/en.json'
 
 const resources = {
   [UserLocale.EN]: { translation: en },
+  [UserLocale.DE]: { translation: de },
 } as const
+
+if (typeof window !== 'undefined') {
+  // Legacy key, always held the fallback language as browser language detection wasn't enabled
+  window.localStorage.removeItem(MISC.LS_I18N_LOCALE_KEY_LEGACY)
+}
 
 i18n
   .use(initReactI18next)
-  .use(new LanguageDetector(null, { lookupLocalStorage: MISC.LS_I18N_LOCALE_KEY }))
+  .use(
+    new LanguageDetector(null, {
+      lookupLocalStorage: MISC.LS_I18N_LOCALE_KEY,
+      // e.g. `de-AT` -> `de`
+      convertDetectedLanguage: (lng) => lng.split('-')[0],
+    }),
+  )
   .init({
     resources,
+    supportedLngs: Object.values(UserLocale),
     fallbackLng: MISC.DEFAULT_LOCALE,
     detection: {
-      order: ['localStorage'],
+      // A selected language (localStorage) takes precedence over the browser language
+      order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
     },
     interpolation: {
       escapeValue: false,
     },
   })
+
+i18n.on('languageChanged', (lng) => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = lng
+  }
+})
+
+if (typeof document !== 'undefined' && i18n.resolvedLanguage) {
+  document.documentElement.lang = i18n.resolvedLanguage
+}
 
 export { Trans, useTranslation, i18n }

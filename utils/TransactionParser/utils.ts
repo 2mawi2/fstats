@@ -1,28 +1,13 @@
-import type { CategoryCode, Transaction } from '@/types'
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
-import { Big } from '@/lib/w-big'
+import type { CategoryCode, GradientColorsLightDark, ParentCategoryCode, Transaction } from '@/types'
+import { ALL_CATEGORIES, PARENT_CATEGORY_COLORS } from '@/common'
+import { isExpense } from '@/utils/Stats'
 
-import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './helper'
-
-const useRandomizer = false
+import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './keyword-rules'
 
 export const getCategoryCode = (row: Transaction): CategoryCode => {
-  const isIncome = Big(row.value).gte(0)
+  // Zero amounts are categorised as income
+  const isIncome = !isExpense(row)
   const keywordRules = isIncome ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
-
-  if (useRandomizer) {
-    const incomeCats: CategoryCode[] = Object.keys(INCOME_CATEGORIES).flatMap((catCode) =>
-      Object.keys(INCOME_CATEGORIES[catCode].subcategories),
-    )
-    const expenseCats: CategoryCode[] = Object.keys(EXPENSE_CATEGORIES).flatMap((catCode) =>
-      Object.keys(EXPENSE_CATEGORIES[catCode].subcategories),
-    )
-
-    const incomeIndex = Math.floor(Math.random() * incomeCats.length)
-    const expenseIndex = Math.floor(Math.random() * expenseCats.length)
-
-    return isIncome ? incomeCats[incomeIndex] : expenseCats[expenseIndex]
-  }
 
   const description = row.description.toLowerCase()
   let matchedCategory: CategoryCode | null = null
@@ -44,4 +29,34 @@ export const getCategoryCode = (row: Transaction): CategoryCode => {
 
   // Uncategorised
   return isIncome ? 'TFI_02' : 'TFO_02'
+}
+
+export const getSubcategoryLabel = (code: CategoryCode | null): string => {
+  if (!code) {
+    return 'Uncategorised'
+  }
+
+  const category = ALL_CATEGORIES[getParentCategoryCode(code)]
+
+  if (!category) {
+    return code
+  }
+
+  const subcategory = category.subcategories[code]
+  return subcategory?.label ?? code
+}
+
+/**
+ * E.g. "INC" for "INC_01"
+ */
+export const getParentCategoryCode = (code: CategoryCode): ParentCategoryCode => {
+  return code.split('_')[0]
+}
+
+export const getCategoryColor = (code: CategoryCode | null): GradientColorsLightDark | undefined => {
+  if (!code) {
+    return
+  }
+
+  return PARENT_CATEGORY_COLORS[getParentCategoryCode(code)]
 }

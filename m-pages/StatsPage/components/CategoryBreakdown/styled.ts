@@ -1,14 +1,13 @@
-import type { Theme } from '@mui/material/styles'
-
-export const ui = (theme: Theme) => {
+export const ui = () => {
   return {
     tableHeader: {
       display: 'flex',
       alignItems: 'flex-end',
       justifyContent: 'flex-start',
       height: '100%',
-      fontSize: 14,
-      fontWeight: 'bold',
+      fontSize: 12,
+      fontWeight: 'medium',
+      color: 'text.secondary',
       cursor: 'pointer',
       userSelect: 'none',
       WebkitTapHighlightColor: 'transparent',

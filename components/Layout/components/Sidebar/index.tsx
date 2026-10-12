@@ -30,7 +30,7 @@ const Component = ({ expanded, onToggle }: SidebarProps) => {
             key={item.route}
             route={item.route}
             label={t(item.labelKey)}
-            icon={item.icon}
+            icon={pathname === item.route ? item.iconActive : item.icon}
             expanded={expanded}
             isActive={pathname === item.route}
           />
@@ -43,7 +43,7 @@ const Component = ({ expanded, onToggle }: SidebarProps) => {
             key={item.route}
             route={item.route}
             label={t(item.labelKey)}
-            icon={item.icon}
+            icon={pathname === item.route ? item.iconActive : item.icon}
             expanded={expanded}
             isActive={pathname === item.route}
           />

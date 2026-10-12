@@ -1,21 +1,14 @@
-import { blue, green, grey, red } from '@mui/material/colors'
+import { grey } from '@mui/material/colors'
 import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 import type { ChartOptions } from 'chart.js'
 
 import type { TransactionRangeItem } from '@/types'
+import { getBaseChartOptions } from '@/utils/Chart'
 import { Big } from '@/lib/w-big'
 
 export const getChartColors = (isDarkMode: boolean) => {
   return {
-    income: {
-      start: isDarkMode ? alpha(green[50], 0.1) : green[50],
-      end: green[600],
-    },
-    expenses: {
-      start: isDarkMode ? alpha(red[50], 0.1) : red[50],
-      end: red[700],
-    },
     both: {
       start: isDarkMode ? alpha(grey[500], 0.1) : grey[500],
       end: isDarkMode ? grey[200] : grey[900],
@@ -24,13 +17,7 @@ export const getChartColors = (isDarkMode: boolean) => {
 }
 
 export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      intersect: false,
-      mode: 'index',
-    },
+  return getBaseChartOptions<'line'>({
     plugins: {
       legend: {
         position: 'bottom',
@@ -54,21 +41,14 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
     },
     scales: {
       x: {
-        border: {
-          display: false,
-        },
         grid: {
           display: true,
         },
         ticks: {
           display: true,
-          maxTicksLimit: 12,
         },
       },
       y: {
-        border: {
-          display: false,
-        },
         grid: {
           display: true,
           color: (ctx) => {
@@ -77,34 +57,20 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
         },
         ticks: {
           display: true,
-          // maxTicksLimit: 3,
         },
         afterBuildTicks: (scale) => {
           scale.ticks.push({ value: 0 })
         },
       },
     },
-  }
+  })
 }
 
-export const accumulateValues = (
-  transactionRangeItems: TransactionRangeItem[],
-  direction: 'income' | 'expenses' | 'both',
-): number[] => {
-  return transactionRangeItems.reduce((acc, item) => {
-    const accTotal = acc[acc.length - 1] || 0
-    const itemTotal = item.transactions.reduce((iacc, transaction) => {
-      if (direction === 'income') {
-        return Big(transaction.value).gte(0) ? Big(iacc).add(transaction.value).toNumber() : iacc
-      } else if (direction === 'expenses') {
-        return Big(transaction.value).lt(0) ? Big(iacc).add(Big(transaction.value).abs()).toNumber() : iacc
-      } else {
-        return Big(iacc).add(Big(transaction.value)).toNumber()
-      }
-    }, 0)
+export const accumulateValues = (transactionRangeItems: TransactionRangeItem[]): number[] => {
+  let total = Big(0)
 
-    acc.push(Big(accTotal).add(itemTotal).toNumber())
-
-    return acc
-  }, [] as number[])
+  return transactionRangeItems.map((item) => {
+    total = item.transactions.reduce((acc, transaction) => acc.add(transaction.value), total)
+    return total.toNumber()
+  })
 }
