@@ -32,39 +32,35 @@
   },
   "HOME_PAGE": {
     "HERO_TITLE": "Kontoauszüge <accent>privat</accent> analysieren",
-    "HERO_SUBTITLE": "Füge CSV-Kontoauszüge hinzu und erhalte sofort Einblicke. Die gesamte Verarbeitung findet ausschließlich auf deinem Gerät statt – keine Uploads, keine Konten, kein Tracking.",
+    "HERO_SUBTITLE": "Verwandle CSV-Kontoauszüge in übersichtliche Statistiken. Alles bleibt in deinem Browser.",
     "GET_STARTED": "Loslegen",
-    "GET_STARTED_NOW": "Jetzt loslegen",
     "HOW_IT_WORKS": "So funktioniert's",
     "SUPPORTED_BANKS": "Unterstützte Banken",
-    "CARDS": {
-      "ON_DEVICE": {
-        "TITLE": "100 % auf deinem Gerät",
-        "DESCRIPTION": "Verarbeitung und Speicherung finden komplett in deinem Browser statt. Deine Daten erreichen nie einen Server."
-      },
-      "IN_BROWSER": {
-        "TITLE": "Läuft im Browser",
-        "DESCRIPTION": "Nutze es wie eine normale Website, während deine Daten trotzdem auf deinem Gerät bleiben."
-      },
-      "NO_ACCOUNT": {
-        "TITLE": "Kein Konto nötig",
-        "DESCRIPTION": "Keine Registrierung, kein Login, keine Cloud-Synchronisierung. Alles bleibt lokal."
-      }
+    "BADGES": {
+      "NO_TRACKING": "Kein Tracking",
+      "NO_ACCOUNT": "Kein Konto",
+      "WORKS_OFFLINE": "Funktioniert offline"
     },
     "STEPS": {
+      "GO_OFFLINE": {
+        "TITLE": "Offline gehen (optional)",
+        "DESCRIPTION": "Öffne die Statistik-Seite und trenne dann die Internetverbindung, für zusätzliche Sicherheit."
+      },
       "ADD_FILES": {
         "TITLE": "Dateien hinzufügen",
-        "DESCRIPTION": "Ziehe CSV-Kontoauszüge oder einen ganzen Ordner auf die Statistik-Seite."
-      },
-      "SELECT_FILES": {
-        "TITLE": "Dateien auswählen",
-        "DESCRIPTION": "Dateien werden auf deinem Gerät ausgewertet, wähle die aus, die du analysieren willst."
+        "DESCRIPTION": "Ziehe CSV-Kontoauszüge oder einen ganzen Ordner hinein. Deine Bank wird automatisch erkannt."
       },
       "VIEW_STATS": {
-        "TITLE": "Statistiken ansehen",
-        "DESCRIPTION": "Sieh dir Saldo, Kategorien und Cashflow der ausgewählten Dateien an."
+        "TITLE": "Statistiken entdecken",
+        "DESCRIPTION": "Sieh dir Saldo, Cashflow und Ausgaben nach Kategorie über alle ausgewählten Dateien an."
       }
-    }
+    },
+    "OPEN_SOURCE": {
+      "TITLE": "Open Source",
+      "DESCRIPTION": "Der gesamte Quellcode ist öffentlich, sodass jeder prüfen kann, dass deine Daten dein Gerät nie verlassen."
+    },
+    "MISSING_BANK": "Deine Bank fehlt?",
+    "REQUEST_BANK": "Auf GitHub anfragen"
   },
   "COUNTRY": {
     "DE": "Deutschland",

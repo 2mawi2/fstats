@@ -32,39 +32,35 @@
   },
   "HOME_PAGE": {
     "HERO_TITLE": "Analyse bank statements <accent>privately</accent>",
-    "HERO_SUBTITLE": "Add CSV statements and get instant insights. All processing happens entirely on your device — no uploads, no accounts, no tracking.",
+    "HERO_SUBTITLE": "Turn CSV bank statements into clear stats. Everything stays in your browser.",
     "GET_STARTED": "Get started",
-    "GET_STARTED_NOW": "Get started now",
     "HOW_IT_WORKS": "How it works",
     "SUPPORTED_BANKS": "Supported banks",
-    "CARDS": {
-      "ON_DEVICE": {
-        "TITLE": "100% on-device",
-        "DESCRIPTION": "All parsing and storage happens in your browser. Your data never touches a server."
-      },
-      "IN_BROWSER": {
-        "TITLE": "Runs in your browser",
-        "DESCRIPTION": "Use it like a normal website while your data still stays on your device."
-      },
-      "NO_ACCOUNT": {
-        "TITLE": "No account needed",
-        "DESCRIPTION": "No sign-up, no login, no cloud sync. Everything stays local."
-      }
+    "BADGES": {
+      "NO_TRACKING": "No tracking",
+      "NO_ACCOUNT": "No account",
+      "WORKS_OFFLINE": "Works offline"
     },
     "STEPS": {
+      "GO_OFFLINE": {
+        "TITLE": "Go offline (optional)",
+        "DESCRIPTION": "Open the Stats page, then disconnect from the internet for extra peace of mind."
+      },
       "ADD_FILES": {
         "TITLE": "Add your files",
-        "DESCRIPTION": "Drop CSV statements or a whole folder on the Stats page."
-      },
-      "SELECT_FILES": {
-        "TITLE": "Select your files",
-        "DESCRIPTION": "Files are parsed on your device, select the ones you want to analyse."
+        "DESCRIPTION": "Drop CSV statements or a whole folder. Your bank is detected automatically."
       },
       "VIEW_STATS": {
-        "TITLE": "View your stats",
-        "DESCRIPTION": "See the balance, categories and cashflow of your selected files."
+        "TITLE": "Explore your stats",
+        "DESCRIPTION": "See your balance, cashflow and spending by category across all selected files."
       }
-    }
+    },
+    "OPEN_SOURCE": {
+      "TITLE": "Open source",
+      "DESCRIPTION": "The full source code is public, so anyone can verify that your data never leaves your device."
+    },
+    "MISSING_BANK": "Missing your bank?",
+    "REQUEST_BANK": "Request it on GitHub"
   },
   "COUNTRY": {
     "DE": "Germany",

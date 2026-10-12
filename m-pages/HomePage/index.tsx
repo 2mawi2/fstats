@@ -1,17 +1,17 @@
 'use client'
 
-import { Box, Button, Grid, Typography } from '@mui/material'
+import { GitHub } from '@mui/icons-material'
+import { Box, Link as MuiLink, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import Link from 'next/link'
 
-import { ROUTES } from '@/common'
+import { CONFIG } from '@/common'
 import { PageWrapper } from '@/components'
 import { useIsMobile } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
-import { CARD_ITEMS, getBanksByCountry, getFlagEmoji, STEPS } from './actions'
+import { BADGES, getFlagEmoji, getSupportedBanks, STEPS } from './actions'
 import { Hero } from './components'
-import { ctaButton, ui } from './styled'
+import { ui } from './styled'
 
 const Page = () => {
   const isMobile = useIsMobile()
@@ -27,73 +27,74 @@ const Page = () => {
         ctaLabel={t('HOME_PAGE.GET_STARTED')}
       />
 
-      <Grid container spacing={isMobile ? 2 : 3} sx={sx.trustSection}>
-        {CARD_ITEMS.map(({ Icon, key }) => (
-          <Grid size={isMobile ? 12 : 4} key={key}>
-            <Box sx={sx.trustCard}>
-              <Icon sx={sx.trustIcon} />
-              <Typography variant="h6" sx={sx.trustTitle}>
-                {t(`HOME_PAGE.CARDS.${key}.TITLE`)}
-              </Typography>
-              <Typography variant="body2" sx={sx.trustDescription}>
-                {t(`HOME_PAGE.CARDS.${key}.DESCRIPTION`)}
-              </Typography>
-            </Box>
-          </Grid>
+      <Box component="ul" sx={sx.badges}>
+        {BADGES.map(({ Icon, key }) => (
+          <Box component="li" key={key} sx={sx.badge}>
+            <Icon sx={sx.badgeIcon} />
+            {t(`HOME_PAGE.BADGES.${key}`)}
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
-      <Box sx={sx.section}>
-        <Typography variant="h5" sx={sx.sectionTitle}>
+      <Box component="section" sx={sx.section}>
+        <Typography variant="h5" component="h2" sx={sx.sectionTitle}>
+          {t('HOME_PAGE.OPEN_SOURCE.TITLE')}
+        </Typography>
+        <Typography variant="body1" component="p" sx={sx.sectionSubtitle}>
+          {t('HOME_PAGE.OPEN_SOURCE.DESCRIPTION')}
+        </Typography>
+        <Box sx={sx.centered}>
+          <MuiLink href={CONFIG.GITHUB_URL} target="_blank" rel="noopener noreferrer" sx={sx.link}>
+            <GitHub sx={sx.linkIcon} />
+            {t('ABOUT_PAGE.VIEW_ON_GITHUB')}
+          </MuiLink>
+        </Box>
+      </Box>
+
+      <Box component="section" sx={sx.section}>
+        <Typography variant="h5" component="h2" sx={sx.sectionTitle}>
           {t('HOME_PAGE.HOW_IT_WORKS')}
         </Typography>
 
-        <Grid container spacing={isMobile ? 3 : 4} sx={{ mb: 6 }}>
+        <Box component="ol" sx={sx.steps}>
           {STEPS.map(({ step, key }) => (
-            <Grid size={isMobile ? 12 : 4} key={step}>
-              <Box sx={sx.stepCard}>
-                <Box sx={sx.stepBadge}>{step}</Box>
-                <Typography variant="h6" sx={sx.stepTitle}>
+            <Box component="li" key={step} sx={sx.step}>
+              <Box sx={sx.stepNumber}>{step}</Box>
+              <Box>
+                <Typography variant="h6" component="h3" sx={sx.cardTitle}>
                   {t(`HOME_PAGE.STEPS.${key}.TITLE`)}
                 </Typography>
-                <Typography variant="body2" sx={sx.stepDescription}>
+                <Typography variant="body2" sx={sx.cardDescription}>
                   {t(`HOME_PAGE.STEPS.${key}.DESCRIPTION`)}
                 </Typography>
               </Box>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
-
-        <Button component={Link} href={ROUTES.STATS} variant="contained" size="large" sx={ctaButton}>
-          {t('HOME_PAGE.GET_STARTED_NOW')}
-        </Button>
+        </Box>
       </Box>
 
-      <Box sx={sx.banksSection}>
-        <Typography variant="h6" sx={sx.sectionTitle}>
+      <Box component="section" sx={sx.section}>
+        <Typography variant="h5" component="h2" sx={sx.sectionTitle}>
           {t('HOME_PAGE.SUPPORTED_BANKS')}
         </Typography>
-        <Grid container spacing={isMobile ? 2 : 3} sx={sx.countryGrid}>
-          {Object.entries(getBanksByCountry()).map(([country, bankNames]) => (
-            <Grid size={isMobile ? 12 : 4} key={country}>
-              <Box sx={sx.trustCard}>
-                <Box component="span" role="img" aria-hidden sx={sx.countryFlag}>
-                  {getFlagEmoji(country)}
-                </Box>
-                <Typography variant="h6" component="h3" sx={sx.trustTitle}>
-                  {t(`COUNTRY.${country}`)}
-                </Typography>
-                <Box component="ul" sx={sx.bankList}>
-                  {bankNames.map((bankName) => (
-                    <Box component="li" key={bankName} sx={sx.bankItem}>
-                      {bankName}
-                    </Box>
-                  ))}
-                </Box>
+
+        <Box component="ul" sx={sx.bankList}>
+          {getSupportedBanks().map(({ name, country }) => (
+            <Box component="li" key={name} title={t(`COUNTRY.${country}`)} sx={sx.bankItem}>
+              <Box component="span" aria-hidden>
+                {getFlagEmoji(country)}
               </Box>
-            </Grid>
+              {name}
+            </Box>
           ))}
-        </Grid>
+        </Box>
+
+        <Typography variant="body2" sx={sx.missingBank}>
+          {t('HOME_PAGE.MISSING_BANK')}{' '}
+          <MuiLink href={`${CONFIG.GITHUB_URL}/issues`} target="_blank" rel="noopener noreferrer" sx={sx.inlineLink}>
+            {t('HOME_PAGE.REQUEST_BANK')}
+          </MuiLink>
+        </Typography>
       </Box>
     </PageWrapper>
   )
