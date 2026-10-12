@@ -2,12 +2,12 @@
 
 import { Box } from '@mui/material'
 import type { SxProps, Theme } from '@mui/material'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { Fragment, useRef } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC, ROUTES } from '@/common'
+import { MISC } from '@/common'
 import { PageWrapper } from '@/components'
 import { resizeColumns } from '@/m-pages/DataPage/actions'
 import { DropOverlay, FileExplorer, FileSidebar } from '@/m-pages/DataPage/components'
@@ -16,6 +16,7 @@ import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
 
 import { DemoBanner } from './components'
 import { WorkspaceContext } from './context'
+import { DEMO_PARAM, getView, getWorkspaceHref, isDemo, WorkspaceView } from './params'
 import { ui } from './styled'
 
 type WorkspaceProps = {
@@ -23,17 +24,15 @@ type WorkspaceProps = {
 }
 
 /**
- * Layout of the data and stats pages: file explorer, the page in the middle column, and the file summary. Stays
- * mounted when switching between the pages.
+ * Layout of the stats page: file explorer, the data or stats view in the middle column, and the file summary.
  */
 const Component = ({ children }: WorkspaceProps) => {
   const sx = ui()
   const containerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
-  const isStats = pathname === ROUTES.STATS
-  const isDemoMode = searchParams.get('demo') === 'true'
+  const isStats = getView(searchParams) === WorkspaceView.STATS
+  const isDemoMode = isDemo(searchParams)
   const { isLoadingFiles } = useFileHelper()
   const [includeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
     initializeWithValue: false,
@@ -41,7 +40,7 @@ const Component = ({ children }: WorkspaceProps) => {
   const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
   // Leave demo mode once real files are added, so they are shown
   const { dropzone, addFolder } = useFileDropzone({
-    onAdded: isDemoMode ? () => router.replace(pathname) : undefined,
+    onAdded: isDemoMode ? () => router.replace(getWorkspaceHref(searchParams, { [DEMO_PARAM]: null })) : undefined,
   })
   const startResize = useResizeHandle(containerRef, 'x')
 

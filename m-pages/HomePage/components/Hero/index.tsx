@@ -40,11 +40,17 @@ const Component = ({ titleKey, subtitle, ctaLabel, compact = false }: HeroProps)
       </Typography>
 
       <Box sx={sx.buttons}>
-        <Button component={Link} href={ROUTES.DATA} variant="contained" size="large" sx={sx.ctaButton}>
+        <Button component={Link} href={ROUTES.STATS} variant="contained" size="large" sx={sx.ctaButton}>
           {ctaLabel}
         </Button>
 
-        <Button component={Link} href={`${ROUTES.STATS}?demo=true`} variant="outlined" size="large" sx={sx.demoButton}>
+        <Button
+          component={Link}
+          href={`${ROUTES.STATS}?demo=true&view=stats`}
+          variant="outlined"
+          size="large"
+          sx={sx.demoButton}
+        >
           {t('MISC.VIEW_DEMO')}
         </Button>
       </Box>

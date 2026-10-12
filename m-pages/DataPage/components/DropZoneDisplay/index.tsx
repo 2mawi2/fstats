@@ -4,8 +4,10 @@ import type { SvgIconComponent } from '@mui/icons-material'
 import { CloudUploadOutlined } from '@mui/icons-material'
 import { Button, Divider, Link } from '@mui/material'
 import NextLink from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
-import { MISC, ROUTES } from '@/common'
+import { MISC } from '@/common'
+import { DEMO_PARAM, getWorkspaceHref } from '@/m-pages/Workspace/params'
 import { Trans, useTranslation } from '@/lib/i18n'
 
 import EmptyDisplay from '../EmptyDisplay'
@@ -32,6 +34,7 @@ const Component = ({
   subtitleKey = 'DATA_PAGE.CLICK_TO_SELECT',
 }: DropZoneDisplayProps) => {
   const { t } = useTranslation()
+  const searchParams = useSearchParams()
 
   // Don't also trigger the click of the whole display
   const renderLink = (onClick: () => void) => (
@@ -61,7 +64,11 @@ const Component = ({
       actions={
         <>
           <Divider sx={{ width: 240, fontSize: 12, color: 'text.secondary' }}>{t('MISC.OR')}</Divider>
-          <Button component={NextLink} href={`${ROUTES.STATS}?demo=true`} variant="outlined">
+          <Button
+            component={NextLink}
+            href={getWorkspaceHref(searchParams, { [DEMO_PARAM]: 'true' })}
+            variant="outlined"
+          >
             {t('MISC.VIEW_DEMO')}
           </Button>
         </>

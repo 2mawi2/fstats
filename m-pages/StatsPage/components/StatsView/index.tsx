@@ -10,10 +10,16 @@ import { ViewToolbar } from '@/m-pages/Workspace/components'
 import { useWorkspace } from '@/m-pages/Workspace/context'
 import { useFileHelper, useTransactionHelper, useUserPreferences } from '@/hooks'
 
-import { getCurrency } from './actions'
-import { CategoryBreakdown, NoDataDisplay, SummaryChart, TransactionChart } from './components'
+import { getCurrency } from '../../actions'
+import CategoryBreakdown from '../CategoryBreakdown'
+import NoDataDisplay from '../NoDataDisplay'
+import SummaryChart from '../SummaryChart'
+import TransactionChart from '../TransactionChart'
 import { ui } from './styled'
 
+/**
+ * Middle column of the stats view: charts and category breakdown of the selected files.
+ */
 const Component = () => {
   const sx = ui()
   const { locale, dateFormat } = useUserPreferences()

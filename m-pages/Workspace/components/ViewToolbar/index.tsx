@@ -3,12 +3,12 @@
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material'
 import { Box, Divider, Link } from '@mui/material'
 import NextLink from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-import { ROUTES } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
+import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
 import { ui } from './styled'
 
 type ViewToolbarProps = {
@@ -16,31 +16,30 @@ type ViewToolbarProps = {
 }
 
 /**
- * Toolbar of the middle column: switches between the data and stats pages, followed by the page's own controls.
+ * Toolbar of the middle column: switches between the data and stats views, followed by the view's own controls.
  */
 const Component = ({ children }: ViewToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
-  // Keeps e.g. demo mode when switching
-  const query = searchParams.toString()
+  const activeView = getView(searchParams)
   const views = [
-    { route: ROUTES.DATA, label: t('NAVIGATION.DATA') },
-    { route: ROUTES.STATS, label: t('NAVIGATION.STATS') },
+    { view: WorkspaceView.DATA, label: t('NAVIGATION.DATA') },
+    { view: WorkspaceView.STATS, label: t('NAVIGATION.STATS') },
   ]
 
   return (
     <Box sx={sx.toolbar}>
       <Box component="nav" sx={sx.views}>
-        {views.map(({ route, label }) => {
-          const isActive = pathname === route
+        {views.map(({ view, label }) => {
+          const isActive = view === activeView
 
           return (
             <Link
-              key={route}
+              key={view}
               component={NextLink}
-              href={query ? `${route}?${query}` : route}
+              // Keeps e.g. demo mode when switching
+              href={getWorkspaceHref(searchParams, getViewChange(view))}
               underline="none"
               aria-current={isActive ? 'page' : undefined}
               sx={isActive ? { ...sx.view, ...sx.activeView } : sx.view}

@@ -52,7 +52,7 @@
     "STEPS": {
       "ADD_FILES": {
         "TITLE": "Dateien hinzufügen",
-        "DESCRIPTION": "Ziehe CSV-Kontoauszüge oder einen ganzen Ordner auf die Daten-Seite."
+        "DESCRIPTION": "Ziehe CSV-Kontoauszüge oder einen ganzen Ordner auf die Statistik-Seite."
       },
       "SELECT_FILES": {
         "TITLE": "Dateien auswählen",
@@ -172,7 +172,7 @@
       "CLEAR_ALL_DATA": "Alle Daten löschen"
     },
     "LAYOUT": {
-      "TITLE": "Layout der Datenseite",
+      "TITLE": "Layout der Statistikseite",
       "CUSTOM": "Benutzerdefiniert",
       "DEFAULT": "Standard",
       "COLUMNS": "Spalten",

@@ -52,7 +52,7 @@
     "STEPS": {
       "ADD_FILES": {
         "TITLE": "Add your files",
-        "DESCRIPTION": "Drop CSV statements or a whole folder on the Data page."
+        "DESCRIPTION": "Drop CSV statements or a whole folder on the Stats page."
       },
       "SELECT_FILES": {
         "TITLE": "Select your files",
@@ -172,7 +172,7 @@
       "CLEAR_ALL_DATA": "Clear all data"
     },
     "LAYOUT": {
-      "TITLE": "Data page layout",
+      "TITLE": "Stats page layout",
       "CUSTOM": "Custom",
       "DEFAULT": "Default",
       "COLUMNS": "Columns",

@@ -1,9 +1,11 @@
 import { Close } from '@mui/icons-material'
 import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useIsMobile } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
+
+import { DEMO_PARAM, getWorkspaceHref } from '../../params'
 
 type DemoBannerProps = {
   onAddFiles: () => void
@@ -13,7 +15,7 @@ const Component = ({ onAddFiles }: DemoBannerProps) => {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
   const router = useRouter()
-  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   return (
     <Box
@@ -50,12 +52,12 @@ const Component = ({ onAddFiles }: DemoBannerProps) => {
         >
           {t('STATS_PAGE.UPLOAD_YOUR_DATA')}
         </Button>
-        {/* Same page without the demo query */}
+        {/* Same view without the demo param */}
         <Tooltip title={t('STATS_PAGE.END_DEMO')}>
           <IconButton
             edge="end"
             aria-label={t('STATS_PAGE.END_DEMO')}
-            onClick={() => router.replace(pathname)}
+            onClick={() => router.replace(getWorkspaceHref(searchParams, { [DEMO_PARAM]: null }))}
             sx={{ color: '#fff', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}
           >
             <Close />

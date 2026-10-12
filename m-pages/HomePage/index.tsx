@@ -64,7 +64,7 @@ const Page = () => {
           ))}
         </Grid>
 
-        <Button component={Link} href={ROUTES.DATA} variant="contained" size="large" sx={ctaButton}>
+        <Button component={Link} href={ROUTES.STATS} variant="contained" size="large" sx={ctaButton}>
           {t('HOME_PAGE.GET_STARTED_NOW')}
         </Button>
       </Box>
