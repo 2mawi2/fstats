@@ -21,9 +21,12 @@ export const parseStatsFile = (dataToParse: StatsFileAtRest): StatsFile => {
 
   return {
     ...dataToParse,
-    transactions: dataToParse.transactions.map((row) => ({
-      ...row,
-      currency: row.currency as Currency,
+    sections: dataToParse.sections.map((section) => ({
+      ...section,
+      transactions: section.transactions.map((row) => ({
+        ...row,
+        currency: row.currency as Currency,
+      })),
     })),
   }
 }

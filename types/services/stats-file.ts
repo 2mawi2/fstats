@@ -32,11 +32,18 @@ const zStatsFileParsing = z.object({ status: z.literal(StatsFileStatus.PARSING) 
 const zStatsFileErrorState = z.object({ status: z.literal(StatsFileStatus.ERROR), error: zStatsFileError })
 
 /**
+ * Transactions of one account. Most files have one section, some have one per account (e.g. Giro + Visa).
+ */
+const zStatsFileSection = z.object({ parserId: zParserId, transactions: z.array(zTransaction) })
+
+export type StatsFileSection = z.infer<typeof zStatsFileSection>
+
+/**
  * The status dependent part of a file, i.e. the result of parsing.
  */
 export const zStatsFileState = z.discriminatedUnion('status', [
   zStatsFileParsing,
-  z.object({ status: z.literal(StatsFileStatus.PARSED), parserId: zParserId, transactions: z.array(zTransaction) }),
+  z.object({ status: z.literal(StatsFileStatus.PARSED), sections: z.array(zStatsFileSection).min(1) }),
   zStatsFileErrorState,
 ])
 
@@ -62,8 +69,7 @@ const zStatsFileAtRest = z.intersection(
     zStatsFileParsing,
     z.object({
       status: z.literal(StatsFileStatus.PARSED),
-      parserId: zParserId,
-      transactions: z.array(zTransactionAtRest),
+      sections: z.array(z.object({ parserId: zParserId, transactions: z.array(zTransactionAtRest) })).min(1),
     }),
     zStatsFileErrorState,
   ]),

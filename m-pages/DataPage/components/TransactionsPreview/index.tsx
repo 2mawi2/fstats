@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles'
 import { useMemo } from 'react'
 
 import type { StatsFile } from '@/types'
-import { isParsed } from '@/m-stats-file/service'
+import { getFileTransactions, isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
@@ -30,7 +30,7 @@ const Component = ({ file, amountFilter, scrollElement }: TransactionsPreviewPro
   const { locale, dateFormat } = useUserPreferences()
   const parsedFile = isParsed(file) ? file : null
   const transactions = useMemo(
-    () => (parsedFile ? filterTransactions(parsedFile.transactions, amountFilter) : []),
+    () => (parsedFile ? filterTransactions(getFileTransactions(parsedFile), amountFilter) : []),
     [parsedFile, amountFilter],
   )
   const columns = useMemo(

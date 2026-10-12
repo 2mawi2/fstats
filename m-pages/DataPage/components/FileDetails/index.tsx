@@ -4,12 +4,11 @@ import { Box, Typography } from '@mui/material'
 
 import type { StatsFile } from '@/types'
 import { MISC } from '@/common'
-import { isParsed } from '@/m-stats-file/service'
+import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 import { toFixedLocale, toFixedLocaleCurrency } from '@/utils/Number'
-import { getParserCurrency } from '@/utils/Parser'
 import { getStats } from '@/utils/Stats'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
@@ -34,11 +33,12 @@ const Component = ({ file }: FileDetailsProps) => {
       return []
     }
 
-    const currency = getParserCurrency(file.parserId)
-    const { totalIncome, totalExpense, profit, profitMargin } = getStats(file.transactions)
+    const currency = getFileCurrency(file)
+    const transactions = getFileTransactions(file)
+    const { totalIncome, totalExpense, profit, profitMargin } = getStats(transactions)
 
     return [
-      { label: t('MISC.TRANSACTIONS'), value: String(file.transactions.length) },
+      { label: t('MISC.TRANSACTIONS'), value: String(transactions.length) },
       { label: t('MISC.INCOME'), value: toFixedLocaleCurrency(totalIncome, currency, locale), color: 'success.main' },
       { label: t('MISC.EXPENSES'), value: toFixedLocaleCurrency(totalExpense, currency, locale), color: 'error.main' },
       {
@@ -46,7 +46,10 @@ const Component = ({ file }: FileDetailsProps) => {
         value: toFixedLocaleCurrency(profit, currency, locale),
         color: Big(profit).gte(0) ? 'success.main' : 'error.main',
       },
-      { label: t('MISC.PROFIT_MARGIN'), value: `${toFixedLocale(profitMargin, 1, locale, { trimTrailingZeros: true })}%` },
+      {
+        label: t('MISC.PROFIT_MARGIN'),
+        value: `${toFixedLocale(profitMargin, 1, locale, { trimTrailingZeros: true })}%`,
+      },
     ]
   }
 

@@ -4,29 +4,25 @@ import type { BankAccountId, ParserId } from '@/utils/Parser/registry'
 import type { RowData } from './services/stats-file'
 import type { Transaction } from './services/transaction'
 
-export type DetectResult =
-  | { match: true }
-  | {
-      match: false
-      reason: string
-      /**
-       * 0..1 share of required headers found. 1 = header matched but no valid rows.
-       */
-      closeness: number
-    }
-
 export type Parser = {
   id: ParserId
   bankAccountId: BankAccountId
   bankName: string
   accountName: string
   currency: Currency
-  detect: (rows: RowData[]) => DetectResult
   /**
-   * The header row and transaction rows as is, without preambles, footers or other sections.
+   * Headers that must be present in a header row of this format.
    */
-  extractRows: (rows: RowData[]) => { header: RowData; rows: RowData[] } | null
-  parse: (rows: RowData[]) => Transaction[]
+  requiredHeaders: string[]
+  /**
+   * Required headers missing from `row`, empty if `row` is a header row of this format.
+   */
+  getMissingHeaders: (row: RowData) => string[]
+  /**
+   * The header row and transaction rows of a section (header in the first row) as is, without footers.
+   */
+  extractRows: (section: RowData[]) => { header: RowData; rows: RowData[] }
+  parse: (section: RowData[]) => Transaction[]
 }
 
 // Bank definitions

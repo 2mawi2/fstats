@@ -1,9 +1,9 @@
 import { parse } from 'papaparse'
 
-import type { Parser, PPRowData, RowData, StatsFile, StatsFileState, Transaction } from '@/types'
+import type { PPRowData, RowData, StatsFile, StatsFileSection, StatsFileState } from '@/types'
 import { zStatsFileState } from '@/types'
 import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
-import { AVAILABLE_PARSERS } from '@/utils/Parser'
+import { findSections } from '@/utils/Parser'
 
 export const parseFiles = async (files: StatsFile[]): Promise<{ id: string; state: StatsFileState }[]> => {
   return Promise.all(files.map(async (file) => ({ id: file.id, state: await parseFile(file.file) })))
@@ -18,28 +18,31 @@ const parseFile = async (file: File): Promise<StatsFileState> => {
     return _toError(StatsFileErrorCode.UNREADABLE, `Reading CSV failed: ${getErrorMessage(err)}`)
   }
 
-  // 2. Find a matching parser
-  const { parser, error } = getMatchingParser(rows)
-  if (!parser) {
+  // 2. Find the sections (one per account) and their parsers
+  const { sections, error } = findSections(rows)
+  if (!sections.length) {
     return _toError(StatsFileErrorCode.UNSUPPORTED_FORMAT, error)
   }
 
   // 3. Transform rows to transactions
-  let transactions: Transaction[]
-  try {
-    transactions = parser.parse(rows)
-  } catch (err) {
-    console.error(`Parsing failed with ${parser.id}:`, getErrorMessage(err))
-    return _toError(StatsFileErrorCode.INVALID_DATA, `Parsing "${parser.id}" failed: ${getErrorMessage(err)}`)
+  const parsedSections: StatsFileSection[] = []
+  for (const { parser, rows: sectionRows } of sections) {
+    try {
+      parsedSections.push({ parserId: parser.id, transactions: parser.parse(sectionRows) })
+    } catch (err) {
+      console.error(`Parsing failed with ${parser.id}:`, getErrorMessage(err))
+      return _toError(StatsFileErrorCode.INVALID_DATA, `Parsing "${parser.id}" failed: ${getErrorMessage(err)}`)
+    }
   }
 
   // 4. Validate so consumers are working with valid data
-  const res = zStatsFileState.safeParse({ status: StatsFileStatus.PARSED, parserId: parser.id, transactions })
+  const res = zStatsFileState.safeParse({ status: StatsFileStatus.PARSED, sections: parsedSections })
 
   if (!res.success) {
+    const parserIds = parsedSections.map((section) => section.parserId).join(', ')
     const errors = res.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join(', ')
-    console.error(`Validation failed for parser "${parser.id}":`, errors)
-    return _toError(StatsFileErrorCode.INVALID_DATA, `Validating "${parser.id}" failed: ${errors}`)
+    console.error(`Validation failed for parser "${parserIds}":`, errors)
+    return _toError(StatsFileErrorCode.INVALID_DATA, `Validating "${parserIds}" failed: ${errors}`)
   }
 
   return res.data
@@ -76,48 +79,6 @@ export const readCsvRows = async (file: Blob): Promise<RowData[]> => {
       },
     })
   })
-}
-
-const getParserName = ({ bankName, accountName }: Parser) => `${bankName} ${accountName}`
-
-/**
- * Exactly one parser must match, multiple matches are an error rather than a guess.
- * If none match, `error` explains why the closest parser was rejected.
- */
-export const getMatchingParser = (rows: RowData[]): { parser: Parser | null; error: string } => {
-  const matches: Parser[] = []
-  let closest: { parser: Parser; closeness: number; reason: string } | null = null
-
-  for (const parser of Object.values(AVAILABLE_PARSERS)) {
-    try {
-      const result = parser.detect(rows)
-
-      if (result.match) {
-        matches.push(parser)
-      } else if (!closest || result.closeness > closest.closeness) {
-        closest = { parser, closeness: result.closeness, reason: result.reason }
-      }
-    } catch (err) {
-      console.error(`Error detecting with ${parser.id}:`, getErrorMessage(err))
-    }
-  }
-
-  if (matches.length === 1) {
-    return { parser: matches[0], error: '' }
-  }
-
-  if (matches.length > 1) {
-    return { parser: null, error: `Ambiguous format, matches: ${matches.map(getParserName).join(', ')}` }
-  }
-
-  if (closest && closest.closeness >= 0.5) {
-    return {
-      parser: null,
-      error: `No matching parser found. Closest: ${getParserName(closest.parser)} (${closest.reason})`,
-    }
-  }
-
-  return { parser: null, error: 'No matching parser found!' }
 }
 
 export const getErrorMessage = (err: unknown) => {

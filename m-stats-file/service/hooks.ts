@@ -5,24 +5,24 @@ import { useCallback } from 'react'
 
 import type { NewStatsFile, RowData, StatsFile, StatsFileState } from '@/types'
 import { readCsvRows } from '@/utils/FileParser'
-import { AVAILABLE_PARSERS } from '@/utils/Parser'
+import type { FileRows } from '@/utils/Parser'
+import { extractFileRows } from '@/utils/Parser'
 
 import { addFiles, getFiles, getStorageSize, removeAllFiles, removeFiles, updateFiles } from '../api'
 import { isParsed } from './helper'
 import { statsFileKey } from './keys'
 
 /**
- * Header and transaction rows of a file as is. Files that weren't parsed have no known header, so all rows are
- * returned.
+ * Header and transaction rows of a file as is, one entry per section. Files that weren't parsed have no known header,
+ * so all rows are returned.
  */
 export const useFileRows = (file: StatsFile) => {
-  const parserId = isParsed(file) ? file.parserId : null
+  const parsed = isParsed(file)
 
   // Stable `select`, otherwise it re-runs (scanning the whole file) on every render
   const select = useCallback(
-    (rows: RowData[]): { header: RowData | null; rows: RowData[] } =>
-      (parserId ? AVAILABLE_PARSERS[parserId].extractRows(rows) : null) ?? { header: null, rows },
-    [parserId],
+    (rows: RowData[]): FileRows[] => (parsed ? extractFileRows(rows) : [{ accountName: null, header: null, rows }]),
+    [parsed],
   )
 
   return useQuery({

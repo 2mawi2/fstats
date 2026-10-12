@@ -1,6 +1,6 @@
 import { formatISO, isValid, parse, parseISO } from 'date-fns'
 
-import type { BankDef, DetectResult, ExtraField, FormatDef, Parser, RowData, Transaction } from '@/types'
+import type { BankDef, ExtraField, FormatDef, Parser, RowData, Transaction } from '@/types'
 import { SortOrder } from '@/types-enums'
 import { getUniqueTimestamps, toDate } from '@/utils/Date'
 import { CYRB53 } from '@/utils/Encryption'
@@ -12,21 +12,15 @@ import { Big } from '@/lib/w-big'
 import { getDescriptionHeaders, getFormatHeaders, toAccountId, toParserId } from './definition'
 import type { BankAccountId, ParserId } from './registry'
 
-// How many rows from the top are searched for the header row (skips bank preambles)
-const HEADER_SEARCH_LIMIT = 30
-
 const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
 
 type Row = {
   get: (header: string) => string
 }
 
-type LocatedRows =
-  | { header: RowData; rawRows: RowData[]; rows: Row[]; unexpectedHeaders: string[] }
-  | Extract<DetectResult, { match: false }>
-
 /**
- * Turns a declarative bank format into a parser.
+ * Turns a declarative bank format into a parser. Parsers work on sections, i.e. rows starting at the header row up to
+ * the next section (see `findSections`).
  */
 export const createParser = (bank: BankDef, format: FormatDef): Parser => {
   const { columns, extraColumns, dateFormat, numberFormat = 'en' } = format
@@ -69,59 +63,27 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
     return fields.length ? Object.fromEntries(fields) : null
   }
 
-  const locateRows = (data: RowData[]): LocatedRows => {
-    // Find the row containing the most required headers
-    let best = { index: -1, headers: [] as string[], missing: required }
+  const normalizedRequired = required.map(normalizeHeader)
 
-    for (let index = 0; index < Math.min(data.length, HEADER_SEARCH_LIMIT); index += 1) {
-      const rowHeaders = data[index].map(normalizeHeader)
-      const missing = required.filter((header) => !rowHeaders.includes(normalizeHeader(header)))
+  const getMissingHeaders = (row: RowData) => {
+    const rowHeaders = new Set(row.map(normalizeHeader))
+    return required.filter((_, index) => !rowHeaders.has(normalizedRequired[index]))
+  }
 
-      if (missing.length < best.missing.length) {
-        best = { index, headers: rowHeaders, missing }
-      }
-
-      if (!missing.length) {
-        break
-      }
-    }
-
-    if (best.missing.length) {
-      return {
-        match: false,
-        reason: `Missing columns: ${best.missing.map((header) => `"${header}"`).join(', ')}`,
-        closeness: 1 - best.missing.length / required.length,
-      }
-    }
-
-    const indexes = new Map(headers.map((header) => [header, best.headers.indexOf(normalizeHeader(header))]))
+  const locateRows = ([header = [], ...body]: RowData[]) => {
+    const normalizedHeader = header.map(normalizeHeader)
+    const indexes = new Map(headers.map((name) => [name, normalizedHeader.indexOf(normalizeHeader(name))]))
 
     const toRow = (row: RowData): Row => ({
-      get: (header) => row[indexes.get(header) ?? -1]?.trim() ?? '',
+      get: (name) => row[indexes.get(name) ?? -1]?.trim() ?? '',
     })
 
-    const rawRows = data
-      .slice(best.index + 1)
-      // Rows with a different column count are preambles, footers or other sections
-      .filter((row) => row.length === best.headers.length)
+    const rawRows = body
+      // Rows with a different column count are footers or notes
+      .filter((row) => row.length === header.length)
       .filter((row) => isValidDate(toRow(row).get(columns.date)))
-    const rows = rawRows.map(toRow)
 
-    if (!rows.length) {
-      return {
-        match: false,
-        reason: `Header found in row ${best.index + 1}, but no rows with ${best.headers.length} columns and a "${dateFormat}" date`,
-        closeness: 1,
-      }
-    }
-
-    // Unlisted headers still match, but the definition may need updating
-    const knownHeaders = headers.map(normalizeHeader)
-    const unexpectedHeaders = data[best.index]
-      .map((header) => header.trim())
-      .filter((header) => header && !knownHeaders.includes(normalizeHeader(header)))
-
-    return { header: data[best.index], rawRows, rows, unexpectedHeaders }
+    return { header, rawRows, rows: rawRows.map(toRow) }
   }
 
   return {
@@ -131,28 +93,33 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
     accountName: format.accountName,
     currency: bank.currency,
 
-    detect: (rows) => {
-      const located = locateRows(rows)
-      return 'rows' in located ? { match: true } : located
+    requiredHeaders: required,
+    getMissingHeaders,
+
+    extractRows: (section) => {
+      const { header, rawRows } = locateRows(section)
+      return { header, rows: rawRows }
     },
 
-    extractRows: (rows) => {
-      const located = locateRows(rows)
-      return 'rows' in located ? { header: located.header, rows: located.rawRows } : null
-    },
+    parse: (section) => {
+      const [header = []] = section
+      const missing = getMissingHeaders(header)
 
-    parse: (rows) => {
-      const located = locateRows(rows)
-
-      if (!('rows' in located)) {
-        throw new Error(located.reason)
+      if (missing.length) {
+        throw new Error(`Missing columns: ${missing.map((name) => `"${name}"`).join(', ')}`)
       }
 
-      if (located.unexpectedHeaders.length) {
-        logger('warn', 'Parser', `Unexpected headers for ${toParserId(bank, format)}:`, located.unexpectedHeaders)
+      // Unlisted headers still match, but the definition may need updating
+      const knownHeaders = headers.map(normalizeHeader)
+      const unexpectedHeaders = header
+        .map((name) => name.trim())
+        .filter((name) => name && !knownHeaders.includes(normalizeHeader(name)))
+
+      if (unexpectedHeaders.length) {
+        logger('warn', 'Parser', `Unexpected headers for ${toParserId(bank, format)}:`, unexpectedHeaders)
       }
 
-      const parsedRows: Omit<Transaction, 'id'>[] = located.rows.map((row) => ({
+      const parsedRows: Omit<Transaction, 'id'>[] = locateRows(section).rows.map((row) => ({
         date: formatISO(toDate(row.get(columns.date), { formatFrom: dateFormat })),
         description: descriptionHeaders.map(row.get).filter(Boolean).join(' '),
         value: getValue(row) || '0',

@@ -1,7 +1,10 @@
+import { uniq } from 'lodash'
+
 import type { StatsFile } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
+import { MISC } from '@/common'
 import { isParsed, isUnknown } from '@/m-stats-file/service'
-import { getBankAccountName } from '@/utils/Parser'
+import { AVAILABLE_PARSERS, getBankAccountName } from '@/utils/Parser'
 import { i18n } from '@/lib/i18n'
 
 /**
@@ -9,7 +12,16 @@ import { i18n } from '@/lib/i18n'
  */
 export const getFileFormat = (file: StatsFile) => {
   if (isParsed(file)) {
-    return { value: getBankAccountName(file.parserId).long, color: 'text.primary' }
+    const parserIds = uniq(file.sections.map((section) => section.parserId))
+
+    if (parserIds.length === 1) {
+      return { value: getBankAccountName(parserIds[0]).long, color: 'text.primary' }
+    }
+
+    // Sections are all from the same bank, e.g. "Comdirect · Giro + Visa"
+    const parsers = parserIds.map((parserId) => AVAILABLE_PARSERS[parserId])
+    const accountNames = parsers.map((parser) => parser.accountName).join(' + ')
+    return { value: `${parsers[0].bankName} ${MISC.CENTER_DOT} ${accountNames}`, color: 'text.primary' }
   }
 
   if (file.status === StatsFileStatus.PARSING) {

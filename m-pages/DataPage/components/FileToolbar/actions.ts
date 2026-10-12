@@ -15,13 +15,18 @@ export const getBankAccountOptions = (files: StatsFile[]): BankAccountOption[] =
   const options = new Map<string, BankAccountOption>()
 
   files.filter(isParsed).forEach((file) => {
-    const { bankAccountId } = AVAILABLE_PARSERS[file.parserId]
-    const option = options.get(bankAccountId) ?? {
-      value: bankAccountId,
-      label: getBankAccountName(file.parserId).alt,
-      fileIds: [],
-    }
-    options.set(bankAccountId, { ...option, fileIds: [...option.fileIds, file.id] })
+    file.sections.forEach(({ parserId }) => {
+      const { bankAccountId } = AVAILABLE_PARSERS[parserId]
+      const option = options.get(bankAccountId) ?? {
+        value: bankAccountId,
+        label: getBankAccountName(parserId).alt,
+        fileIds: [],
+      }
+
+      if (!option.fileIds.includes(file.id)) {
+        options.set(bankAccountId, { ...option, fileIds: [...option.fileIds, file.id] })
+      }
+    })
   })
 
   return Array.from(options.values()).sort((a, b) => a.label.localeCompare(b.label))

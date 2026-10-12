@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next'
 
 import type { ParsedStatsFile, Transaction } from '@/types'
+import { getFileCurrency } from '@/m-stats-file/service'
 import { getCurrencySymbol } from '@/utils/Currency'
-import { getParserCurrency } from '@/utils/Parser'
 import { Big } from '@/lib/w-big'
 
 import { AmountFilter } from '../../actions'
@@ -20,7 +20,7 @@ export const getTransactionColumns = (
   { label: t('MISC.DATE'), width: 100, getStyle: () => TABULAR_NUMS },
   { label: t('MISC.DESCRIPTION'), width: 320 },
   {
-    label: t('MISC.AMOUNT_WITH_CURRENCY', { currency: getCurrencySymbol(getParserCurrency(file.parserId)) }),
+    label: t('MISC.AMOUNT_WITH_CURRENCY', { currency: getCurrencySymbol(getFileCurrency(file)) }),
     width: 120,
     align: 'right',
     // Only highlight money in when both directions are shown

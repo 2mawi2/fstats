@@ -16,14 +16,16 @@ export const getCurrencyForSelection = (selectedId: SelectOptionBankAccountId, t
 }
 
 export const getBankSelectOptions = (selectedFiles: ParsedStatsFile[]): BankSelectOption[] => {
-  const banks = selectedFiles.map((file) => {
-    const parser = AVAILABLE_PARSERS[file.parserId]
-    return {
-      bankAccountId: parser.bankAccountId,
-      label: getBankAccountName(file.parserId).alt,
-      currency: parser.currency,
-    }
-  })
+  const banks = selectedFiles
+    .flatMap((file) => file.sections)
+    .map(({ parserId }) => {
+      const parser = AVAILABLE_PARSERS[parserId]
+      return {
+        bankAccountId: parser.bankAccountId,
+        label: getBankAccountName(parserId).alt,
+        currency: parser.currency,
+      }
+    })
 
   const uniqueBanks = uniqBy(banks, 'bankAccountId')
 

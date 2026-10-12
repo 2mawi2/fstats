@@ -32,9 +32,10 @@ export const useTransactionHelper = ({
   if (isDemoMode) {
     allTransactions = DEMO_TRANSACTIONS
   } else {
-    const filesForSelectedId =
-      selectedId === 'all' ? files : files.filter((file) => getBankAccountId(file.parserId) === selectedId)
-    allTransactions = filesForSelectedId.flatMap((file) => file.transactions)
+    allTransactions = files
+      .flatMap((file) => file.sections)
+      .filter((section) => selectedId === 'all' || getBankAccountId(section.parserId) === selectedId)
+      .flatMap((section) => section.transactions)
   }
 
   if (!allTransactions.length) {

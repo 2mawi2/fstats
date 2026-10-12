@@ -7,6 +7,8 @@ import {
   BANKS,
   createParser,
   defineBank,
+  extractFileRows,
+  findSections,
   getFormatHeaders,
   getReferencedHeaders,
   normalizeHeader,
@@ -113,6 +115,79 @@ describe('createParser', () => {
       { balance: '1234.56', reference: 'Ref' },
       { reference: 'Ref' },
       null,
+    ])
+  })
+})
+
+describe('findSections', () => {
+  const giroHeader = ['Buchungstag', 'Wertstellung (Valuta)', 'Vorgang', 'Buchungstext', 'Umsatz in EUR', '']
+  const visaHeader = ['Buchungstag', 'Umsatztag', 'Vorgang', 'Referenz', 'Buchungstext', 'Umsatz in EUR', '']
+  const giroRow = (day: number) => [
+    '30.01.2026',
+    `${String(day).padStart(2, '0')}.01.2026`,
+    'Lastschrift',
+    `G${day}`,
+    '-1,00',
+    '',
+  ]
+  const visaRow = ['29.01.2026', '28.01.2026', 'Kartenumsatz', '123', 'Shop', '-159,00', '']
+  const preamble = (title: string) => [title, 'Zeitraum: 01.01.2026 - 31.01.2026', '']
+
+  // Giro section long enough that the Visa header is far from the top
+  const giroRows = Array.from({ length: 200 }, (_, index) => giroRow((index % 28) + 1))
+  const file = [
+    [''],
+    preamble('Umsätze Girokonto'),
+    giroHeader,
+    ...giroRows,
+    ['Alter Kontostand', '1.000,00 EUR'],
+    preamble('Umsätze Visa-Karte (Kreditkarte)'),
+    visaHeader,
+    visaRow,
+    ['Neuer Kontostand', '-159,00 EUR'],
+  ]
+
+  it('should find one section per account anywhere in the file', () => {
+    const { sections, error } = findSections(file)
+
+    expect(error).toBe('')
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__current__1', 'comdirect__credit_card__1'])
+    expect(sections.map(({ parser, rows }) => parser.parse(rows).length)).toEqual([200, 1])
+  })
+
+  it('should not include rows of the next section', () => {
+    const [giro] = findSections(file).sections
+
+    expect(giro.rows.at(-1)).toEqual(preamble('Umsätze Visa-Karte (Kreditkarte)'))
+  })
+
+  it('should find a single section', () => {
+    const { sections } = findSections([preamble('Umsätze Visa-Karte (Kreditkarte)'), visaHeader, visaRow])
+
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__1'])
+  })
+
+  it('should drop sections without transactions', () => {
+    const { sections } = findSections([giroHeader, ['Keine Umsätze vorhanden.'], visaHeader, visaRow])
+
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__1'])
+  })
+
+  it('should explain why nothing matched', () => {
+    expect(findSections([giroHeader]).error).toContain('Header found in row 1, but no transaction rows')
+    expect(findSections([giroHeader.slice(0, 4), giroRow(1)]).error).toContain('Missing columns: "Umsatz in EUR"')
+    expect(
+      findSections([
+        ['a', 'b'],
+        ['1', '2'],
+      ]).error,
+    ).toBe('No matching parser found!')
+  })
+
+  it('should extract the rows of each section', () => {
+    expect(extractFileRows(file)).toEqual([
+      { accountName: 'Giro', header: giroHeader, rows: giroRows },
+      { accountName: 'Visa', header: visaHeader, rows: [visaRow] },
     ])
   })
 })
