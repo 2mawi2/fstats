@@ -57,18 +57,6 @@ export const getAmountColor = (value: NumberString) => {
   return Big(value).lt(0) ? 'error.main' : undefined
 }
 
-export const TableView = {
-  RAW: 'raw',
-  TRANSACTIONS: 'transactions',
-} as const
-
-export type TableView = (typeof TableView)[keyof typeof TableView]
-
-export const getTableViewOptions = () => [
-  { value: TableView.RAW, label: i18n.t('STATS_PAGE.TABLE_VIEW.RAW') },
-  { value: TableView.TRANSACTIONS, label: i18n.t('STATS_PAGE.TABLE_VIEW.TRANSACTIONS') },
-]
-
 export const MIN_COLUMN_WIDTH = 10 // %
 
 /**

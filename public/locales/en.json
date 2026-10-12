@@ -69,12 +69,9 @@
   },
   "STATS_PAGE": {
     "VIEW": {
-      "DATA": "Data",
+      "CSV": "CSV",
+      "TRANSACTIONS": "Transactions",
       "STATS": "Stats"
-    },
-    "TABLE_VIEW": {
-      "RAW": "Raw CSV",
-      "TRANSACTIONS": "Transactions"
     },
     "FILE_TOOLBAR": {
       "SELECT_ALL": "All",
@@ -144,7 +141,8 @@
         "IN": "In",
         "IN_TITLE": "Money in only",
         "OUT": "Out",
-        "OUT_TITLE": "Money out only"
+        "OUT_TITLE": "Money out only",
+        "CSV_DISABLED": "Only available in Transactions and Stats"
       }
     },
     "STATS_VIEW": {

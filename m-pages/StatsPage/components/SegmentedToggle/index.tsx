@@ -1,6 +1,6 @@
 'use client'
 
-import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
 
 import { ui } from './styled'
 
@@ -9,12 +9,22 @@ type SegmentedToggleProps<T extends string> = {
   options: { value: T; label: string; title?: string }[]
   onChange: (value: T) => void
   disabled?: boolean
+  /**
+   * Explains why the toggle is disabled, shown on hover.
+   */
+  disabledTooltip?: string
 }
 
-const Component = <T extends string>({ value, options, onChange, disabled }: SegmentedToggleProps<T>) => {
+const Component = <T extends string>({
+  value,
+  options,
+  onChange,
+  disabled,
+  disabledTooltip,
+}: SegmentedToggleProps<T>) => {
   const sx = ui()
 
-  return (
+  const group = (
     <ToggleButtonGroup
       size="small"
       exclusive
@@ -29,6 +39,17 @@ const Component = <T extends string>({ value, options, onChange, disabled }: Seg
         </ToggleButton>
       ))}
     </ToggleButtonGroup>
+  )
+
+  // Disabled elements don't fire hover events, so the tooltip needs a wrapper
+  return disabled && disabledTooltip ? (
+    <Tooltip title={disabledTooltip}>
+      <Box component="span" sx={sx.tooltipWrapper}>
+        {group}
+      </Box>
+    </Tooltip>
+  ) : (
+    group
   )
 }
 

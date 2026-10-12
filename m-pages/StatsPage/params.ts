@@ -5,10 +5,11 @@ export const VIEW_PARAM = 'view'
 export const DEMO_PARAM = 'demo'
 
 /**
- * View of the middle column, `data` when the URL has none.
+ * View of the middle column, `transactions` when the URL has none (or an unknown one).
  */
 export const WorkspaceView = {
-  DATA: 'data',
+  CSV: 'csv',
+  TRANSACTIONS: 'transactions',
   STATS: 'stats',
 } as const
 
@@ -17,7 +18,8 @@ export type WorkspaceView = (typeof WorkspaceView)[keyof typeof WorkspaceView]
 type SearchParams = { get: (name: string) => string | null; toString: () => string }
 
 export const getView = (searchParams: SearchParams): WorkspaceView => {
-  return searchParams.get(VIEW_PARAM) === WorkspaceView.STATS ? WorkspaceView.STATS : WorkspaceView.DATA
+  const view = searchParams.get(VIEW_PARAM)
+  return Object.values(WorkspaceView).find((value) => value === view) ?? WorkspaceView.TRANSACTIONS
 }
 
 export const isDemo = (searchParams: SearchParams) => {
@@ -41,7 +43,7 @@ export const getWorkspaceHref = (searchParams: SearchParams, changes: Record<str
  * The default view has no param, so the plain route stays clean.
  */
 export const getViewChange = (view: WorkspaceView) => {
-  return { [VIEW_PARAM]: view === WorkspaceView.DATA ? null : view }
+  return { [VIEW_PARAM]: view === WorkspaceView.TRANSACTIONS ? null : view }
 }
 
 /**

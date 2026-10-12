@@ -6,9 +6,9 @@ import { Box, Divider, Stack } from '@mui/material'
 import { useTransactionHelper, useUserPreferences } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
-import { getCurrency, getTableViewOptions } from '../../actions'
+import { filterTransactions, getAmountFilterOptions, getCurrency } from '../../actions'
 import { useWorkspaceFiles } from '../../context'
-import { useTableView } from '../../useTableView'
+import { useAmountFilter } from '../../useAmountFilter'
 import CategoryBreakdown from '../CategoryBreakdown'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
@@ -26,19 +26,24 @@ const Component = () => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const { files, selectedFiles } = useWorkspaceFiles()
+  const [amountFilter, setAmountFilter] = useAmountFilter()
   const { transactions, transactionRangeItems } = useTransactionHelper({
     files: selectedFiles,
     locale,
     dateFormat,
+    filterTransactions: (unique) => filterTransactions(unique, amountFilter),
   })
   const currency = getCurrency(transactions)
-  // Only applies to the data view, shown disabled so the toolbar doesn't change when switching
-  const [tableView] = useTableView()
 
   return (
     <>
       <ViewToolbar>
-        <SegmentedToggle value={tableView} options={getTableViewOptions()} onChange={() => {}} disabled />
+        <SegmentedToggle
+          value={amountFilter}
+          options={getAmountFilterOptions()}
+          onChange={setAmountFilter}
+          disabled={!selectedFiles.length}
+        />
       </ViewToolbar>
       <Box sx={sx.scroll}>
         {!files.length ? (
@@ -56,7 +61,7 @@ const Component = () => {
             </Box>
 
             <Box sx={sx.section}>
-              <CategoryBreakdown transactions={transactions} currency={currency} />
+              <CategoryBreakdown transactions={transactions} currency={currency} amountFilter={amountFilter} />
             </Box>
 
             <Box sx={sx.section}>

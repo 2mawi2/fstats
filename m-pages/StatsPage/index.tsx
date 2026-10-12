@@ -19,7 +19,7 @@ import { ui } from './styled'
 import { useFileDropzone } from './useFileDropzone'
 
 /**
- * Workspace of the stats page: file explorer, the data or stats view (`view` param) in the middle column, and the file
+ * Workspace of the stats page: file explorer, the transactions, stats or CSV view (`view` param) in the middle column, and the file
  * summary.
  */
 const Component = () => {
@@ -27,7 +27,7 @@ const Component = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const isStats = getView(searchParams) === WorkspaceView.STATS
+  const view = getView(searchParams)
   const isDemoMode = isDemo(searchParams)
   const { isLoadingFiles } = useFileHelper()
   const [includeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
@@ -57,13 +57,13 @@ const Component = () => {
     {
       id: 'middle',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn },
-      content: isStats ? <StatsView /> : <DataView />,
+      content: view === WorkspaceView.STATS ? <StatsView /> : <DataView />,
     },
     {
       id: 'right',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn, ...sx.rightColumn },
       // Duplicates are always excluded from the stats
-      content: <FileSidebar includeDuplicates={!isStats && includeDuplicates} />,
+      content: <FileSidebar includeDuplicates={view === WorkspaceView.TRANSACTIONS && includeDuplicates} />,
     },
   ]
 

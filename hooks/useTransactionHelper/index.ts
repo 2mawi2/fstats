@@ -12,24 +12,29 @@ export const useTransactionHelper = ({
   files,
   locale,
   dateFormat,
+  filterTransactions = (transactions) => transactions,
 }: {
   files: ParsedStatsFile[]
   locale: UserLocale
   dateFormat: DateFormat
+  /**
+   * Applied to the unique transactions, before the range items are grouped.
+   */
+  filterTransactions?: (transactions: Transaction[]) => Transaction[]
 }): {
   transactions: Transaction[]
   transactionRangeItems: TransactionRangeItem[]
 } => {
   const allTransactions = files.flatMap((file) => file.sections).flatMap((section) => section.transactions)
+  const transactions = filterTransactions(splitDuplicates(allTransactions).unique)
 
-  if (!allTransactions.length) {
+  if (!transactions.length) {
     return {
       transactions: [],
       transactionRangeItems: [],
     }
   }
 
-  const { unique: transactions } = splitDuplicates(allTransactions)
   transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
   const transactionRangeItems = getTransactionsGroupedByDay({
     dateRange: {

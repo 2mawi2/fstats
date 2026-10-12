@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, FormControlLabel, Switch } from '@mui/material'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
@@ -8,16 +9,14 @@ import { MISC } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
 import {
-  AmountFilter,
   getAmountFilterOptions,
   getDuplicateCount,
-  getTableViewOptions,
   getTransactionsLayoutOptions,
-  TableView,
   TransactionsLayout,
 } from '../../actions'
 import { useWorkspaceFiles } from '../../context'
-import { useTableView } from '../../useTableView'
+import { getView, WorkspaceView } from '../../params'
+import { useAmountFilter } from '../../useAmountFilter'
 import CsvPreview from '../CsvPreview'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
@@ -27,14 +26,14 @@ import ViewToolbar from '../ViewToolbar'
 import { ui } from './styled'
 
 /**
- * Data view of the workspace: the raw CSV or transactions of the checked files.
+ * Transactions or CSV view of the workspace (`view` param) of the checked files.
  */
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   // State rather than a ref, so the previews re-render once the scroll element exists
   const [middleColumn, setMiddleColumn] = useState<HTMLDivElement | null>(null)
-  const [tableView, setTableView] = useTableView()
+  const isTransactions = getView(useSearchParams()) === WorkspaceView.TRANSACTIONS
   const [transactionsLayout, setTransactionsLayout] = useLocalStorage<TransactionsLayout>(
     MISC.LS_DATA_TRANSACTIONS_LAYOUT_KEY,
     TransactionsLayout.COMBINED,
@@ -43,17 +42,11 @@ const Component = () => {
   const [includeDuplicates, setIncludeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
     initializeWithValue: false,
   })
-  const [amountFilter, setAmountFilter] = useLocalStorage<AmountFilter>(
-    MISC.LS_DATA_AMOUNT_FILTER_KEY,
-    AmountFilter.ALL,
-    {
-      initializeWithValue: false,
-    },
-  )
+  const [amountFilter, setAmountFilter] = useAmountFilter()
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
   const isEmpty = !files.length || !checkedFiles.length
   // The view's controls only apply to checked files
-  const isTransactionsView = checkedFiles.length > 0 && tableView === TableView.TRANSACTIONS
+  const isTransactionsView = checkedFiles.length > 0 && isTransactions
   // Multiple parsed files are shown as one, with combined stats above the stats per file
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
@@ -64,11 +57,13 @@ const Component = () => {
     <>
       {/* Outside the scroll container, so it stays in place */}
       <ViewToolbar>
+        {/* Always shown, so the toolbar doesn't change when switching views */}
         <SegmentedToggle
-          value={tableView}
-          options={getTableViewOptions()}
-          onChange={setTableView}
-          disabled={!checkedFiles.length}
+          value={amountFilter}
+          options={getAmountFilterOptions()}
+          onChange={setAmountFilter}
+          disabled={!isTransactionsView}
+          disabledTooltip={isTransactions ? undefined : t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.CSV_DISABLED')}
         />
         {isTransactionsView && isCombined ? (
           <SegmentedToggle
@@ -76,9 +71,6 @@ const Component = () => {
             options={getTransactionsLayoutOptions()}
             onChange={setTransactionsLayout}
           />
-        ) : null}
-        {isTransactionsView ? (
-          <SegmentedToggle value={amountFilter} options={getAmountFilterOptions()} onChange={setAmountFilter} />
         ) : null}
         {isTransactionsView && duplicateCount ? (
           <FormControlLabel
@@ -102,7 +94,7 @@ const Component = () => {
             <DropZoneDisplay />
           ) : !checkedFiles.length ? (
             <NoSelectionDisplay />
-          ) : tableView === TableView.TRANSACTIONS ? (
+          ) : isTransactions ? (
             isTransactionsSplit ? (
               checkedFiles.map((file) => (
                 <TransactionsPreview
