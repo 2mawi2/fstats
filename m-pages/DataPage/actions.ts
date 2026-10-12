@@ -3,7 +3,7 @@ import { uniq } from 'lodash'
 import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
-import { getFileTransactions, isParsed, isUnknown, splitDuplicates } from '@/m-stats-file/service'
+import { getFileTransactions, isError, isParsed, isUnknown, splitDuplicates } from '@/m-stats-file/service'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
 import { isExpense, isIncome } from '@/utils/Stats'
 import { i18n } from '@/lib/i18n'
@@ -15,6 +15,13 @@ import { Big } from '@/lib/w-big'
 export const getFileAccount = (file: ParsedStatsFile) => {
   const parsers = uniq(file.sections.map((section) => section.parserId)).map((parserId) => AVAILABLE_PARSERS[parserId])
   return { bankName: parsers[0].bankName, accountNames: parsers.map((parser) => parser.accountName) }
+}
+
+/**
+ * Same colors as `FileStatusIcon`.
+ */
+export const getFileNameColor = (file: StatsFile) => {
+  return isUnknown(file) ? 'warning.main' : isError(file) ? 'error.main' : 'text.primary'
 }
 
 /**

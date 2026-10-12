@@ -9,6 +9,9 @@ export const ui = () => {
     stickyWrapper: {
       borderTop: 0,
     },
+    scrollWrapper: {
+      overflowX: 'auto',
+    },
     table: {
       // Fixed layout, so column widths don't change as rows are virtualized
       tableLayout: 'fixed',

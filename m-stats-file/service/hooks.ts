@@ -9,12 +9,12 @@ import type { FileRows } from '@/utils/Parser'
 import { extractFileRows } from '@/utils/Parser'
 
 import { addFiles, getFiles, getStorageSize, removeAllFiles, removeFiles, updateFiles } from '../api'
-import { isParsed } from './helper'
+import { isParsed, isRejected } from './helper'
 import { statsFileKey } from './keys'
 
 /**
  * Header and transaction rows of a file as is, one entry per section. Files that weren't parsed have no known header,
- * so all rows are returned.
+ * so all rows are returned. Rejected files aren't CSVs, so they aren't read.
  */
 export const useFileRows = (file: StatsFile) => {
   const parsed = isParsed(file)
@@ -31,6 +31,7 @@ export const useFileRows = (file: StatsFile) => {
       return readCsvRows(file.file)
     },
     select,
+    enabled: !isRejected(file),
   })
 }
 

@@ -17,6 +17,13 @@ export const isError = (file: StatsFile) => {
   return file.status === StatsFileStatus.ERROR && file.error.code !== StatsFileErrorCode.UNSUPPORTED_FORMAT
 }
 
+/**
+ * Files that weren't added as CSV (wrong file type or too large), so their content is never read.
+ */
+export const isRejected = (file: StatsFile): file is Extract<StatsFile, { status: typeof StatsFileStatus.ERROR }> => {
+  return file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.REJECTED
+}
+
 export const isUnknown = (file: StatsFile) => {
   return file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.UNSUPPORTED_FORMAT
 }

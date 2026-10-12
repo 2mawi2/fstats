@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
 import { AmountFilter, filterTransactions } from '../../actions'
+import FileMessage from '../FileMessage'
 import PreviewSection from '../PreviewSection'
 import { STICKY_HEADER_OFFSET } from '../PreviewSection/actions'
 import VirtualTable from '../VirtualTable'
@@ -69,20 +70,24 @@ const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: Tr
   return (
     <PreviewSection
       title={isCombined ? t('DATA_PAGE.ALL_TRANSACTIONS') : (parsedFiles[0] ?? files[0]).file.name}
+      file={isCombined ? undefined : (parsedFiles[0] ?? files[0])}
       rowCount={parsedFiles.length ? transactions.length : undefined}
-      error={parsedFiles.length ? null : t('DATA_PAGE.FILE_NOT_PARSED')}
       // A single table, so its title and header row can stay in view
       isSticky={isCombined}
     >
-      <VirtualTable
-        columns={columns}
-        columnCount={columns.length}
-        rowCount={transactions.length}
-        getCells={getCells}
-        stickyHeaderTop={isCombined ? STICKY_HEADER_OFFSET : undefined}
-        getRowStyle={(index) => (transactions[index].isDuplicate ? DUPLICATE_ROW_STYLE : undefined)}
-        scrollElement={scrollElement}
-      />
+      {parsedFiles.length ? (
+        <VirtualTable
+          columns={columns}
+          columnCount={columns.length}
+          rowCount={transactions.length}
+          getCells={getCells}
+          stickyHeaderTop={isCombined ? STICKY_HEADER_OFFSET : undefined}
+          getRowStyle={(index) => (transactions[index].isDuplicate ? DUPLICATE_ROW_STYLE : undefined)}
+          scrollElement={scrollElement}
+        />
+      ) : (
+        <FileMessage file={files[0]} message={t('DATA_PAGE.FILE_NOT_PARSED')} />
+      )}
     </PreviewSection>
   )
 }

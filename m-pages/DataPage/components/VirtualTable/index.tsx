@@ -50,6 +50,11 @@ type VirtualTableProps = {
    */
   stickyHeaderTop?: number
   /**
+   * Minimum width in px of each column. If the columns don't fit, the table scrolls horizontally. Not compatible with
+   * `stickyHeaderTop`, the horizontal scroll container would break the sticky header.
+   */
+  minColumnWidth?: number
+  /**
    * The scrolling ancestor, can be shared by multiple tables.
    */
   scrollElement: HTMLElement | null
@@ -62,6 +67,7 @@ const Component = ({
   getCells,
   getRowStyle,
   stickyHeaderTop,
+  minColumnWidth,
   scrollElement,
 }: VirtualTableProps) => {
   const sx = ui()
@@ -104,8 +110,18 @@ const Component = ({
   const paddingBottom = items.length ? virtualizer.getTotalSize() - (items[items.length - 1].end - scrollMargin) : 0
 
   return (
-    <Box sx={stickyHeaderTop === undefined ? sx.wrapper : { ...sx.wrapper, ...sx.stickyWrapper }}>
-      <Box component="table" sx={sx.table}>
+    <Box
+      sx={{
+        ...sx.wrapper,
+        ...(stickyHeaderTop === undefined ? null : sx.stickyWrapper),
+        ...(minColumnWidth === undefined ? null : sx.scrollWrapper),
+      }}
+    >
+      <Box
+        component="table"
+        sx={sx.table}
+        style={minColumnWidth === undefined ? undefined : { minWidth: columnCount * minColumnWidth }}
+      >
         <colgroup>
           {colWidths.map((width, index) => (
             // eslint-disable-next-line react/no-array-index-key

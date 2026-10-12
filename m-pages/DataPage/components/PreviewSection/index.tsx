@@ -3,12 +3,18 @@
 import { Box, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
 
+import type { StatsFile } from '@/types'
 import { useTranslation } from '@/lib/i18n'
 
+import { getFileNameColor } from '../../actions'
 import { ui } from './styled'
 
 type PreviewSectionProps = {
   title: string
+  /**
+   * The file shown, its status is indicated by the title color.
+   */
+  file?: StatsFile
   rowCount?: number
   isLoading?: boolean
   error?: string | null
@@ -21,6 +27,7 @@ type PreviewSectionProps = {
 
 const Component = ({
   title,
+  file,
   rowCount,
   isLoading = false,
   error = null,
@@ -33,7 +40,7 @@ const Component = ({
   return (
     <Box component="section" sx={sx.section}>
       <Box sx={isSticky ? { ...sx.header, ...sx.stickyHeader } : sx.header}>
-        <Typography variant="body2" sx={sx.title}>
+        <Typography variant="body2" sx={file ? { ...sx.title, color: getFileNameColor(file) } : sx.title}>
           {title}
           {rowCount !== undefined ? (
             <Box component="span" sx={sx.rowCount}>

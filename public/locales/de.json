@@ -89,6 +89,7 @@
     "TRANSACTION_COUNT_other": "{{count}} Umsätze",
     "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
     "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
+    "FILE_NOT_READ": "Keine Vorschau, diese Datei wurde nicht hinzugefügt: {{message}}",
     "FOLDER_NOT_SUPPORTED": "Die Ordnerauswahl wird von deinem Browser nicht unterstützt. Bitte verwende einen Browser, der die lokale File API unterstützt (z. B. Chrome oder Edge).",
     "FOLDER_EMPTY": "Im ausgewählten Ordner wurden keine Dateien gefunden.",
     "FOLDER_ACCESS_FAILED": "Zugriff auf den Ordner fehlgeschlagen. Bitte versuche es erneut.",

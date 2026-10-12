@@ -89,6 +89,7 @@
     "TRANSACTION_COUNT_other": "{{count}} transactions",
     "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
     "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
+    "FILE_NOT_READ": "No preview, this file was not added: {{message}}",
     "FOLDER_NOT_SUPPORTED": "Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).",
     "FOLDER_EMPTY": "No files found in the selected folder.",
     "FOLDER_ACCESS_FAILED": "Failed to access the folder. Please try again.",
