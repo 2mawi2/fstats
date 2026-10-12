@@ -85,6 +85,11 @@ const Component = ({ file, isChecked, onToggle }: FileRowProps) => {
             </Tooltip>
           ) : null}
         </Box>
+        {isParsed(file) ? (
+          <Box component="span" title={format.value} sx={sx.bankChip}>
+            {format.value}
+          </Box>
+        ) : null}
         {/* The warning/error icon already toggles the details */}
         {isUnknownFile || isErrorFile ? null : (
           <Tooltip title={expanded ? 'Hide details' : 'Show details'}>
