@@ -14,6 +14,11 @@ import type { BankAccountId, ParserId } from './registry'
 
 const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
 
+/**
+ * Bump when the parse output changes (e.g. how transaction IDs are generated), so stored files are re-parsed.
+ */
+export const PARSER_VERSION = 2
+
 type Row = {
   get: (header: string) => string
 }
@@ -130,11 +135,11 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 
       const dates = parsedRows.map((row) => parseISO(row.date))
       const uniqueTimestamps = getUniqueTimestamps({ dates, dateFormat, sortOrder: getCsvSortOrder(dates) })
-      const getId = createTransactionIdGenerator()
+      const getId = createTransactionIdGenerator(toAccountId(bank, format))
 
       return parsedRows.map((row, index) => {
-        const date = formatISO(uniqueTimestamps[index])
-        const transaction: Transaction = { ...row, id: getId({ ...row, date }), date }
+        // ID from the date as in the file, the unique timestamps depend on the other rows of the day
+        const transaction: Transaction = { ...row, id: getId(row), date: formatISO(uniqueTimestamps[index]) }
         return { ...transaction, category: getCategoryCode(transaction) }
       })
     },
@@ -142,15 +147,16 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 }
 
 /**
- * IDs are a hash of the transaction content (excluding the derived `category`), so they are stable across
- * re-parses. Identical transactions within a file (only possible with second precision dates) get a counter suffix.
+ * IDs are a hash of the account and transaction content (excluding the derived `category`), so they are stable across
+ * re-parses and equal for the same transaction in overlapping statements. Identical transactions within a file (e.g.
+ * two equal payments on the same day) get a counter suffix.
  */
-const createTransactionIdGenerator = () => {
+const createTransactionIdGenerator = (accountId: string) => {
   const seen = new Map<string, number>()
 
   return ({ date, description, value, currency, extra }: Omit<Transaction, 'id' | 'category'>): string => {
     const sortedExtra = extra ? Object.entries(extra).sort(([a], [b]) => a.localeCompare(b)) : null
-    const id = CYRB53.encrypt(JSON.stringify([date, description, value, currency, sortedExtra]))
+    const id = CYRB53.encrypt(JSON.stringify([accountId, date, description, value, currency, sortedExtra]))
     const count = (seen.get(id) ?? 0) + 1
     seen.set(id, count)
     return count === 1 ? id : `${id}-${count}`

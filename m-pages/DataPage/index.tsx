@@ -20,10 +20,12 @@ import {
   AmountFilter,
   getAmountFilterOptions,
   getTableViewOptions,
+  getTransactionsLayoutOptions,
   openFolderPicker,
   resizeColumns,
   setInputFiles,
   TableView,
+  TransactionsLayout,
 } from './actions'
 import {
   CsvPreview,
@@ -32,6 +34,7 @@ import {
   FileExplorer,
   SegmentedToggle,
   TransactionsPreview,
+  TransactionsSummary,
 } from './components'
 import { ui } from './styled'
 
@@ -44,6 +47,11 @@ const Component = () => {
   const [tableView, setTableView] = useLocalStorage<TableView>(MISC.LS_DATA_TABLE_VIEW_KEY, TableView.RAW, {
     initializeWithValue: false,
   })
+  const [transactionsLayout, setTransactionsLayout] = useLocalStorage<TransactionsLayout>(
+    MISC.LS_DATA_TRANSACTIONS_LAYOUT_KEY,
+    TransactionsLayout.COMBINED,
+    { initializeWithValue: false },
+  )
   const [amountFilter, setAmountFilter] = useState<AmountFilter>(AmountFilter.ALL)
 
   const changeTableView = (view: TableView) => {
@@ -56,6 +64,10 @@ const Component = () => {
   const { mutateAsync: updateFiles } = useMutateUpdateFiles()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const checkedFiles = files.filter((file) => selectedFileIds.includes(file.id))
+  const checkedParsedFiles = checkedFiles.filter(isParsed)
+  // Multiple parsed files are shown as one, with combined stats above the stats per file
+  const isCombined = checkedParsedFiles.length > 1
+  const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: RDZFileRejection[]) => {
@@ -115,21 +127,32 @@ const Component = () => {
             <>
               <Box sx={sx.middleToolbar}>
                 <SegmentedToggle value={tableView} options={getTableViewOptions()} onChange={changeTableView} />
+                {tableView === TableView.TRANSACTIONS && isCombined ? (
+                  <SegmentedToggle
+                    value={transactionsLayout}
+                    options={getTransactionsLayoutOptions()}
+                    onChange={setTransactionsLayout}
+                  />
+                ) : null}
                 {tableView === TableView.TRANSACTIONS ? (
                   <SegmentedToggle value={amountFilter} options={getAmountFilterOptions()} onChange={setAmountFilter} />
                 ) : null}
               </Box>
-              {checkedFiles.map((file) =>
-                tableView === TableView.TRANSACTIONS ? (
-                  <TransactionsPreview
-                    key={file.id}
-                    file={file}
-                    amountFilter={amountFilter}
-                    scrollElement={middleColumn}
-                  />
+              {tableView === TableView.TRANSACTIONS ? (
+                isTransactionsSplit ? (
+                  checkedFiles.map((file) => (
+                    <TransactionsPreview
+                      key={file.id}
+                      files={[file]}
+                      amountFilter={amountFilter}
+                      scrollElement={middleColumn}
+                    />
+                  ))
                 ) : (
-                  <CsvPreview key={file.id} file={file} scrollElement={middleColumn} />
-                ),
+                  <TransactionsPreview files={checkedFiles} amountFilter={amountFilter} scrollElement={middleColumn} />
+                )
+              ) : (
+                checkedFiles.map((file) => <CsvPreview key={file.id} file={file} scrollElement={middleColumn} />)
               )}
             </>
           ) : (
@@ -142,7 +165,12 @@ const Component = () => {
       id: 'right',
       sx: sx.stickyColumn,
       content: checkedFiles.length ? (
-        checkedFiles.map((file) => <FileDetails key={file.id} file={file} />)
+        <>
+          {isCombined ? <TransactionsSummary files={checkedParsedFiles} /> : null}
+          {checkedFiles.map((file) => (
+            <FileDetails key={file.id} file={file} />
+          ))}
+        </>
       ) : files.length ? (
         <Typography variant="body2" color="text.secondary">
           {t('DATA_PAGE.CHECK_FILE_FOR_DETAILS')}

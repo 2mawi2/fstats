@@ -11,7 +11,9 @@
     "PROFIT_MARGIN": "Profit margin",
     "DATE": "Date",
     "DESCRIPTION": "Description",
+    "SOURCE": "Source",
     "CATEGORY": "Category",
+    "AMOUNT": "Amount",
     "AMOUNT_WITH_CURRENCY": "Amount ({{currency}})",
     "TOTAL_WITH_CURRENCY": "Total ({{currency}})"
   },
@@ -63,6 +65,14 @@
   "DATA_PAGE": {
     "CHECK_FILE_FOR_DATA": "Check a file to see its data.",
     "CHECK_FILE_FOR_DETAILS": "Check a file to see its details.",
+    "ALL_TRANSACTIONS": "All transactions",
+    "PER_FILE": "Per file",
+    "SHOW_DUPLICATES_one": "Show {{count}} duplicate",
+    "SHOW_DUPLICATES_other": "Show {{count}} duplicates",
+    "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
+    "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
+    "DUPLICATE_OF": "Duplicate, also in {{file}}",
+    "ALSO_IN": "Also in {{files}}",
     "DROP_FILES_HERE": "Drop your files here",
     "DROP_FILES_ANYWHERE": "Drop files anywhere",
     "CLICK_TO_SELECT": "or click to select files {{dot}} <link>select a folder</link>",
@@ -72,6 +82,8 @@
     "UNSUPPORTED_FORMAT": "Unsupported format",
     "ROW_COUNT_one": "{{count}} row",
     "ROW_COUNT_other": "{{count}} rows",
+    "TRANSACTION_COUNT_one": "{{count}} transaction",
+    "TRANSACTION_COUNT_other": "{{count}} transactions",
     "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
     "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
     "FOLDER_NOT_SUPPORTED": "Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).",
@@ -80,6 +92,12 @@
     "TABLE_VIEW": {
       "RAW": "Raw CSV",
       "TRANSACTIONS": "Transactions"
+    },
+    "TRANSACTIONS_LAYOUT": {
+      "COMBINED": "Combined",
+      "COMBINED_TITLE": "All files in one table",
+      "SPLIT": "Split",
+      "SPLIT_TITLE": "One table per file"
     },
     "AMOUNT_FILTER": {
       "ALL": "All",

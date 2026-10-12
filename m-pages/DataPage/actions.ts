@@ -47,6 +47,26 @@ export const getTableViewOptions = () => [
   { value: TableView.TRANSACTIONS, label: i18n.t('DATA_PAGE.TABLE_VIEW.TRANSACTIONS') },
 ]
 
+export const TransactionsLayout = {
+  COMBINED: 'combined',
+  SPLIT: 'split',
+} as const
+
+export type TransactionsLayout = (typeof TransactionsLayout)[keyof typeof TransactionsLayout]
+
+export const getTransactionsLayoutOptions = () => [
+  {
+    value: TransactionsLayout.COMBINED,
+    label: i18n.t('DATA_PAGE.TRANSACTIONS_LAYOUT.COMBINED'),
+    title: i18n.t('DATA_PAGE.TRANSACTIONS_LAYOUT.COMBINED_TITLE'),
+  },
+  {
+    value: TransactionsLayout.SPLIT,
+    label: i18n.t('DATA_PAGE.TRANSACTIONS_LAYOUT.SPLIT'),
+    title: i18n.t('DATA_PAGE.TRANSACTIONS_LAYOUT.SPLIT_TITLE'),
+  },
+]
+
 export const AmountFilter = {
   ALL: 'all',
   IN: 'in',

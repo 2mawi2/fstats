@@ -43,7 +43,14 @@ export type StatsFileSection = z.infer<typeof zStatsFileSection>
  */
 export const zStatsFileState = z.discriminatedUnion('status', [
   zStatsFileParsing,
-  z.object({ status: z.literal(StatsFileStatus.PARSED), sections: z.array(zStatsFileSection).min(1) }),
+  z.object({
+    status: z.literal(StatsFileStatus.PARSED),
+    sections: z.array(zStatsFileSection).min(1),
+    /**
+     * `PARSER_VERSION` at parse time, files parsed with an older version are re-parsed. Missing for old files.
+     */
+    parserVersion: z.number().int().optional(),
+  }),
   zStatsFileErrorState,
 ])
 
@@ -70,6 +77,7 @@ const zStatsFileAtRest = z.intersection(
     z.object({
       status: z.literal(StatsFileStatus.PARSED),
       sections: z.array(z.object({ parserId: zParserId, transactions: z.array(zTransactionAtRest) })).min(1),
+      parserVersion: z.number().int().optional(),
     }),
     zStatsFileErrorState,
   ]),

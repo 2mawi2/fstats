@@ -3,7 +3,7 @@ import { parse } from 'papaparse'
 import type { PPRowData, RowData, StatsFile, StatsFileSection, StatsFileState } from '@/types'
 import { zStatsFileState } from '@/types'
 import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
-import { findSections } from '@/utils/Parser'
+import { findSections, PARSER_VERSION } from '@/utils/Parser'
 
 export const parseFiles = async (files: StatsFile[]): Promise<{ id: string; state: StatsFileState }[]> => {
   return Promise.all(files.map(async (file) => ({ id: file.id, state: await parseFile(file.file) })))
@@ -36,7 +36,11 @@ const parseFile = async (file: File): Promise<StatsFileState> => {
   }
 
   // 4. Validate so consumers are working with valid data
-  const res = zStatsFileState.safeParse({ status: StatsFileStatus.PARSED, sections: parsedSections })
+  const res = zStatsFileState.safeParse({
+    status: StatsFileStatus.PARSED,
+    sections: parsedSections,
+    parserVersion: PARSER_VERSION,
+  })
 
   if (!res.success) {
     const parserIds = parsedSections.map((section) => section.parserId).join(', ')

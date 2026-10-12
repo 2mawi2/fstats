@@ -11,7 +11,9 @@
     "PROFIT_MARGIN": "Gewinnmarge",
     "DATE": "Datum",
     "DESCRIPTION": "Beschreibung",
+    "SOURCE": "Quelle",
     "CATEGORY": "Kategorie",
+    "AMOUNT": "Betrag",
     "AMOUNT_WITH_CURRENCY": "Betrag ({{currency}})",
     "TOTAL_WITH_CURRENCY": "Summe ({{currency}})"
   },
@@ -63,6 +65,14 @@
   "DATA_PAGE": {
     "CHECK_FILE_FOR_DATA": "Wähle eine Datei aus, um ihre Daten zu sehen.",
     "CHECK_FILE_FOR_DETAILS": "Wähle eine Datei aus, um ihre Details zu sehen.",
+    "ALL_TRANSACTIONS": "Alle Umsätze",
+    "PER_FILE": "Pro Datei",
+    "SHOW_DUPLICATES_one": "{{count}} Duplikat anzeigen",
+    "SHOW_DUPLICATES_other": "{{count}} Duplikate anzeigen",
+    "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
+    "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen",
+    "DUPLICATE_OF": "Duplikat, auch in {{file}}",
+    "ALSO_IN": "Auch in {{files}}",
     "DROP_FILES_HERE": "Dateien hier ablegen",
     "DROP_FILES_ANYWHERE": "Dateien irgendwo ablegen",
     "CLICK_TO_SELECT": "oder klicken, um Dateien auszuwählen {{dot}} <link>Ordner auswählen</link>",
@@ -72,6 +82,8 @@
     "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format",
     "ROW_COUNT_one": "{{count}} Zeile",
     "ROW_COUNT_other": "{{count}} Zeilen",
+    "TRANSACTION_COUNT_one": "{{count}} Umsatz",
+    "TRANSACTION_COUNT_other": "{{count}} Umsätze",
     "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
     "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
     "FOLDER_NOT_SUPPORTED": "Die Ordnerauswahl wird von deinem Browser nicht unterstützt. Bitte verwende einen Browser, der die lokale File API unterstützt (z. B. Chrome oder Edge).",
@@ -80,6 +92,12 @@
     "TABLE_VIEW": {
       "RAW": "CSV-Rohdaten",
       "TRANSACTIONS": "Umsätze"
+    },
+    "TRANSACTIONS_LAYOUT": {
+      "COMBINED": "Kombiniert",
+      "COMBINED_TITLE": "Alle Dateien in einer Tabelle",
+      "SPLIT": "Getrennt",
+      "SPLIT_TITLE": "Eine Tabelle pro Datei"
     },
     "AMOUNT_FILTER": {
       "ALL": "Alle",

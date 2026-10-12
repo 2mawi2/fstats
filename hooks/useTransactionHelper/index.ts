@@ -1,11 +1,12 @@
 'use client'
 
 import { parseISO } from 'date-fns'
-import { difference, uniqBy } from 'lodash'
+import { difference } from 'lodash'
 
 import { ParsedStatsFile, SelectOptionBankAccountId, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { DEMO_TRANSACTIONS } from '@/common'
+import { getUniqueTransactions } from '@/m-stats-file/service'
 import { getBankAccountId } from '@/utils/Parser'
 
 import { getTransactionsGroupedByDay } from './helper'
@@ -46,8 +47,7 @@ export const useTransactionHelper = ({
     }
   }
 
-  // IDs are content hashes, so this removes identical transactions (e.g. from overlapping statements)
-  const transactions = uniqBy(allTransactions, 'id')
+  const transactions = getUniqueTransactions(allTransactions)
   const duplicates = difference(allTransactions, transactions)
   transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
   const transactionRangeItems = getTransactionsGroupedByDay({

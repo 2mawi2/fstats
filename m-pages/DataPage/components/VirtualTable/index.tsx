@@ -2,10 +2,10 @@
 
 import { Box } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { useLayoutEffect, useRef, useState } from 'react'
 
-import { DEFAULT_COLUMN_WIDTH, OVERSCAN, ROW_HEIGHT } from './actions'
+import { getColWidths, OVERSCAN, ROW_HEIGHT } from './actions'
 import { ui } from './styled'
 
 export type VirtualTableColumn = {
@@ -14,11 +14,23 @@ export type VirtualTableColumn = {
    * Relative width, all columns always fit the table width.
    */
   width?: number
-  align?: 'left' | 'right'
+  /**
+   * Width in px, overrides `width`. Use for icons. The widest relative column then takes the remaining space.
+   */
+  fixedWidth?: number
+  /**
+   * Only shown as the header's tooltip, e.g. for narrow columns.
+   */
+  hideLabel?: boolean
+  align?: 'left' | 'center' | 'right'
   /**
    * Cell style, by value.
    */
   getStyle?: (value: string) => CSSProperties | undefined
+  /**
+   * Cell content, by value. Replaces the value and its tooltip.
+   */
+  renderCell?: (value: string) => ReactNode
 }
 
 type VirtualTableProps = {
@@ -32,18 +44,18 @@ type VirtualTableProps = {
    * Only called for rendered rows, so the cell values can be computed lazily.
    */
   getCells: (index: number) => string[]
+  getRowStyle?: (index: number) => CSSProperties | undefined
   /**
    * The scrolling ancestor, can be shared by multiple tables.
    */
   scrollElement: HTMLElement | null
 }
 
-const Component = ({ columns, columnCount, rowCount, getCells, scrollElement }: VirtualTableProps) => {
+const Component = ({ columns, columnCount, rowCount, getCells, getRowStyle, scrollElement }: VirtualTableProps) => {
   const sx = ui()
   const tbodyRef = useRef<HTMLTableSectionElement>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
-  const widths = Array.from({ length: columnCount }, (_, index) => columns?.[index]?.width ?? DEFAULT_COLUMN_WIDTH)
-  const totalWidth = widths.reduce((sum, width) => sum + width, 0)
+  const colWidths = getColWidths(columns, columnCount)
 
   // Offset of the rows within the scroll element, changes when content above (e.g. other tables) resizes
   useLayoutEffect(() => {
@@ -83,9 +95,9 @@ const Component = ({ columns, columnCount, rowCount, getCells, scrollElement }: 
     <Box sx={sx.wrapper}>
       <Box component="table" sx={sx.table}>
         <colgroup>
-          {widths.map((width, index) => (
+          {colWidths.map((width, index) => (
             // eslint-disable-next-line react/no-array-index-key
-            <col key={index} style={{ width: `${(width / totalWidth) * 100}%` }} />
+            <col key={index} style={{ width }} />
           ))}
         </colgroup>
         {columns ? (
@@ -95,7 +107,7 @@ const Component = ({ columns, columnCount, rowCount, getCells, scrollElement }: 
               {columns.map((column, index) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <th key={index} title={column.label} style={{ textAlign: column.align }}>
-                  {column.label}
+                  {column.hideLabel ? null : column.label}
                 </th>
               ))}
             </tr>
@@ -108,7 +120,12 @@ const Component = ({ columns, columnCount, rowCount, getCells, scrollElement }: 
             </tr>
           ) : null}
           {items.map((item) => (
-            <tr key={item.key} data-index={item.index} ref={virtualizer.measureElement}>
+            <tr
+              key={item.key}
+              data-index={item.index}
+              ref={virtualizer.measureElement}
+              style={getRowStyle?.(item.index)}
+            >
               {getCells(item.index).map((cell, cellIndex) => {
                 const column = columns?.[cellIndex]
 
@@ -116,10 +133,10 @@ const Component = ({ columns, columnCount, rowCount, getCells, scrollElement }: 
                   <td
                     // eslint-disable-next-line react/no-array-index-key
                     key={cellIndex}
-                    title={cell}
+                    title={column?.renderCell ? undefined : cell}
                     style={{ textAlign: column?.align, ...column?.getStyle?.(cell) }}
                   >
-                    {cell}
+                    {column?.renderCell ? column.renderCell(cell) : cell}
                   </td>
                 )
               })}

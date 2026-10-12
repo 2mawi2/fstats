@@ -119,6 +119,55 @@ describe('createParser', () => {
   })
 })
 
+describe('transaction IDs', () => {
+  const header = ['Datum', 'Text', 'Betrag']
+  const defineTestBank = (id: string) =>
+    defineBank({
+      id,
+      name: id,
+      currency: Currency.EUR,
+      formats: [
+        {
+          accountType: AccountType.CURRENT,
+          accountName: 'Giro',
+          version: '1',
+          dateFormat: 'dd.MM.yyyy',
+          numberFormat: 'de',
+          headers: header,
+          columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
+        },
+      ],
+    })
+  const bankA = defineTestBank('bank_a')
+  const parser = createParser(bankA, bankA.formats[0])
+  const rows = [
+    ['01.01.2024', 'A', '-1,00'],
+    ['01.01.2024', 'Coffee', '-3,50'],
+    ['01.01.2024', 'Coffee', '-3,50'],
+    ['02.01.2024', 'B', '2,00'],
+  ]
+
+  it('should match for overlapping statements, even when a day is only partially included', () => {
+    const full = parser.parse([header, ...rows])
+    const partial = parser.parse([header, ...rows.slice(1)])
+
+    expect(partial.map(({ id }) => id)).toEqual(full.slice(1).map(({ id }) => id))
+  })
+
+  it('should keep identical transactions on the same day apart', () => {
+    const [, first, second] = parser.parse([header, ...rows])
+
+    expect(first.id).not.toBe(second.id)
+  })
+
+  it('should differ between accounts', () => {
+    const bankB = defineTestBank('bank_b')
+    const otherParser = createParser(bankB, bankB.formats[0])
+
+    expect(otherParser.parse([header, rows[0]])[0].id).not.toBe(parser.parse([header, rows[0]])[0].id)
+  })
+})
+
 describe('findSections', () => {
   const giroHeader = ['Buchungstag', 'Wertstellung (Valuta)', 'Vorgang', 'Buchungstext', 'Umsatz in EUR', '']
   const visaHeader = ['Buchungstag', 'Umsatztag', 'Vorgang', 'Referenz', 'Buchungstext', 'Umsatz in EUR', '']

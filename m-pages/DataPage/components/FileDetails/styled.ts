@@ -1,7 +1,11 @@
 export const ui = () => {
   return {
     section: {
-      mb: 3,
+      mb: 2,
+      p: 2,
+      border: 1,
+      borderColor: 'divider',
+      borderRadius: 2,
     },
     title: {
       mb: 0,
@@ -10,28 +14,8 @@ export const ui = () => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
-    list: {
-      m: 0,
-    },
-    row: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      gap: 2,
-      py: 0.75,
-      borderBottom: 1,
-      borderColor: 'divider',
-    },
-    label: {
-      m: 0,
-    },
-    value: {
-      m: 0,
-      fontWeight: 'medium',
-      fontVariantNumeric: 'tabular-nums',
-      whiteSpace: 'nowrap',
-    },
     info: {
-      mb: 1,
+      mb: 1.5,
       fontSize: 12,
       lineHeight: 1.5,
     },

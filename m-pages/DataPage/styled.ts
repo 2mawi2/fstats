@@ -48,6 +48,7 @@ export const ui = () => {
       top: -16, // Column padding, so it sticks to the very top
       zIndex: 2,
       display: 'flex',
+      flexWrap: 'wrap',
       gap: 1,
       mt: -2,
       mb: 1,

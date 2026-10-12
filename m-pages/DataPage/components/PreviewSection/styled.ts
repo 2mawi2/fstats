@@ -3,8 +3,16 @@ export const ui = () => {
     section: {
       mb: 3,
     },
-    title: {
+    header: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      columnGap: 2,
+      minHeight: 28,
       mb: 1,
+    },
+    title: {
       fontWeight: 'medium',
     },
     rowCount: {
