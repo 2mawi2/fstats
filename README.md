@@ -1,48 +1,44 @@
 # fstats
 
-A privacy focused bank statement parser.
+A privacy-focused bank statement parser.
 
-Turn CSV exports from your bank into granular income/expense stats. Everything runs in your browser. No uploads, no tracking, no account, no internet required!
+Turn your bank's CSV exports into detailed income and expense stats. Everything runs in your browser: no uploads, no tracking, no account and no internet connection required.
 
-Try it for free at: [fstats.site](https://fstats.site/)
+Try it for free at [fstats.site](https://fstats.site/).
 
 ## How it works
 
-1. Navigate to [fstats.site/stats](https://fstats.site/stats)
-2. Turn off internet (optional)
-3. Add files
+1. Go to [fstats.site/stats](https://fstats.site/stats)
+2. Turn off your internet connection (optional)
+3. Add your files
 4. View and analyse your statements
 
-### Under the hood
+### Privacy
 
-Security first.
+Your files are stored only in your browser and never leave your device.
 
-Files you add get stored in your browser! I'm really not interested in your finances.
-
-By default files you add **will be deleted** as soon as you close the tab or browser window. To keep files and have them persist across browser sessions go to the "Settings" page and choose the "Persist data" option.
-
+By default, your files **are deleted** when you close the tab or browser window. To keep them between sessions, open the "Settings" page and enable "Persist data".
 
 ### Supported banks
 
-##### United Kingdom
+#### United Kingdom
 
-[lloydsbank.com](https://www.lloydsbank.com/) - Lloyds
+- [Lloyds](https://www.lloydsbank.com/)
 
-##### Germany
+#### Germany
 
-[comdirect.de](https://www.comdirect.de/) - Comdirect
-[ing.de](https://www.ing.de/) - ING
+- [Comdirect](https://www.comdirect.de/)
+- [ING](https://www.ing.de/)
 
-##### South Africa
+#### South Africa
 
-[capitecbank.co.za](https://www.capitecbank.co.za/) - Capitec
-[fnb.co.za](https://www.fnb.co.za/) - FNB
-
+- [Capitec](https://www.capitecbank.co.za/)
+- [FNB](https://www.fnb.co.za/)
 
 ## Development
 
 See [DEVELOPMENT.md](DEVELOPMENT.md).
 
-#### Important files
+### Important files
 
-[utils/Parser](./utils/Parser/create-parser.ts) - Read up on how CSVs get parsed
+- [utils/Parser](./utils/Parser/create-parser.ts): how CSV files are parsed
