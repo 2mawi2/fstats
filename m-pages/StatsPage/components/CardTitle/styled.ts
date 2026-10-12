@@ -1,4 +1,4 @@
-import { HEADER_HEIGHT } from '@/m-pages/DataPage/components/PreviewSection/actions'
+import { HEADER_HEIGHT } from '../../actions'
 
 export const ui = () => {
   return {

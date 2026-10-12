@@ -16,7 +16,7 @@ export const DataLayout = {
 export type DataLayout = (typeof DataLayout)[keyof typeof DataLayout]
 
 /**
- * Resizable layout of the data page: the column widths and the split of the left column.
+ * Resizable layout of the stats page: the column widths and the split of the left column.
  *
  * There are always two versions, the default and the user's custom layout. Resizing while the default is active
  * starts a new custom layout from the default values (overwriting the previous one) and activates it.

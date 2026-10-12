@@ -1,5 +1,3 @@
-import { green, red } from '@mui/material/colors'
-
 import type { NumberString, Transaction } from '@/types'
 import type { BigSource } from '@/lib/w-big'
 import { Big } from '@/lib/w-big'
@@ -46,35 +44,5 @@ export const getStats = (
     profit: profit.toString(),
     profitMargin: profitMargin.toString(),
     expenseRatio: expenseRatio.toString(),
-  }
-}
-
-export const getProfitLossColors = (
-  hasProfit: boolean,
-  isDarkMode: boolean,
-): {
-  incomeTextColor: string
-  incomeBgColor: string
-  expensesTextColor: string
-  expensesBgColor: string
-  profitTextColor: string
-  profitBgColor: string
-} => {
-  const incomeTextColor = 'primary.main'
-  const incomeBgColor = isDarkMode ? 'rgba(76, 175, 80, 0.08)' : green[50]
-
-  const expensesBgColor = isDarkMode ? 'rgba(244, 67, 54, 0.08)' : red[50]
-  const expensesTextColor = isDarkMode ? red[400] : red[700]
-
-  const profitBgColor = hasProfit ? incomeBgColor : expensesBgColor
-  const profitTextColor = hasProfit ? 'success.main' : 'error.main'
-
-  return {
-    incomeTextColor,
-    incomeBgColor,
-    expensesTextColor,
-    expensesBgColor,
-    profitTextColor,
-    profitBgColor,
   }
 }

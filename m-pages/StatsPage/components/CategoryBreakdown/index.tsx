@@ -30,19 +30,19 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
         action={
           <FormControlLabel
             control={<Switch size="small" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} />}
-            label={t('STATS_PAGE.SHOW_ALL_CATEGORIES')}
+            label={t('STATS_PAGE.STATS_VIEW.SHOW_ALL_CATEGORIES')}
             slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
             sx={{ mr: 0 }}
           />
         }
       >
-        {t('STATS_PAGE.BREAKDOWN_BY_CATEGORY')}
+        {t('STATS_PAGE.STATS_VIEW.BREAKDOWN_BY_CATEGORY')}
       </CardTitle>
 
       <Box sx={{ mb: 3 }}>
         <BreakdownTable
           title={t('MISC.INCOME')}
-          emptyText={t('STATS_PAGE.NO_INCOME')}
+          emptyText={t('STATS_PAGE.STATS_VIEW.NO_INCOME')}
           transactionsGrouped={income}
           total={totalIncome}
           currency={currency}
@@ -52,7 +52,7 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
 
       <BreakdownTable
         title={t('MISC.EXPENSES')}
-        emptyText={t('STATS_PAGE.NO_EXPENSES')}
+        emptyText={t('STATS_PAGE.STATS_VIEW.NO_EXPENSES')}
         transactionsGrouped={expenses}
         total={totalExpense}
         currency={currency}

@@ -57,7 +57,6 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
         },
         ticks: {
           display: true,
-          // maxTicksLimit: 3,
         },
         afterBuildTicks: (scale) => {
           scale.ticks.push({ value: 0 })

@@ -89,7 +89,6 @@ export const ui = (theme: Theme, isMobile: boolean) => {
       alignItems: 'center',
       justifyContent: 'center',
       mx: 'auto',
-      // mb: 1.5,
       mb: 4,
       background: 'linear-gradient(135deg, rgba(0,188,212,0.18), rgba(0,96,100,0.12))',
       color: Color.cyanDark,

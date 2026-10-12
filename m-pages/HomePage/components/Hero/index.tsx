@@ -5,6 +5,7 @@ import { useTheme } from '@mui/material/styles'
 import Link from 'next/link'
 
 import { ROUTES } from '@/common'
+import { getDemoHref, WorkspaceView } from '@/m-pages/StatsPage/params'
 import { useIsDarkMode, useIsMobile } from '@/hooks'
 import { Trans, useTranslation } from '@/lib/i18n'
 
@@ -14,18 +15,17 @@ type HeroProps = {
   titleKey: string
   subtitle: string
   ctaLabel: string
-  compact?: boolean
 }
 
 /**
  * Logo, title with accent, subtitle and the "get started" / demo buttons.
  */
-const Component = ({ titleKey, subtitle, ctaLabel, compact = false }: HeroProps) => {
+const Component = ({ titleKey, subtitle, ctaLabel }: HeroProps) => {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
   const isDarkMode = useIsDarkMode()
   const theme = useTheme()
-  const sx = ui(theme, isMobile, compact)
+  const sx = ui(theme, isMobile)
 
   return (
     <Box sx={sx.hero}>
@@ -46,7 +46,7 @@ const Component = ({ titleKey, subtitle, ctaLabel, compact = false }: HeroProps)
 
         <Button
           component={Link}
-          href={`${ROUTES.STATS}?demo=true&view=stats`}
+          href={getDemoHref(undefined, WorkspaceView.STATS)}
           variant="outlined"
           size="large"
           sx={sx.demoButton}

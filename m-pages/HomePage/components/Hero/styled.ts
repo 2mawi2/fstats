@@ -2,7 +2,7 @@ import type { Theme } from '@mui/material/styles'
 
 import { accentColor, ctaButton } from '../../styled'
 
-export const ui = (theme: Theme, isMobile: boolean, compact: boolean) => {
+export const ui = (theme: Theme, isMobile: boolean) => {
   return {
     hero: {
       display: 'flex',
@@ -20,7 +20,7 @@ export const ui = (theme: Theme, isMobile: boolean, compact: boolean) => {
     },
 
     title: {
-      fontSize: isMobile || compact ? 28 : 40,
+      fontSize: isMobile ? 28 : 40,
       fontWeight: 800,
       lineHeight: 1.2,
       mb: 2,

@@ -11,7 +11,6 @@ export const parseFiles = async (files: StatsFile[]): Promise<{ id: string; stat
 }
 
 const parseFile = async (file: File): Promise<StatsFileState> => {
-  // 1. Read the CSV rows
   let rows: RowData[]
   try {
     rows = await readCsvRows(file)
@@ -19,13 +18,11 @@ const parseFile = async (file: File): Promise<StatsFileState> => {
     return _toError(StatsFileErrorCode.UNREADABLE, `Reading CSV failed: ${getErrorMessage(err)}`)
   }
 
-  // 2. Find the sections (one per account) and their parsers
   const { sections, error } = findSections(rows)
   if (!sections.length) {
     return _toError(StatsFileErrorCode.UNSUPPORTED_FORMAT, error)
   }
 
-  // 3. Transform rows to transactions
   const parsedSections: StatsFileSection[] = []
   for (const { parser, rows: sectionRows } of sections) {
     try {
@@ -36,7 +33,7 @@ const parseFile = async (file: File): Promise<StatsFileState> => {
     }
   }
 
-  // 4. Validate so consumers are working with valid data
+  // Validate so consumers are working with valid data
   const res = zStatsFileState.safeParse({
     status: StatsFileStatus.PARSED,
     sections: parsedSections,

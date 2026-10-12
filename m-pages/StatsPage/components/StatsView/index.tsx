@@ -1,40 +1,39 @@
 'use client'
 
+import { InsertChartOutlined } from '@mui/icons-material'
 import { Box, Divider, Stack } from '@mui/material'
-import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC } from '@/common'
-import { getTableViewOptions, TableView } from '@/m-pages/DataPage/actions'
-import { NoSelectionDisplay, SegmentedToggle } from '@/m-pages/DataPage/components'
-import { ViewToolbar } from '@/m-pages/Workspace/components'
-import { useWorkspace } from '@/m-pages/Workspace/context'
-import { useFileHelper, useTransactionHelper, useUserPreferences } from '@/hooks'
+import { useTransactionHelper, useUserPreferences } from '@/hooks'
+import { useTranslation } from '@/lib/i18n'
 
-import { getCurrency } from '../../actions'
+import { getCurrency, getTableViewOptions } from '../../actions'
+import { useWorkspaceFiles } from '../../context'
+import { useTableView } from '../../useTableView'
 import CategoryBreakdown from '../CategoryBreakdown'
-import NoDataDisplay from '../NoDataDisplay'
+import DropZoneDisplay from '../DropZoneDisplay'
+import NoSelectionDisplay from '../NoSelectionDisplay'
+import SegmentedToggle from '../SegmentedToggle'
 import SummaryChart from '../SummaryChart'
 import TransactionChart from '../TransactionChart'
+import ViewToolbar from '../ViewToolbar'
 import { ui } from './styled'
 
 /**
- * Middle column of the stats view: charts and category breakdown of the selected files.
+ * Stats view of the workspace: charts and category breakdown of the selected files.
  */
 const Component = () => {
   const sx = ui()
+  const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
-  const { isDemoMode, onAddFiles, onAddFolder } = useWorkspace()
-  const { files, selectedFiles } = useFileHelper({ isDemoMode })
+  const { files, selectedFiles } = useWorkspaceFiles()
   const { transactions, transactionRangeItems } = useTransactionHelper({
     files: selectedFiles,
     locale,
     dateFormat,
   })
   const currency = getCurrency(transactions)
-  // Only applies to the data page, shown disabled so the toolbar doesn't change when switching
-  const [tableView] = useLocalStorage<TableView>(MISC.LS_DATA_TABLE_VIEW_KEY, TableView.RAW, {
-    initializeWithValue: false,
-  })
+  // Only applies to the data view, shown disabled so the toolbar doesn't change when switching
+  const [tableView] = useTableView()
 
   return (
     <>
@@ -43,7 +42,11 @@ const Component = () => {
       </ViewToolbar>
       <Box sx={sx.scroll}>
         {!files.length ? (
-          <NoDataDisplay onAddFiles={onAddFiles} onAddFolder={onAddFolder} />
+          <DropZoneDisplay
+            icon={InsertChartOutlined}
+            title={t('STATS_PAGE.STATS_VIEW.NO_DATA')}
+            subtitleKey="STATS_PAGE.STATS_VIEW.NO_DATA_SELECT"
+          />
         ) : !selectedFiles.length ? (
           <NoSelectionDisplay />
         ) : (

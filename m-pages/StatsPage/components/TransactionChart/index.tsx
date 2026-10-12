@@ -54,7 +54,7 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
 
   return (
     <Box>
-      <CardTitle>{t('STATS_PAGE.CASHFLOW')}</CardTitle>
+      <CardTitle>{t('STATS_PAGE.STATS_VIEW.CASHFLOW')}</CardTitle>
 
       <Box sx={sx.chartCard} ref={ref}>
         {/* @ts-expect-error Type '"line"' is not assignable to type '"bar"'. */}

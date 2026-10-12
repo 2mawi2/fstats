@@ -2,9 +2,6 @@ import { z } from 'zod'
 
 // -------------------------------------------------------
 
-/**
- * The color mode which is currently applied in the app.
- */
 export const ColorMode = {
   SYSTEM: 'system',
   LIGHT: 'light',
@@ -67,9 +64,6 @@ export type StatsFileErrorCode = z.infer<typeof zStatsFileErrorCode>
 
 // -------------------------------------------------------
 
-/**
- * The user's chosen date format which applies across the app.
- */
 export const DateFormat = {
   DMY_LONG: 'd MMMM yyyy',
   DMY_SHORT: 'd MMM yyyy',
@@ -102,9 +96,6 @@ export type DateFormat = z.infer<typeof zDateFormat>
 
 // -------------------------------------------------------
 
-/**
- * The user's chosen display currency preference.
- */
 export const Currency = {
   USD: 'USD',
   EUR: 'EUR',

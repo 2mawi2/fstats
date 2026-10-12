@@ -10,7 +10,7 @@ type CardTitleProps = {
 }
 
 /**
- * Section header, like the preview headers of the data page.
+ * Section header, like the preview headers of the data view.
  */
 const Component = ({ children, caption, action }: CardTitleProps) => {
   const sx = ui()

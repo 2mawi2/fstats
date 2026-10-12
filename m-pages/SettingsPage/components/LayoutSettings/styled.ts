@@ -6,7 +6,6 @@ export const ui = () => {
       display: 'grid',
       gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
       gap: 2,
-      // 8 of 12 columns on larger screens
       width: { xs: '100%', md: `${(8 / 12) * 100}%` },
     },
 

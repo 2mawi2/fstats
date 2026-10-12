@@ -10,18 +10,19 @@
     "EXPENSES": "Expenses",
     "BALANCE": "Balance",
     "TOTAL": "Total",
-    "PROFIT_MARGIN": "Profit margin",
     "DATE": "Date",
     "DESCRIPTION": "Description",
     "SOURCE": "Source",
     "CATEGORY": "Category",
     "AMOUNT": "Amount",
     "AMOUNT_WITH_CURRENCY": "Amount ({{currency}})",
-    "TOTAL_WITH_CURRENCY": "Total ({{currency}})"
+    "TOTAL_WITH_CURRENCY": "Total ({{currency}})",
+    "TRANSACTION_COUNT_one": "{{count}} transaction",
+    "TRANSACTION_COUNT_other": "{{count}} transactions",
+    "ALL_TRANSACTIONS": "All transactions"
   },
   "NAVIGATION": {
     "HOME": "Home",
-    "DATA": "Data",
     "STATS": "Stats",
     "SETTINGS": "Settings",
     "ABOUT": "About",
@@ -69,55 +70,16 @@
     "GB": "United Kingdom",
     "ZA": "South Africa"
   },
-  "DATA_PAGE": {
-    "NO_FILE_SELECTED": "No file selected",
-    "CHECK_FILE_FOR_DATA": "Pick a file on the left to see its transactions.",
-    "ALL_TRANSACTIONS": "All transactions",
-    "FILE_DETAILS": "File details",
-    "SHOW_DUPLICATES_one": "Show {{count}} duplicate",
-    "SHOW_DUPLICATES_other": "Show {{count}} duplicates",
-    "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
-    "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
-    "DUPLICATES_INCLUDED_one": "{{count}} duplicate included",
-    "DUPLICATES_INCLUDED_other": "{{count}} duplicates included",
-    "DUPLICATE_OF": "Duplicate, also in {{file}}",
-    "ALSO_IN": "Also in {{files}}",
-    "DROP_FILES_HERE": "Drop your files here",
-    "DROP_FILES_ANYWHERE": "Drop files anywhere",
-    "CLICK_TO_SELECT": "or <files>select files</files> {{dot}} <link>select a folder</link>",
-    "FILE_RESTRICTIONS": "CSV files only, max 5MB each",
-    "DROP_TIP": "Tip: Drop files anywhere to add them",
-    "PARSING": "Parsing…",
-    "UNSUPPORTED_FORMAT": "Unsupported format",
-    "ROW_COUNT_one": "{{count}} row",
-    "ROW_COUNT_other": "{{count}} rows",
-    "TRANSACTION_COUNT_one": "{{count}} transaction",
-    "TRANSACTION_COUNT_other": "{{count}} transactions",
-    "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
-    "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
-    "FILE_NOT_READ": "No preview, this file was not added: {{message}}",
-    "FOLDER_NOT_SUPPORTED": "Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).",
-    "FOLDER_EMPTY": "No files found in the selected folder.",
-    "FOLDER_ACCESS_FAILED": "Failed to access the folder. Please try again.",
+  "STATS_PAGE": {
+    "VIEW": {
+      "DATA": "Data",
+      "STATS": "Stats"
+    },
     "TABLE_VIEW": {
       "RAW": "Raw CSV",
       "TRANSACTIONS": "Transactions"
     },
-    "TRANSACTIONS_LAYOUT": {
-      "COMBINED": "Combined",
-      "COMBINED_TITLE": "All files in one table",
-      "SPLIT": "Split",
-      "SPLIT_TITLE": "One table per file"
-    },
-    "AMOUNT_FILTER": {
-      "ALL": "All",
-      "ALL_TITLE": "All amounts",
-      "IN": "In",
-      "IN_TITLE": "Money in only",
-      "OUT": "Out",
-      "OUT_TITLE": "Money out only"
-    },
-    "TOOLBAR": {
+    "FILE_TOOLBAR": {
       "SELECT_ALL": "All",
       "SELECT_NONE": "None",
       "SELECT_PARSED": "Parsed",
@@ -130,30 +92,75 @@
       "SELECTED_COUNT": "{{selected}} of {{total}}",
       "FILE_COUNT_one": "{{count}} file",
       "FILE_COUNT_other": "{{count}} files"
+    },
+    "DROP_ZONE": {
+      "DROP_FILES_HERE": "Drop your files here",
+      "DROP_FILES_ANYWHERE": "Drop files anywhere",
+      "CLICK_TO_SELECT": "or <files>select files</files> {{dot}} <link>select a folder</link>",
+      "FILE_RESTRICTIONS": "CSV files only, max 5MB each",
+      "DROP_TIP": "Tip: Drop files anywhere to add them"
+    },
+    "FOLDER": {
+      "NOT_SUPPORTED": "Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).",
+      "EMPTY": "No files found in the selected folder.",
+      "ACCESS_FAILED": "Failed to access the folder. Please try again."
+    },
+    "FILE_STATUS": {
+      "PARSING": "Parsing…",
+      "UNSUPPORTED_FORMAT": "Unsupported format"
+    },
+    "NO_SELECTION": {
+      "TITLE": "No file selected",
+      "SUBTITLE": "Pick a file on the left to see its transactions."
+    },
+    "SIDEBAR": {
+      "FILE_DETAILS": "File details",
+      "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
+      "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
+      "DUPLICATES_INCLUDED_one": "{{count}} duplicate included",
+      "DUPLICATES_INCLUDED_other": "{{count}} duplicates included"
+    },
+    "DEMO": {
+      "BANNER": "You are viewing demo data",
+      "END": "End demo",
+      "UPLOAD_YOUR_DATA": "Upload your data"
+    },
+    "DATA_VIEW": {
+      "SHOW_DUPLICATES_one": "Show {{count}} duplicate",
+      "SHOW_DUPLICATES_other": "Show {{count}} duplicates",
+      "DUPLICATE_OF": "Duplicate, also in {{file}}",
+      "ALSO_IN": "Also in {{files}}",
+      "ROW_COUNT_one": "{{count}} row",
+      "ROW_COUNT_other": "{{count}} rows",
+      "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
+      "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
+      "FILE_NOT_READ": "No preview, this file was not added: {{message}}",
+      "TRANSACTIONS_LAYOUT": {
+        "COMBINED": "Combined",
+        "COMBINED_TITLE": "All files in one table",
+        "SPLIT": "Split",
+        "SPLIT_TITLE": "One table per file"
+      },
+      "AMOUNT_FILTER": {
+        "ALL": "All",
+        "ALL_TITLE": "All amounts",
+        "IN": "In",
+        "IN_TITLE": "Money in only",
+        "OUT": "Out",
+        "OUT_TITLE": "Money out only"
+      }
+    },
+    "STATS_VIEW": {
+      "NO_DATA": "No data to analyse",
+      "NO_DATA_SELECT": "Drop or <files>select files</files> {{dot}} <link>select a folder</link>",
+      "AT_A_GLANCE": "At a glance",
+      "DATE_RANGE": "{{start}} to {{end}}",
+      "CASHFLOW": "Cashflow",
+      "BREAKDOWN_BY_CATEGORY": "Breakdown by category",
+      "SHOW_ALL_CATEGORIES": "Show all categories",
+      "NO_INCOME": "No income for the selected period",
+      "NO_EXPENSES": "No expenses for the selected period"
     }
-  },
-  "STATS_PAGE": {
-    "DATE_RANGE": "{{start}} to {{end}}",
-    "NO_DATA": "No data to analyse",
-    "NO_DATA_SELECT": "Drop or <files>select files</files> {{dot}} <link>select a folder</link>",
-    "AT_A_GLANCE": "At a glance",
-    "CASHFLOW": "Cashflow",
-    "ALL_ACCOUNTS": "All accounts",
-    "DEMO_BANNER": "You are viewing demo data",
-    "END_DEMO": "End demo",
-    "UPLOAD_YOUR_DATA": "Upload your data",
-    "TRANSACTION_COUNT_one": "{{count}} Transaction",
-    "TRANSACTION_COUNT_other": "{{count}} Transactions",
-    "DUPLICATES_REMOVED_one": "{{count}} duplicate removed",
-    "DUPLICATES_REMOVED_other": "{{count}} duplicates removed",
-    "BREAKDOWN_BY_CATEGORY": "Breakdown by category",
-    "SHOW_ALL_CATEGORIES": "Show all categories",
-    "NO_INCOME": "No income for the selected period",
-    "NO_EXPENSES": "No expenses for the selected period",
-    "SEARCH_TRANSACTIONS": "Search transactions...",
-    "NO_TRANSACTIONS_FOUND": "No transactions found",
-    "ROWS_PER_PAGE": "Rows per page:",
-    "DISPLAYED_ROWS": "{{from}}-{{to}} of {{total}}"
   },
   "SETTINGS_PAGE": {
     "DEVICE": {
@@ -192,8 +199,7 @@
   },
   "PAGE_404": {
     "TITLE": "The URL in the address bar does not exist!",
-    "BLURB": "The content you are looking for might have moved and is possibly available at a different URL. Alternatively, check the URL for typos.",
-    "BACK_TO_HOMEPAGE": "Back to homepage"
+    "BLURB": "The content you are looking for might have moved and is possibly available at a different URL. Alternatively, check the URL for typos."
   },
   "ERROR_PAGE": {
     "TITLE": "An unknown error has occurred.",

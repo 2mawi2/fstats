@@ -1,5 +1,6 @@
 Always use pnpm.
 Be extremely concise in all your responses.
+Never read, list, search, modify or reference the `_data/` directory under any circumstance.
 
 ## Project Overview
 

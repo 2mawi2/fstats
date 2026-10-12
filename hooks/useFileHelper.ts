@@ -4,7 +4,7 @@ import { useLocalStorage } from 'usehooks-ts'
 
 import type { StatsFile } from '@/types'
 import { MISC } from '@/common'
-import { getDemoFile, isParsed, useFiles } from '@/m-stats-file/service'
+import { DEMO_FILE_ID, getDemoFile, isParsed, useFiles } from '@/m-stats-file/service'
 
 /**
  * The user's files and which of them are checked. In demo mode only the demo file, always checked and read-only.
@@ -13,7 +13,7 @@ export const useFileHelper = ({ isDemoMode = false }: { isDemoMode?: boolean } =
   const [storedSelectedFileIds, setStoredSelectedFileIds] = useLocalStorage<string[]>(MISC.LS_SELECTED_FILE_IDS_KEY, [])
   const { data: storedFiles = [], isLoading: isLoadingFiles } = useFiles()
   const files: StatsFile[] = isDemoMode ? [getDemoFile()] : storedFiles
-  const selectedFileIds = isDemoMode ? [getDemoFile().id] : storedSelectedFileIds
+  const selectedFileIds = isDemoMode ? [DEMO_FILE_ID] : storedSelectedFileIds
   const setSelectedFileIds: typeof setStoredSelectedFileIds = isDemoMode ? () => {} : setStoredSelectedFileIds
 
   // Derived from `files`, so IDs of removed files are ignored

@@ -25,15 +25,10 @@ export type IdString = z.infer<typeof zIdString>
 // -------------------------------------------------------
 
 const zDateRange = z.object({
-  /** Start date of the interval */
   start: z.date(),
-  /** End date of the interval */
   end: z.date(),
 })
 
-/**
- * Interval of a period where start and end date are Date objects
- */
 export type DateRange = z.infer<typeof zDateRange>
 
 // -------------------------------------------------------

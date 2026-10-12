@@ -37,10 +37,6 @@ const Component = ({ transactionRangeItems }: SummaryChartProps) => {
         label: t('MISC.BALANCE'),
         data: both,
         borderColor: (context: ScriptableContext<'line'>) => getGradient({ context, colors: chartColors.both }),
-        // backgroundColor: (context: ScriptableContext<'line'>) => {
-        //   return getGradient({ context, colors: chartColors.both })
-        // },
-        // fill: true,
         lineTension: 0.1,
         borderWidth: 2,
       },
@@ -52,14 +48,14 @@ const Component = ({ transactionRangeItems }: SummaryChartProps) => {
       <CardTitle
         caption={
           transactionRangeItems.length
-            ? t('STATS_PAGE.DATE_RANGE', {
+            ? t('STATS_PAGE.STATS_VIEW.DATE_RANGE', {
                 start: transactionRangeItems[0].label,
                 end: transactionRangeItems[transactionRangeItems.length - 1].label,
               })
             : null
         }
       >
-        {t('STATS_PAGE.AT_A_GLANCE')}
+        {t('STATS_PAGE.STATS_VIEW.AT_A_GLANCE')}
       </CardTitle>
       <Box sx={sx.chartCard}>
         <LineChart type="line" options={chartOptions} data={chartData} />

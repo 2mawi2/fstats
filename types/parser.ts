@@ -90,9 +90,9 @@ export type BankDef = {
   id: string
   name: string
   /**
-   * Required for built-in banks (see `defineBank`), custom formats have none.
+   * Shown on the home page.
    */
-  country?: Country
+  country: Country
   currency: Currency
   formats: readonly FormatDef[]
 }

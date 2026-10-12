@@ -10,18 +10,19 @@
     "EXPENSES": "Ausgaben",
     "BALANCE": "Saldo",
     "TOTAL": "Summe",
-    "PROFIT_MARGIN": "Gewinnmarge",
     "DATE": "Datum",
     "DESCRIPTION": "Beschreibung",
     "SOURCE": "Quelle",
     "CATEGORY": "Kategorie",
     "AMOUNT": "Betrag",
     "AMOUNT_WITH_CURRENCY": "Betrag ({{currency}})",
-    "TOTAL_WITH_CURRENCY": "Summe ({{currency}})"
+    "TOTAL_WITH_CURRENCY": "Summe ({{currency}})",
+    "TRANSACTION_COUNT_one": "{{count}} Umsatz",
+    "TRANSACTION_COUNT_other": "{{count}} Umsätze",
+    "ALL_TRANSACTIONS": "Alle Umsätze"
   },
   "NAVIGATION": {
     "HOME": "Start",
-    "DATA": "Daten",
     "STATS": "Statistiken",
     "SETTINGS": "Einstellungen",
     "ABOUT": "Über",
@@ -69,55 +70,16 @@
     "GB": "Vereinigtes Königreich",
     "ZA": "Südafrika"
   },
-  "DATA_PAGE": {
-    "NO_FILE_SELECTED": "Keine Datei ausgewählt",
-    "CHECK_FILE_FOR_DATA": "Wähle links eine Datei aus, um ihre Umsätze zu sehen.",
-    "ALL_TRANSACTIONS": "Alle Umsätze",
-    "FILE_DETAILS": "Dateidetails",
-    "SHOW_DUPLICATES_one": "{{count}} Duplikat anzeigen",
-    "SHOW_DUPLICATES_other": "{{count}} Duplikate anzeigen",
-    "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
-    "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen",
-    "DUPLICATES_INCLUDED_one": "{{count}} Duplikat einbezogen",
-    "DUPLICATES_INCLUDED_other": "{{count}} Duplikate einbezogen",
-    "DUPLICATE_OF": "Duplikat, auch in {{file}}",
-    "ALSO_IN": "Auch in {{files}}",
-    "DROP_FILES_HERE": "Dateien hier ablegen",
-    "DROP_FILES_ANYWHERE": "Dateien irgendwo ablegen",
-    "CLICK_TO_SELECT": "oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
-    "FILE_RESTRICTIONS": "Nur CSV-Dateien, max. 5 MB pro Datei",
-    "DROP_TIP": "Tipp: Dateien einfach irgendwo ablegen, um sie hinzuzufügen",
-    "PARSING": "Wird ausgewertet…",
-    "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format",
-    "ROW_COUNT_one": "{{count}} Zeile",
-    "ROW_COUNT_other": "{{count}} Zeilen",
-    "TRANSACTION_COUNT_one": "{{count}} Umsatz",
-    "TRANSACTION_COUNT_other": "{{count}} Umsätze",
-    "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
-    "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
-    "FILE_NOT_READ": "Keine Vorschau, diese Datei wurde nicht hinzugefügt: {{message}}",
-    "FOLDER_NOT_SUPPORTED": "Die Ordnerauswahl wird von deinem Browser nicht unterstützt. Bitte verwende einen Browser, der die lokale File API unterstützt (z. B. Chrome oder Edge).",
-    "FOLDER_EMPTY": "Im ausgewählten Ordner wurden keine Dateien gefunden.",
-    "FOLDER_ACCESS_FAILED": "Zugriff auf den Ordner fehlgeschlagen. Bitte versuche es erneut.",
+  "STATS_PAGE": {
+    "VIEW": {
+      "DATA": "Daten",
+      "STATS": "Statistiken"
+    },
     "TABLE_VIEW": {
       "RAW": "CSV-Rohdaten",
       "TRANSACTIONS": "Umsätze"
     },
-    "TRANSACTIONS_LAYOUT": {
-      "COMBINED": "Kombiniert",
-      "COMBINED_TITLE": "Alle Dateien in einer Tabelle",
-      "SPLIT": "Getrennt",
-      "SPLIT_TITLE": "Eine Tabelle pro Datei"
-    },
-    "AMOUNT_FILTER": {
-      "ALL": "Alle",
-      "ALL_TITLE": "Alle Beträge",
-      "IN": "Ein",
-      "IN_TITLE": "Nur Geldeingänge",
-      "OUT": "Aus",
-      "OUT_TITLE": "Nur Geldausgänge"
-    },
-    "TOOLBAR": {
+    "FILE_TOOLBAR": {
       "SELECT_ALL": "Alle",
       "SELECT_NONE": "Keine",
       "SELECT_PARSED": "Ausgewertet",
@@ -130,30 +92,75 @@
       "SELECTED_COUNT": "{{selected}} von {{total}}",
       "FILE_COUNT_one": "{{count}} Datei",
       "FILE_COUNT_other": "{{count}} Dateien"
+    },
+    "DROP_ZONE": {
+      "DROP_FILES_HERE": "Dateien hier ablegen",
+      "DROP_FILES_ANYWHERE": "Dateien irgendwo ablegen",
+      "CLICK_TO_SELECT": "oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
+      "FILE_RESTRICTIONS": "Nur CSV-Dateien, max. 5 MB pro Datei",
+      "DROP_TIP": "Tipp: Dateien einfach irgendwo ablegen, um sie hinzuzufügen"
+    },
+    "FOLDER": {
+      "NOT_SUPPORTED": "Die Ordnerauswahl wird von deinem Browser nicht unterstützt. Bitte verwende einen Browser, der die lokale File API unterstützt (z. B. Chrome oder Edge).",
+      "EMPTY": "Im ausgewählten Ordner wurden keine Dateien gefunden.",
+      "ACCESS_FAILED": "Zugriff auf den Ordner fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "FILE_STATUS": {
+      "PARSING": "Wird ausgewertet…",
+      "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format"
+    },
+    "NO_SELECTION": {
+      "TITLE": "Keine Datei ausgewählt",
+      "SUBTITLE": "Wähle links eine Datei aus, um ihre Umsätze zu sehen."
+    },
+    "SIDEBAR": {
+      "FILE_DETAILS": "Dateidetails",
+      "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
+      "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen",
+      "DUPLICATES_INCLUDED_one": "{{count}} Duplikat einbezogen",
+      "DUPLICATES_INCLUDED_other": "{{count}} Duplikate einbezogen"
+    },
+    "DEMO": {
+      "BANNER": "Du siehst Demodaten",
+      "END": "Demo beenden",
+      "UPLOAD_YOUR_DATA": "Eigene Daten hochladen"
+    },
+    "DATA_VIEW": {
+      "SHOW_DUPLICATES_one": "{{count}} Duplikat anzeigen",
+      "SHOW_DUPLICATES_other": "{{count}} Duplikate anzeigen",
+      "DUPLICATE_OF": "Duplikat, auch in {{file}}",
+      "ALSO_IN": "Auch in {{files}}",
+      "ROW_COUNT_one": "{{count}} Zeile",
+      "ROW_COUNT_other": "{{count}} Zeilen",
+      "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
+      "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
+      "FILE_NOT_READ": "Keine Vorschau, diese Datei wurde nicht hinzugefügt: {{message}}",
+      "TRANSACTIONS_LAYOUT": {
+        "COMBINED": "Kombiniert",
+        "COMBINED_TITLE": "Alle Dateien in einer Tabelle",
+        "SPLIT": "Getrennt",
+        "SPLIT_TITLE": "Eine Tabelle pro Datei"
+      },
+      "AMOUNT_FILTER": {
+        "ALL": "Alle",
+        "ALL_TITLE": "Alle Beträge",
+        "IN": "Ein",
+        "IN_TITLE": "Nur Geldeingänge",
+        "OUT": "Aus",
+        "OUT_TITLE": "Nur Geldausgänge"
+      }
+    },
+    "STATS_VIEW": {
+      "NO_DATA": "Keine Daten zum Analysieren",
+      "NO_DATA_SELECT": "Ablegen oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
+      "AT_A_GLANCE": "Auf einen Blick",
+      "DATE_RANGE": "{{start}} bis {{end}}",
+      "CASHFLOW": "Cashflow",
+      "BREAKDOWN_BY_CATEGORY": "Aufschlüsselung nach Kategorie",
+      "SHOW_ALL_CATEGORIES": "Alle Kategorien anzeigen",
+      "NO_INCOME": "Keine Einnahmen im ausgewählten Zeitraum",
+      "NO_EXPENSES": "Keine Ausgaben im ausgewählten Zeitraum"
     }
-  },
-  "STATS_PAGE": {
-    "DATE_RANGE": "{{start}} bis {{end}}",
-    "NO_DATA": "Keine Daten zum Analysieren",
-    "NO_DATA_SELECT": "Ablegen oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
-    "AT_A_GLANCE": "Auf einen Blick",
-    "CASHFLOW": "Cashflow",
-    "ALL_ACCOUNTS": "Alle Konten",
-    "DEMO_BANNER": "Du siehst Demodaten",
-    "END_DEMO": "Demo beenden",
-    "UPLOAD_YOUR_DATA": "Eigene Daten hochladen",
-    "TRANSACTION_COUNT_one": "{{count}} Umsatz",
-    "TRANSACTION_COUNT_other": "{{count}} Umsätze",
-    "DUPLICATES_REMOVED_one": "{{count}} Duplikat entfernt",
-    "DUPLICATES_REMOVED_other": "{{count}} Duplikate entfernt",
-    "BREAKDOWN_BY_CATEGORY": "Aufschlüsselung nach Kategorie",
-    "SHOW_ALL_CATEGORIES": "Alle Kategorien anzeigen",
-    "NO_INCOME": "Keine Einnahmen im ausgewählten Zeitraum",
-    "NO_EXPENSES": "Keine Ausgaben im ausgewählten Zeitraum",
-    "SEARCH_TRANSACTIONS": "Umsätze durchsuchen...",
-    "NO_TRANSACTIONS_FOUND": "Keine Umsätze gefunden",
-    "ROWS_PER_PAGE": "Zeilen pro Seite:",
-    "DISPLAYED_ROWS": "{{from}}–{{to}} von {{total}}"
   },
   "SETTINGS_PAGE": {
     "DEVICE": {
@@ -192,8 +199,7 @@
   },
   "PAGE_404": {
     "TITLE": "Die URL in der Adresszeile existiert nicht!",
-    "BLURB": "Der gesuchte Inhalt wurde möglicherweise verschoben und ist unter einer anderen URL verfügbar. Prüfe alternativ die URL auf Tippfehler.",
-    "BACK_TO_HOMEPAGE": "Zurück zur Startseite"
+    "BLURB": "Der gesuchte Inhalt wurde möglicherweise verschoben und ist unter einer anderen URL verfügbar. Prüfe alternativ die URL auf Tippfehler."
   },
   "ERROR_PAGE": {
     "TITLE": "Ein unbekannter Fehler ist aufgetreten.",

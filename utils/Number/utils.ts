@@ -21,12 +21,6 @@ export const parseGermanNumber = (numberString: string): string => {
   return numberString.replace(/\./g, '').replace(/,/g, '.')
 }
 
-/**
- * Gets the thousands and decimal separators for a given locale
- *
- * @param locale - The locale to get separators for
- * @returns Object containing thousandsSeparator and decimalSeparator
- */
 const getNumberSeparators = (locale: UserLocale): { thousandsSeparator: string; decimalSeparator: string } => {
   switch (locale) {
     // @locale-updates
@@ -44,13 +38,6 @@ const getNumberSeparators = (locale: UserLocale): { thousandsSeparator: string; 
   }
 }
 
-/**
- * Formats a number string with locale-specific separators
- *
- * @param value - The number to format
- * @param locale - The locale to use
- * @returns Formatted number string with locale-specific separators
- */
 const toLocaleString = (value: NumberString, locale: UserLocale): string => {
   const { thousandsSeparator, decimalSeparator } = getNumberSeparators(locale)
   const isNegative = Big(value).lt(0)
@@ -63,13 +50,7 @@ const toLocaleString = (value: NumberString, locale: UserLocale): string => {
 }
 
 /**
- * Converts a number to a string with `round` and `locale`
- *
- * @param value - Number to format
- * @param round - Number of digits after the decimal point
- * @param locale - Locale to use for formatting (determines separator and decimal point formatting)
- * @param options - Optional options
- * @param options.trimTrailingZeros - Whether to trim trailing zeros, e.g. "7.00" to "7"
+ * Rounded to `round` decimals. `trimTrailingZeros` turns e.g. "7.00" into "7".
  */
 export const toFixedLocale = (
   value: NumberString,

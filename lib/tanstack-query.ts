@@ -15,7 +15,7 @@ export const getQueryClient = () => {
           refetchOnReconnect: false,
           retry: false,
           staleTime: Infinity,
-          gcTime: 1000 * 60 * 60, // 60 minutes
+          gcTime: 1000 * 60 * 60,
         },
       },
     })

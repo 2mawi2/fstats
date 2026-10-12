@@ -18,7 +18,6 @@ export const useTransactionHelper = ({
   dateFormat: DateFormat
 }): {
   transactions: Transaction[]
-  duplicates: Transaction[]
   transactionRangeItems: TransactionRangeItem[]
 } => {
   const allTransactions = files.flatMap((file) => file.sections).flatMap((section) => section.transactions)
@@ -26,12 +25,11 @@ export const useTransactionHelper = ({
   if (!allTransactions.length) {
     return {
       transactions: [],
-      duplicates: [],
       transactionRangeItems: [],
     }
   }
 
-  const { unique: transactions, duplicates } = splitDuplicates(allTransactions)
+  const { unique: transactions } = splitDuplicates(allTransactions)
   transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
   const transactionRangeItems = getTransactionsGroupedByDay({
     dateRange: {
@@ -45,7 +43,6 @@ export const useTransactionHelper = ({
 
   return {
     transactions,
-    duplicates,
     transactionRangeItems,
   }
 }

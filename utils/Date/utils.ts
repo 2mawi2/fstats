@@ -5,14 +5,7 @@ import type { DateFnsLocale, DateRange, SelectOptionWithType } from '@/types'
 import { DateFormat, SortOrder, UserLocale } from '@/types-enums'
 
 /**
- * Converts a date string or date object to "dd/MM/yyyy" or `options.formatTo` format
- *
- * @param date - Date string or date object to convert
- * @param options - Optional options
- * @param options_formatFrom - The format to convert from when supplying a date string - defaults to ISO date format
- * @param options_formatTo - The format to return
- *
- * @returns Date string in `displayDate` format or `formatTo` format.
+ * Date strings are parsed with `options.formatFrom`, ISO by default.
  */
 export const toDisplayDate = (
   date: Date | string,
@@ -37,13 +30,7 @@ export const toDisplayDate = (
 }
 
 /**
- * Converts a date string to a JS Date object
- *
- * @param date - Date string or date object to convert
- * @param options - Optional options
- * @param options_formatFrom - The format to convert from when supplying a date string - defaults to ISO date format
- *
- * @returns Date string in `displayDate` format or `formatTo` format.
+ * Parsed with `options.formatFrom`, ISO by default.
  */
 export const toDate = (date: string, options?: { formatFrom?: string }): Date => {
   const dateObject = options?.formatFrom ? parse(date, options.formatFrom, new Date()) : parseISO(date)
