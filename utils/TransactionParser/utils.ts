@@ -1,5 +1,5 @@
 import type { CategoryCode, Transaction } from '@/types'
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
+import { ALL_CATEGORIES, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
 import { Big } from '@/lib/w-big'
 
 import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './helper'
@@ -44,4 +44,20 @@ export const getCategoryCode = (row: Transaction): CategoryCode => {
 
   // Uncategorised
   return isIncome ? 'TFI_02' : 'TFO_02'
+}
+
+export const getSubcategoryLabel = (code: CategoryCode | null): string => {
+  if (!code) {
+    return 'Uncategorised'
+  }
+
+  const parentCode = code.split('_')[0] as CategoryCode
+  const category = ALL_CATEGORIES[parentCode]
+
+  if (!category) {
+    return code
+  }
+
+  const subcategory = category.subcategories[code]
+  return subcategory?.label ?? code
 }

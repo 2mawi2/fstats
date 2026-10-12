@@ -1,3 +1,53 @@
+import type { StatsFile } from '@/types'
+import { StatsFileStatus } from '@/types-enums'
+import { isParsed, isUnknown } from '@/m-stats-file/service'
+import { getBankAccountName } from '@/utils/Parser'
+
+/**
+ * What a file was parsed as, or why it wasn't.
+ */
+export const getFileFormat = (file: StatsFile) => {
+  if (isParsed(file)) {
+    return { value: getBankAccountName(file.parserId).long, color: 'text.primary' }
+  }
+
+  if (file.status === StatsFileStatus.PARSING) {
+    return { value: 'Parsing…', color: 'text.secondary' }
+  }
+
+  if (isUnknown(file)) {
+    return { value: 'Unsupported format', color: 'warning.main' }
+  }
+
+  return { value: file.status === StatsFileStatus.ERROR ? file.error.message : '-', color: 'error.main' }
+}
+
+export const TableView = {
+  RAW: 'raw',
+  TRANSACTIONS: 'transactions',
+} as const
+
+export type TableView = (typeof TableView)[keyof typeof TableView]
+
+export const TABLE_VIEW_OPTIONS = [
+  { value: TableView.RAW, label: 'Raw CSV' },
+  { value: TableView.TRANSACTIONS, label: 'Transactions' },
+]
+
+export const AmountFilter = {
+  ALL: 'all',
+  IN: 'in',
+  OUT: 'out',
+} as const
+
+export type AmountFilter = (typeof AmountFilter)[keyof typeof AmountFilter]
+
+export const AMOUNT_FILTER_OPTIONS = [
+  { value: AmountFilter.ALL, label: 'All', title: 'All amounts' },
+  { value: AmountFilter.IN, label: 'In', title: 'Money in only' },
+  { value: AmountFilter.OUT, label: 'Out', title: 'Money out only' },
+]
+
 export const MIN_COLUMN_WIDTH = 10 // %
 
 export const DEFAULT_COLUMN_WIDTHS = [20, 50, 30] // %

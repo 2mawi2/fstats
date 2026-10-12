@@ -28,9 +28,10 @@ import { useIsMobile, useUserPreferences } from '@/hooks'
 import { getCurrencySymbol, getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
 import { toFixedLocale } from '@/utils/Number'
+import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
 
-import { getCategoryColor, getSubcategoryLabel } from './actions'
+import { getCategoryColor } from './actions'
 import { ui } from './styled'
 
 type TransactionsTableProps = {

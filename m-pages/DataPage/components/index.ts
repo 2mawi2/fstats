@@ -1,4 +1,6 @@
 export { default as CsvPreview } from './CsvPreview'
 export { default as DropZoneDisplay } from './DropZoneDisplay'
+export { default as FileDetails } from './FileDetails'
 export { default as FileExplorer } from './FileExplorer'
-export { default as FileStats } from './FileStats'
+export { default as SegmentedToggle } from './SegmentedToggle'
+export { default as TransactionsPreview } from './TransactionsPreview'

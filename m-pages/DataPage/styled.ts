@@ -43,6 +43,18 @@ export const ui = () => {
       flexDirection: 'column',
       p: 0,
     },
+    middleToolbar: {
+      position: 'sticky',
+      top: -16, // Column padding, so it sticks to the very top
+      zIndex: 2,
+      display: 'flex',
+      gap: 1,
+      mt: -2,
+      mb: 1,
+      py: 1,
+      pt: 2,
+      bgcolor: 'background.default',
+    },
     dropOverlay: {
       position: 'absolute',
       inset: 0,

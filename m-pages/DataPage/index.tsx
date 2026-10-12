@@ -15,8 +15,22 @@ import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-fil
 import { useFileHelper, useUserPreferences } from '@/hooks'
 import { parseFiles } from '@/utils/FileParser'
 
-import { DEFAULT_COLUMN_WIDTHS, resizeColumns } from './actions'
-import { CsvPreview, DropZoneDisplay, FileExplorer, FileStats } from './components'
+import {
+  AMOUNT_FILTER_OPTIONS,
+  AmountFilter,
+  DEFAULT_COLUMN_WIDTHS,
+  resizeColumns,
+  TABLE_VIEW_OPTIONS,
+  TableView,
+} from './actions'
+import {
+  CsvPreview,
+  DropZoneDisplay,
+  FileDetails,
+  FileExplorer,
+  SegmentedToggle,
+  TransactionsPreview,
+} from './components'
 import { ui } from './styled'
 
 const Component = () => {
@@ -24,6 +38,16 @@ const Component = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   // State rather than a ref, so the previews re-render once the scroll element exists
   const [middleColumn, setMiddleColumn] = useState<HTMLDivElement | null>(null)
+  const [tableView, setTableView] = useLocalStorage<TableView>(MISC.LS_DATA_TABLE_VIEW_KEY, TableView.RAW, {
+    initializeWithValue: false,
+  })
+  const [amountFilter, setAmountFilter] = useState<AmountFilter>(AmountFilter.ALL)
+
+  const changeTableView = (view: TableView) => {
+    setTableView(view)
+    // Always start with all amounts when switching views
+    setAmountFilter(AmountFilter.ALL)
+  }
   const [storedWidths, setWidths] = useLocalStorage(MISC.LS_DATA_COLUMN_WIDTHS_KEY, DEFAULT_COLUMN_WIDTHS, {
     initializeWithValue: false,
   })
@@ -32,7 +56,6 @@ const Component = () => {
   const { mutateAsync: updateFiles } = useMutateUpdateFiles()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const checkedFiles = files.filter((file) => selectedFileIds.includes(file.id))
-  const checkedParsedFiles = checkedFiles.filter(isParsed)
   const { locale, dateFormat } = useUserPreferences()
 
   const onDrop = useCallback(
@@ -109,7 +132,26 @@ const Component = () => {
           {!files.length ? (
             <DropZoneDisplay isDragActive={dropzone.isDragActive} onAddFiles={dropzone.open} />
           ) : checkedFiles.length ? (
-            checkedFiles.map((file) => <CsvPreview key={file.id} file={file} scrollElement={middleColumn} />)
+            <>
+              <Box sx={sx.middleToolbar}>
+                <SegmentedToggle value={tableView} options={TABLE_VIEW_OPTIONS} onChange={changeTableView} />
+                {tableView === TableView.TRANSACTIONS ? (
+                  <SegmentedToggle value={amountFilter} options={AMOUNT_FILTER_OPTIONS} onChange={setAmountFilter} />
+                ) : null}
+              </Box>
+              {checkedFiles.map((file) =>
+                tableView === TableView.TRANSACTIONS ? (
+                  <TransactionsPreview
+                    key={file.id}
+                    file={file}
+                    amountFilter={amountFilter}
+                    scrollElement={middleColumn}
+                  />
+                ) : (
+                  <CsvPreview key={file.id} file={file} scrollElement={middleColumn} />
+                ),
+              )}
+            </>
           ) : (
             <p>Check a file to see its data.</p>
           )}
@@ -119,11 +161,11 @@ const Component = () => {
     {
       id: 'right',
       sx: sx.stickyColumn,
-      content: checkedParsedFiles.length ? (
-        checkedParsedFiles.map((file) => <FileStats key={file.id} file={file} />)
+      content: checkedFiles.length ? (
+        checkedFiles.map((file) => <FileDetails key={file.id} file={file} />)
       ) : files.length ? (
         <Typography variant="body2" color="text.secondary">
-          Check a parsed file to see its stats.
+          Check a file to see its details.
         </Typography>
       ) : null,
     },

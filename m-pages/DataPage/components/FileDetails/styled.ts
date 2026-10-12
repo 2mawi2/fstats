@@ -4,7 +4,7 @@ export const ui = () => {
       mb: 3,
     },
     title: {
-      mb: 1,
+      mb: 0,
       fontWeight: 'medium',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -29,6 +29,19 @@ export const ui = () => {
       fontWeight: 'medium',
       fontVariantNumeric: 'tabular-nums',
       whiteSpace: 'nowrap',
+    },
+    info: {
+      mb: 1,
+      fontSize: 12,
+      lineHeight: 1.5,
+    },
+    format: {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+    meta: {
+      color: 'text.secondary',
     },
   }
 }

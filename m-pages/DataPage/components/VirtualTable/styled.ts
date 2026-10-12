@@ -1,26 +1,13 @@
 export const ui = () => {
   return {
-    section: {
-      mb: 3,
-    },
-    title: {
-      mb: 1,
-      fontWeight: 'medium',
-    },
-    rowCount: {
-      ml: 1,
-      fontSize: 12,
-      fontWeight: 400,
-      color: 'text.secondary',
-    },
-    tableWrapper: {
-      overflowX: 'auto',
+    wrapper: {
       border: 1,
       borderColor: 'divider',
     },
     table: {
       // Fixed layout, so column widths don't change as rows are virtualized
       tableLayout: 'fixed',
+      width: '100%',
       borderCollapse: 'collapse',
       fontSize: 12,
       '& th, & td': {
