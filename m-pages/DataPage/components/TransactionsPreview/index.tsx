@@ -1,11 +1,8 @@
 'use client'
 
-import { FormControlLabel, Switch } from '@mui/material'
 import { useMemo } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 
 import type { StatsFile } from '@/types'
-import { MISC } from '@/common'
 import { isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { getMaxDecimalsForCurrency } from '@/utils/Currency'
@@ -15,16 +12,11 @@ import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { AmountFilter } from '../../actions'
+import { AmountFilter, filterTransactions } from '../../actions'
 import PreviewSection from '../PreviewSection'
+import { STICKY_HEADER_OFFSET } from '../PreviewSection/actions'
 import VirtualTable from '../VirtualTable'
-import {
-  filterTransactions,
-  getSharedCurrency,
-  getSourcedTransactions,
-  getSourceLabel,
-  getTransactionColumns,
-} from './actions'
+import { getSharedCurrency, getSourcedTransactions, getSourceLabel, getTransactionColumns } from './actions'
 
 // Duplicates are shown greyed out
 const DUPLICATE_ROW_STYLE = { opacity: 0.4 }
@@ -32,32 +24,26 @@ const DUPLICATE_ROW_STYLE = { opacity: 0.4 }
 type TransactionsPreviewProps = {
   files: StatsFile[]
   amountFilter: AmountFilter
+  includeDuplicates: boolean
   scrollElement: HTMLElement | null
 }
 
 /**
  * Transactions of all files in a single table, with their source file when there is more than one.
  */
-const Component = ({ files, amountFilter, scrollElement }: TransactionsPreviewProps) => {
+const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const parsedFiles = useMemo(() => files.filter(isParsed), [files])
   const isCombined = parsedFiles.length > 1
   const currency = useMemo(() => getSharedCurrency(parsedFiles), [parsedFiles])
-  const [showDuplicates, setShowDuplicates] = useLocalStorage(MISC.LS_DATA_SHOW_DUPLICATES_KEY, false, {
-    initializeWithValue: false,
-  })
   const allTransactions = useMemo(
     () => filterTransactions(getSourcedTransactions(parsedFiles), amountFilter),
     [parsedFiles, amountFilter],
   )
-  const duplicateCount = useMemo(
-    () => allTransactions.filter((transaction) => transaction.isDuplicate).length,
-    [allTransactions],
-  )
   const transactions = useMemo(
-    () => (showDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),
-    [allTransactions, showDuplicates],
+    () => (includeDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),
+    [allTransactions, includeDuplicates],
   )
   const columns = useMemo(
     () => getTransactionColumns(currency, isCombined, amountFilter, t),
@@ -88,28 +74,15 @@ const Component = ({ files, amountFilter, scrollElement }: TransactionsPreviewPr
       title={isCombined ? t('DATA_PAGE.ALL_TRANSACTIONS') : (parsedFiles[0] ?? files[0]).file.name}
       rowCount={parsedFiles.length ? transactions.length : undefined}
       error={parsedFiles.length ? null : t('DATA_PAGE.FILE_NOT_PARSED')}
-      actions={
-        duplicateCount ? (
-          <FormControlLabel
-            control={
-              <Switch
-                size="small"
-                checked={showDuplicates}
-                onChange={(event) => setShowDuplicates(event.target.checked)}
-              />
-            }
-            label={t('DATA_PAGE.SHOW_DUPLICATES', { count: duplicateCount })}
-            slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
-            sx={{ mr: 0 }}
-          />
-        ) : null
-      }
+      // A single table, so its title and header row can stay in view
+      isSticky={isCombined}
     >
       <VirtualTable
         columns={columns}
         columnCount={columns.length}
         rowCount={transactions.length}
         getCells={getCells}
+        stickyHeaderTop={isCombined ? STICKY_HEADER_OFFSET : undefined}
         getRowStyle={(index) => (transactions[index].isDuplicate ? DUPLICATE_ROW_STYLE : undefined)}
         scrollElement={scrollElement}
       />

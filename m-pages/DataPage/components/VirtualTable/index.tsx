@@ -46,12 +46,24 @@ type VirtualTableProps = {
   getCells: (index: number) => string[]
   getRowStyle?: (index: number) => CSSProperties | undefined
   /**
+   * Keeps the header row at this offset (px) from the top of the scroll element's content while scrolling.
+   */
+  stickyHeaderTop?: number
+  /**
    * The scrolling ancestor, can be shared by multiple tables.
    */
   scrollElement: HTMLElement | null
 }
 
-const Component = ({ columns, columnCount, rowCount, getCells, getRowStyle, scrollElement }: VirtualTableProps) => {
+const Component = ({
+  columns,
+  columnCount,
+  rowCount,
+  getCells,
+  getRowStyle,
+  stickyHeaderTop,
+  scrollElement,
+}: VirtualTableProps) => {
   const sx = ui()
   const tbodyRef = useRef<HTMLTableSectionElement>(null)
   const [scrollMargin, setScrollMargin] = useState(0)
@@ -92,7 +104,7 @@ const Component = ({ columns, columnCount, rowCount, getCells, getRowStyle, scro
   const paddingBottom = items.length ? virtualizer.getTotalSize() - (items[items.length - 1].end - scrollMargin) : 0
 
   return (
-    <Box sx={sx.wrapper}>
+    <Box sx={stickyHeaderTop === undefined ? sx.wrapper : { ...sx.wrapper, ...sx.stickyWrapper }}>
       <Box component="table" sx={sx.table}>
         <colgroup>
           {colWidths.map((width, index) => (
@@ -105,8 +117,13 @@ const Component = ({ columns, columnCount, rowCount, getCells, getRowStyle, scro
             <tr>
               {/* Index keys, CSV headers aren't necessarily unique */}
               {columns.map((column, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <th key={index} title={column.label} style={{ textAlign: column.align }}>
+                <th
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  title={column.label}
+                  className={stickyHeaderTop === undefined ? undefined : 'sticky'}
+                  style={{ textAlign: column.align, top: stickyHeaderTop }}
+                >
                   {column.hideLabel ? null : column.label}
                 </th>
               ))}

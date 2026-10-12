@@ -73,6 +73,9 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { customColumnWidths, customExplorerSplit, activeLayout, setActiveLayout } = useDataLayout()
+  const isCustomSameAsDefault =
+    !isChanged(customExplorerSplit, DEFAULT_DATA_EXPLORER_SPLIT) &&
+    customColumnWidths.every((width, index) => !isChanged(width, DEFAULT_DATA_COLUMN_WIDTHS[index]))
 
   return (
     <Card sx={{ borderRadius: 2, p: 3 }}>
@@ -82,20 +85,22 @@ const Component = () => {
 
       <Box sx={sx.tiles}>
         <LayoutPreview
-          title={t('SETTINGS_PAGE.LAYOUT.CUSTOM')}
-          columnWidths={customColumnWidths}
-          explorerSplit={customExplorerSplit}
-          isSelected={activeLayout === DataLayout.CUSTOM}
-          onSelect={() => setActiveLayout(DataLayout.CUSTOM)}
-          compareTo={{ columnWidths: DEFAULT_DATA_COLUMN_WIDTHS, explorerSplit: DEFAULT_DATA_EXPLORER_SPLIT }}
-        />
-        <LayoutPreview
           title={t('SETTINGS_PAGE.LAYOUT.DEFAULT')}
           columnWidths={DEFAULT_DATA_COLUMN_WIDTHS}
           explorerSplit={DEFAULT_DATA_EXPLORER_SPLIT}
-          isSelected={activeLayout === DataLayout.DEFAULT}
+          isSelected={activeLayout === DataLayout.DEFAULT || isCustomSameAsDefault}
           onSelect={() => setActiveLayout(DataLayout.DEFAULT)}
         />
+        {isCustomSameAsDefault ? null : (
+          <LayoutPreview
+            title={t('SETTINGS_PAGE.LAYOUT.CUSTOM')}
+            columnWidths={customColumnWidths}
+            explorerSplit={customExplorerSplit}
+            isSelected={activeLayout === DataLayout.CUSTOM}
+            onSelect={() => setActiveLayout(DataLayout.CUSTOM)}
+            compareTo={{ columnWidths: DEFAULT_DATA_COLUMN_WIDTHS, explorerSplit: DEFAULT_DATA_EXPLORER_SPLIT }}
+          />
+        )}
       </Box>
 
       <Typography variant="caption" component="p" color="text.secondary" sx={sx.hint}>

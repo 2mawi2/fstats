@@ -1,27 +1,29 @@
 import { uniq } from 'lodash'
 
-import type { StatsFile } from '@/types'
+import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
-import { isParsed, isUnknown } from '@/m-stats-file/service'
-import { AVAILABLE_PARSERS, getBankAccountName } from '@/utils/Parser'
+import { getFileTransactions, getUniqueTransactions, isParsed, isUnknown } from '@/m-stats-file/service'
+import { AVAILABLE_PARSERS } from '@/utils/Parser'
 import { i18n } from '@/lib/i18n'
+import { Big } from '@/lib/w-big'
+
+/**
+ * Bank and accounts of a parsed file, e.g. Comdirect with Giro and Visa.
+ */
+export const getFileAccount = (file: ParsedStatsFile) => {
+  const parsers = uniq(file.sections.map((section) => section.parserId)).map((parserId) => AVAILABLE_PARSERS[parserId])
+  return { bankName: parsers[0].bankName, accountNames: parsers.map((parser) => parser.accountName) }
+}
 
 /**
  * What a file was parsed as, or why it wasn't.
  */
 export const getFileFormat = (file: StatsFile) => {
   if (isParsed(file)) {
-    const parserIds = uniq(file.sections.map((section) => section.parserId))
-
-    if (parserIds.length === 1) {
-      return { value: getBankAccountName(parserIds[0]).long, color: 'text.primary' }
-    }
-
     // Sections are all from the same bank, e.g. "Comdirect · Giro + Visa"
-    const parsers = parserIds.map((parserId) => AVAILABLE_PARSERS[parserId])
-    const accountNames = parsers.map((parser) => parser.accountName).join(' + ')
-    return { value: `${parsers[0].bankName} ${MISC.CENTER_DOT} ${accountNames}`, color: 'text.primary' }
+    const { bankName, accountNames } = getFileAccount(file)
+    return { value: `${bankName} ${MISC.CENTER_DOT} ${accountNames.join(' + ')}`, color: 'text.primary' }
   }
 
   if (file.status === StatsFileStatus.PARSING) {
@@ -33,6 +35,13 @@ export const getFileFormat = (file: StatsFile) => {
   }
 
   return { value: file.status === StatsFileStatus.ERROR ? file.error.message : '-', color: 'error.main' }
+}
+
+/**
+ * Like accounting software, only negative amounts are colored.
+ */
+export const getAmountColor = (value: NumberString) => {
+  return Big(value).lt(0) ? 'error.main' : undefined
 }
 
 export const TableView = {
@@ -92,6 +101,25 @@ export const getAmountFilterOptions = () => [
     title: i18n.t('DATA_PAGE.AMOUNT_FILTER.OUT_TITLE'),
   },
 ]
+
+export const filterTransactions = <T extends Transaction>(transactions: T[], filter: AmountFilter) => {
+  switch (filter) {
+    case AmountFilter.IN:
+      return transactions.filter((transaction) => Big(transaction.value).gt(0))
+    case AmountFilter.OUT:
+      return transactions.filter((transaction) => Big(transaction.value).lt(0))
+    default:
+      return transactions
+  }
+}
+
+/**
+ * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount filter.
+ */
+export const getDuplicateCount = (files: ParsedStatsFile[], amountFilter: AmountFilter) => {
+  const transactions = filterTransactions(files.flatMap(getFileTransactions), amountFilter)
+  return transactions.length - getUniqueTransactions(transactions).length
+}
 
 export const MIN_COLUMN_WIDTH = 10 // %
 

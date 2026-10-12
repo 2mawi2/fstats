@@ -1,20 +1,23 @@
 'use client'
 
 import { useColorScheme } from '@mui/material/styles'
+import type { ReactNode } from 'react'
 
 import { ColorMode } from '@/types-enums'
 import { useTranslation } from '@/lib/i18n'
 
 import OptionSwitcher from '../OptionSwitcher'
+import type { OptionSwitcherTriggerProps } from '../OptionSwitcher'
 import { getActiveIcon, getActiveLabel } from './actions'
 
 const MODES = [ColorMode.SYSTEM, ColorMode.LIGHT, ColorMode.DARK]
 
 type ThemeSwitcherProps = {
   showLabel?: boolean
+  renderTrigger?: (props: OptionSwitcherTriggerProps) => ReactNode
 }
 
-const Component = ({ showLabel = false }: ThemeSwitcherProps) => {
+const Component = ({ showLabel = false, renderTrigger }: ThemeSwitcherProps) => {
   const { t } = useTranslation()
   const { mode, setMode } = useColorScheme()
 
@@ -28,6 +31,7 @@ const Component = ({ showLabel = false }: ThemeSwitcherProps) => {
       icon={getActiveIcon(mode, 'secondary')}
       label={getActiveLabel(mode)}
       showLabel={showLabel}
+      renderTrigger={renderTrigger}
       listSx={{ pt: 0 }}
       options={MODES.map((value) => ({
         value,

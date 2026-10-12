@@ -13,6 +13,12 @@ import type { Option } from './components/OptionList'
 
 export type { Option }
 
+export type OptionSwitcherTriggerProps = {
+  icon: ReactNode
+  label: ReactNode
+  onOpen: () => void
+}
+
 type OptionSwitcherProps<T extends string> = {
   title: string
   icon: ReactNode
@@ -20,6 +26,10 @@ type OptionSwitcherProps<T extends string> = {
   showLabel?: boolean
   fixedHeader?: boolean
   listSx?: SxProps<Theme>
+  /**
+   * Replaces the default button that opens the options.
+   */
+  renderTrigger?: (props: OptionSwitcherTriggerProps) => ReactNode
   options: Option<T>[]
   onSelect: (value: T) => void
 }
@@ -31,6 +41,7 @@ const Component = <T extends string>({
   showLabel = false,
   fixedHeader = false,
   listSx,
+  renderTrigger,
   options,
   onSelect,
 }: OptionSwitcherProps<T>) => {
@@ -52,28 +63,32 @@ const Component = <T extends string>({
 
   return (
     <>
-      <Tooltip title={title}>
-        {showLabel ? (
-          <Button
-            size={isMobile ? 'large' : 'small'}
-            color="secondary"
-            onClick={onOpen}
-            sx={{
-              minWidth: 0,
-              px: 1.5,
-              py: 1,
-              borderRadius: 1.5,
-            }}
-            startIcon={icon}
-          >
-            <Typography sx={{ fontSize: 14, lineHeight: 1.2 }}>{label}</Typography>
-          </Button>
-        ) : (
-          <IconButton size={isMobile ? 'large' : 'medium'} color="secondary" onClick={onOpen}>
-            {icon}
-          </IconButton>
-        )}
-      </Tooltip>
+      {renderTrigger ? (
+        renderTrigger({ icon, label, onOpen })
+      ) : (
+        <Tooltip title={title}>
+          {showLabel ? (
+            <Button
+              size={isMobile ? 'large' : 'small'}
+              color="secondary"
+              onClick={onOpen}
+              sx={{
+                minWidth: 0,
+                px: 1.5,
+                py: 1,
+                borderRadius: 1.5,
+              }}
+              startIcon={icon}
+            >
+              <Typography sx={{ fontSize: 14, lineHeight: 1.2 }}>{label}</Typography>
+            </Button>
+          ) : (
+            <IconButton size={isMobile ? 'large' : 'medium'} color="secondary" onClick={onOpen}>
+              {icon}
+            </IconButton>
+          )}
+        </Tooltip>
+      )}
 
       <SwipeableDrawer
         title={title}

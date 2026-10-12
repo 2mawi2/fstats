@@ -98,6 +98,18 @@ const defaultTheme = {
           }),
       },
     },
+
+    // Half as strong as the MUI default (0.11 light, 0.13 dark)
+    MuiSkeleton: {
+      styleOverrides: {
+        root: ({ theme }: { theme: Theme }) => ({
+          backgroundColor: `rgba(${theme.vars.palette.text.primaryChannel} / 0.055)`,
+          ...theme.applyStyles('dark', {
+            backgroundColor: `rgba(${theme.vars.palette.text.primaryChannel} / 0.065)`,
+          }),
+        }),
+      },
+    },
   },
 }
 

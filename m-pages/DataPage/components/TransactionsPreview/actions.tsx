@@ -7,7 +7,6 @@ import type { ParsedStatsFile, Transaction } from '@/types'
 import type { Currency } from '@/types-enums'
 import { getFileCurrency, getFileTransactions, getUniqueTransactions } from '@/m-stats-file/service'
 import { getCurrencySymbol } from '@/utils/Currency'
-import { Big } from '@/lib/w-big'
 
 import { AmountFilter } from '../../actions'
 import type { VirtualTableColumn } from '../VirtualTable'
@@ -104,14 +103,3 @@ export const getTransactionColumns = (
       ]
     : []),
 ]
-
-export const filterTransactions = <T extends Transaction>(transactions: T[], filter: AmountFilter) => {
-  switch (filter) {
-    case AmountFilter.IN:
-      return transactions.filter((transaction) => Big(transaction.value).gt(0))
-    case AmountFilter.OUT:
-      return transactions.filter((transaction) => Big(transaction.value).lt(0))
-    default:
-      return transactions
-  }
-}

@@ -19,7 +19,8 @@ export const MISC = {
   LS_DATA_LAYOUT_KEY: 'fstats__data_layout',
   LS_DATA_TABLE_VIEW_KEY: 'fstats__data_table_view',
   LS_DATA_TRANSACTIONS_LAYOUT_KEY: 'fstats__data_transactions_layout',
-  LS_DATA_SHOW_DUPLICATES_KEY: 'fstats__data_show_duplicates',
+  LS_DATA_INCLUDE_DUPLICATES_KEY: 'fstats__data_include_duplicates',
+  LS_DATA_AMOUNT_FILTER_KEY: 'fstats__data_amount_filter',
   SS_SESSION_KEY: 'fstats__session',
   USER_KEY: 'current_user',
 } as const

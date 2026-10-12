@@ -17,11 +17,11 @@ const Component = () => {
         </Grid>
 
         <Grid size={12}>
-          <LayoutSettings />
+          <UserPreferences />
         </Grid>
 
         <Grid size={12}>
-          <UserPreferences />
+          <LayoutSettings />
         </Grid>
       </Grid>
     </PageWrapper>

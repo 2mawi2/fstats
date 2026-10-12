@@ -1,37 +1,42 @@
-const TABULAR_NUMS = { fontVariantNumeric: 'tabular-nums' } as const
-
-export const ui = (size: 'large' | 'small') => {
+export const ui = () => {
   return {
-    balance: {
-      ...TABULAR_NUMS,
-      fontSize: size === 'large' ? 28 : 18,
-      fontWeight: 600,
-      lineHeight: 1.2,
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
+    count: {
+      mb: 1,
+      fontSize: 12,
+      color: 'text.secondary',
     },
-    amounts: {
+    list: {
+      m: 0,
+    },
+    row: {
       display: 'flex',
-      flexWrap: 'wrap',
-      columnGap: 2,
-      rowGap: 1,
-      mt: 1.5,
+      justifyContent: 'space-between',
+      gap: 2,
+      py: 0.125,
     },
-    amount: {
-      flex: '1 1 0',
-      minWidth: 100,
+    // Sum line, like in a ledger
+    totalRow: {
+      mt: 0.25,
+      pt: 0.5,
+      borderTop: 1,
+      // Stronger than the dividers, softer than the text
+      borderColor: 'text.secondary',
     },
-    amountValue: {
-      ...TABULAR_NUMS,
-      fontWeight: 600,
+    label: {
+      m: 0,
+      fontSize: 12,
+    },
+    value: {
+      m: 0,
+      fontSize: 12,
+      fontWeight: 500,
+      fontVariantNumeric: 'tabular-nums',
       whiteSpace: 'nowrap',
     },
-    meta: {
-      mt: 1.5,
-      pt: 1,
-      borderTop: 1,
-      borderColor: 'divider',
+    total: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: 'text.primary',
     },
   }
 }

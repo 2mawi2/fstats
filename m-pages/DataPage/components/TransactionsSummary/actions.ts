@@ -5,18 +5,18 @@ import type { Currency } from '@/types-enums'
 import { getFileCurrency, getFileTransactions, getUniqueTransactions } from '@/m-stats-file/service'
 
 /**
- * Transactions of all files without duplicates, grouped by currency, as amounts in different currencies can't be summed
+ * Transactions of all files, optionally without duplicates, grouped by currency, as amounts in different currencies can't be summed
  * up.
  */
-export const getTransactionsByCurrency = (files: ParsedStatsFile[]) => {
+export const getTransactionsByCurrency = (files: ParsedStatsFile[], includeDuplicates: boolean) => {
   return Object.entries(groupBy(files, getFileCurrency)).map(([currency, currencyFiles]) => {
     const allTransactions = currencyFiles.flatMap(getFileTransactions)
-    const transactions = getUniqueTransactions(allTransactions)
+    const uniqueTransactions = getUniqueTransactions(allTransactions)
 
     return {
       currency: currency as Currency,
-      transactions,
-      duplicateCount: allTransactions.length - transactions.length,
+      transactions: includeDuplicates ? allTransactions : uniqueTransactions,
+      duplicateCount: allTransactions.length - uniqueTransactions.length,
     }
   })
 }

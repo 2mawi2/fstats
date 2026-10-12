@@ -1,16 +1,17 @@
 'use client'
 
-import { Box, Typography } from '@mui/material'
+import { AccountBalanceOutlined, CreditCardOutlined } from '@mui/icons-material'
+import { Box, Chip } from '@mui/material'
 
 import type { StatsFile } from '@/types'
 import { MISC } from '@/common'
-import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/service'
+import { getFileCurrency, getFileTransactions, isError, isParsed, isUnknown } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 
-import { getFileFormat } from '../../actions'
-import StatsList from '../StatsList'
+import { getFileAccount, getFileFormat } from '../../actions'
+import StatsRow from '../StatsRow'
 import { ui } from './styled'
 
 type FileDetailsProps = {
@@ -20,24 +21,53 @@ type FileDetailsProps = {
 const Component = ({ file }: FileDetailsProps) => {
   const sx = ui()
   const { locale } = useUserPreferences()
-  const format = getFileFormat(file)
+  // Same colors as the file row in the left column
+  const titleColor = isUnknown(file) ? 'warning.main' : isError(file) ? 'error.main' : 'text.primary'
 
-  return (
-    <Box component="section" sx={sx.section}>
-      <Typography variant="body2" sx={sx.title} title={file.file.name}>
-        {file.file.name}
-      </Typography>
-      <Box sx={sx.info}>
-        <Box sx={{ ...sx.format, color: format.color }} title={format.value}>
+  const renderAccount = () => {
+    if (!isParsed(file)) {
+      // Why the file wasn't parsed
+      const format = getFileFormat(file)
+      return (
+        <Box sx={{ ...sx.status, color: format.color }} title={format.value}>
           {format.value}
         </Box>
+      )
+    }
+
+    const { bankName, accountNames } = getFileAccount(file)
+
+    return (
+      <Box sx={sx.chips}>
+        <Chip size="small" variant="outlined" icon={<AccountBalanceOutlined />} label={bankName} sx={sx.chip} />
+        {accountNames.map((accountName) => (
+          <Chip
+            key={accountName}
+            size="small"
+            variant="outlined"
+            icon={<CreditCardOutlined />}
+            label={accountName}
+            sx={sx.chip}
+          />
+        ))}
+      </Box>
+    )
+  }
+
+  return (
+    <StatsRow
+      title={file.file.name}
+      titleColor={titleColor}
+      stats={isParsed(file) ? { transactions: getFileTransactions(file), currency: getFileCurrency(file) } : null}
+    >
+      <Box sx={sx.info}>
+        {renderAccount()}
         <Box sx={sx.meta}>
           {formatFileSize(file.file.size)} {MISC.CENTER_DOT}{' '}
           {toDisplayDate(new Date(file.created), locale, { formatTo: 'd MMM yyyy, HH:mm' })}
         </Box>
       </Box>
-      {isParsed(file) ? <StatsList transactions={getFileTransactions(file)} currency={getFileCurrency(file)} /> : null}
-    </Box>
+    </StatsRow>
   )
 }
 

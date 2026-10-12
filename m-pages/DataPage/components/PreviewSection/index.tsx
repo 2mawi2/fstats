@@ -13,19 +13,26 @@ type PreviewSectionProps = {
   isLoading?: boolean
   error?: string | null
   /**
-   * Shown next to the title, e.g. toggles for the table.
+   * The title stays at the top while scrolling. Only for the first section of the scroll container.
    */
-  actions?: ReactNode
+  isSticky?: boolean
   children?: ReactNode
 }
 
-const Component = ({ title, rowCount, isLoading = false, error = null, actions, children }: PreviewSectionProps) => {
+const Component = ({
+  title,
+  rowCount,
+  isLoading = false,
+  error = null,
+  isSticky = false,
+  children,
+}: PreviewSectionProps) => {
   const sx = ui()
   const { t } = useTranslation()
 
   return (
     <Box component="section" sx={sx.section}>
-      <Box sx={sx.header}>
+      <Box sx={isSticky ? { ...sx.header, ...sx.stickyHeader } : sx.header}>
         <Typography variant="body2" sx={sx.title}>
           {title}
           {rowCount !== undefined ? (
@@ -34,7 +41,6 @@ const Component = ({ title, rowCount, isLoading = false, error = null, actions, 
             </Box>
           ) : null}
         </Typography>
-        {actions}
       </Box>
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">

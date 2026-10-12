@@ -38,23 +38,48 @@ export const ui = () => {
       position: 'sticky',
       top: 0,
     },
-    leftColumn: {
+    // Toolbar on top, content scrolls below it
+    toolbarColumn: {
       display: 'flex',
       flexDirection: 'column',
       p: 0,
     },
+    // Same height as the file toolbar of the left column
     middleToolbar: {
-      position: 'sticky',
-      top: -16, // Column padding, so it sticks to the very top
-      zIndex: 2,
+      flexShrink: 0,
       display: 'flex',
       flexWrap: 'wrap',
+      alignItems: 'center',
       gap: 1,
-      mt: -2,
-      mb: 1,
-      py: 1,
+      minHeight: 40,
+      px: 2,
+      py: 0.5,
+      borderBottom: 1,
+      borderColor: 'divider',
+    },
+    middleScroll: {
+      flexGrow: 1,
+      minHeight: 0,
+      overflowY: 'auto',
+      p: 2,
+    },
+    duplicatesSwitch: {
+      ml: 'auto',
+      mr: 0,
+    },
+    rightColumn: {
+      p: 1.5,
+    },
+    rightSubheader: {
+      px: 0.5,
       pt: 2,
-      bgcolor: 'background.default',
+      pb: 0.75,
+      fontSize: 11,
+      fontWeight: 'medium',
+      lineHeight: 1.5,
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase',
+      color: 'text.secondary',
     },
     dropOverlay: {
       position: 'absolute',
