@@ -12,17 +12,10 @@ import type { NewStatsFile, RDZFileRejection, RDZFileWithPath } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
 import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-file/service'
-import { useFileHelper, useUserPreferences } from '@/hooks'
+import { useDataLayout, useFileHelper, useUserPreferences } from '@/hooks'
 import { parseFiles } from '@/utils/FileParser'
 
-import {
-  AMOUNT_FILTER_OPTIONS,
-  AmountFilter,
-  DEFAULT_COLUMN_WIDTHS,
-  resizeColumns,
-  TABLE_VIEW_OPTIONS,
-  TableView,
-} from './actions'
+import { AMOUNT_FILTER_OPTIONS, AmountFilter, resizeColumns, TABLE_VIEW_OPTIONS, TableView } from './actions'
 import {
   CsvPreview,
   DropZoneDisplay,
@@ -48,10 +41,7 @@ const Component = () => {
     // Always start with all amounts when switching views
     setAmountFilter(AmountFilter.ALL)
   }
-  const [storedWidths, setWidths] = useLocalStorage(MISC.LS_DATA_COLUMN_WIDTHS_KEY, DEFAULT_COLUMN_WIDTHS, {
-    initializeWithValue: false,
-  })
-  const widths = storedWidths.length === DEFAULT_COLUMN_WIDTHS.length ? storedWidths : DEFAULT_COLUMN_WIDTHS
+  const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
   const { mutateAsync: addFiles } = useMutateAddFiles()
   const { mutateAsync: updateFiles } = useMutateUpdateFiles()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()

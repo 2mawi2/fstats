@@ -91,8 +91,10 @@ const Component = ({ columns, columnCount, rowCount, getCells, scrollElement }: 
         {columns ? (
           <thead>
             <tr>
-              {columns.map((column) => (
-                <th key={column.label} title={column.label} style={{ textAlign: column.align }}>
+              {/* Index keys, CSV headers aren't necessarily unique */}
+              {columns.map((column, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <th key={index} title={column.label} style={{ textAlign: column.align }}>
                   {column.label}
                 </th>
               ))}

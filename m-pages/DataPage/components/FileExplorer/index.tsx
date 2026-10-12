@@ -3,14 +3,12 @@
 import { Box, List, Skeleton, Typography } from '@mui/material'
 import type { PointerEvent } from 'react'
 import { useRef } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC } from '@/common'
-import { useFileHelper } from '@/hooks'
+import { useDataLayout, useFileHelper } from '@/hooks'
 
 import FileRow from '../FileRow'
 import FileToolbar from '../FileToolbar'
-import { clampSplit, DEFAULT_SPLIT } from './actions'
+import { clampSplit } from './actions'
 import { ui } from './styled'
 
 type FileExplorerProps = {
@@ -21,9 +19,7 @@ const Component = ({ onAddFiles }: FileExplorerProps) => {
   const sx = ui()
   const { files, selectedFileIds, setSelectedFileIds } = useFileHelper()
   const panesRef = useRef<HTMLDivElement>(null)
-  const [split, setSplit] = useLocalStorage(MISC.LS_DATA_EXPLORER_SPLIT_KEY, DEFAULT_SPLIT, {
-    initializeWithValue: false,
-  })
+  const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
 
   const toggleFile = (fileId: string) => {
     setSelectedFileIds((prev) => (prev.includes(fileId) ? prev.filter((id) => id !== fileId) : [...prev, fileId]))

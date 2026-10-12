@@ -2,7 +2,7 @@ import { Grid } from '@mui/material'
 
 import { PageWrapper } from '@/components'
 
-import { DeviceSettings, StorageSettings, UserPreferences } from './components'
+import { DeviceSettings, LayoutSettings, StorageSettings, UserPreferences } from './components'
 
 const Component = () => {
   return (
@@ -14,6 +14,10 @@ const Component = () => {
 
         <Grid size={12}>
           <StorageSettings />
+        </Grid>
+
+        <Grid size={12}>
+          <LayoutSettings />
         </Grid>
 
         <Grid size={12}>

@@ -50,8 +50,6 @@ export const AMOUNT_FILTER_OPTIONS = [
 
 export const MIN_COLUMN_WIDTH = 10 // %
 
-export const DEFAULT_COLUMN_WIDTHS = [20, 50, 30] // %
-
 /**
  * Moves the divider between column `index` and `index + 1` by `delta` percent, respecting the minimum width.
  */
