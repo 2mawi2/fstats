@@ -35,6 +35,7 @@ export type NavItem = {
   labelKey: string
   icon: SvgIconComponent
   iconActive: SvgIconComponent
+  isExternal?: boolean
 }
 
 export type SortingPref = 'asc' | 'desc' | 'totalAsc' | 'totalDesc'
