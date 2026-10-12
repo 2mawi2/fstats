@@ -1,19 +1,13 @@
 'use client'
 
-import { CloudUploadOutlined } from '@mui/icons-material'
-import { Box, FormControlLabel, Switch, Typography } from '@mui/material'
+import { Box, FormControlLabel, Switch } from '@mui/material'
 import type { SxProps, Theme } from '@mui/material'
 import type { ReactNode } from 'react'
-import { Fragment, useCallback, useRef, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
+import { Fragment, useRef, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
-import type { NewStatsFile, RDZFileRejection, RDZFileWithPath } from '@/types'
-import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
-import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-file/service'
 import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
-import { parseFiles } from '@/utils/FileParser'
 import { useTranslation } from '@/lib/i18n'
 
 import {
@@ -22,25 +16,22 @@ import {
   getDuplicateCount,
   getTableViewOptions,
   getTransactionsLayoutOptions,
-  openFolderPicker,
   resizeColumns,
-  setInputFiles,
   TableView,
   TransactionsLayout,
 } from './actions'
 import {
   CsvPreview,
+  DropOverlay,
   DropZoneDisplay,
-  FileDetails,
   FileExplorer,
+  FileSidebar,
   NoSelectionDisplay,
   SegmentedToggle,
-  StatsCard,
-  StatsSkeleton,
   TransactionsPreview,
-  TransactionsSummary,
 } from './components'
 import { ui } from './styled'
+import { useFileDropzone } from './useFileDropzone'
 
 const Component = () => {
   const sx = ui()
@@ -67,47 +58,13 @@ const Component = () => {
     },
   )
   const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
-  const { mutateAsync: addFiles } = useMutateAddFiles()
-  const { mutateAsync: updateFiles } = useMutateUpdateFiles()
-  const { files, checkedFiles, selectedFiles: checkedParsedFiles, setSelectedFileIds } = useFileHelper()
+  const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useFileHelper()
+  const { dropzone, addFolder } = useFileDropzone()
   // Multiple parsed files are shown as one, with combined stats above the stats per file
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // Only the combined table has duplicates
   const duplicateCount = isCombined && !isTransactionsSplit ? getDuplicateCount(checkedParsedFiles, amountFilter) : 0
-
-  const onDrop = useCallback(
-    async (acceptedFiles: File[], fileRejections: RDZFileRejection[]) => {
-      const newFiles: NewStatsFile[] = [
-        ...acceptedFiles.map((file) => ({ file: file as RDZFileWithPath })),
-        ...fileRejections.map(({ file, errors }) => ({ file, rejection: errors.map((e) => e.message).join(', ') })),
-      ]
-
-      const addedFiles = await addFiles(newFiles)
-      const parseResults = await parseFiles(addedFiles.filter((file) => file.status === StatsFileStatus.PARSING))
-      const updatedFiles = await updateFiles(parseResults)
-      setSelectedFileIds((prev) => [...prev, ...updatedFiles.filter(isParsed).map((file) => file.id)])
-    },
-    [addFiles, updateFiles, setSelectedFileIds],
-  )
-
-  const dropzone = useDropzone({
-    onDrop,
-    accept: { 'text/csv': ['.csv'] },
-    maxSize: MISC.MAX_UPLOAD_FILE_SIZE,
-    multiple: true,
-    noClick: true,
-    noKeyboard: true,
-  })
-
-  // Run picked folders through the dropzone input, so they are validated like dropped files
-  const addFolder = async () => {
-    const pickedFiles = await openFolderPicker()
-
-    if (pickedFiles && dropzone.inputRef.current) {
-      setInputFiles(dropzone.inputRef.current, pickedFiles)
-    }
-  }
 
   const startResize = useResizeHandle(containerRef, 'x')
 
@@ -197,27 +154,7 @@ const Component = () => {
     {
       id: 'right',
       sx: { ...sx.stickyColumn, ...sx.toolbarColumn, ...sx.rightColumn },
-      content: checkedFiles.length ? (
-        <>
-          {checkedParsedFiles.length ? (
-            <StatsCard>
-              <TransactionsSummary files={checkedParsedFiles} includeDuplicates={includeDuplicates} />
-            </StatsCard>
-          ) : null}
-          {checkedParsedFiles.length ? (
-            <Typography component="h2" sx={sx.rightSubheader}>
-              {t('DATA_PAGE.FILE_DETAILS')}
-            </Typography>
-          ) : null}
-          <StatsCard>
-            {checkedFiles.map((file) => (
-              <FileDetails key={file.id} file={file} />
-            ))}
-          </StatsCard>
-        </>
-      ) : (
-        <StatsSkeleton />
-      ),
+      content: <FileSidebar includeDuplicates={includeDuplicates} />,
     },
   ]
 
@@ -237,12 +174,7 @@ const Component = () => {
           </Fragment>
         ))}
       </Box>
-      {dropzone.isDragActive ? (
-        <Box sx={sx.dropOverlay}>
-          <CloudUploadOutlined sx={{ fontSize: 48 }} />
-          <Typography variant="h5">{t('DATA_PAGE.DROP_FILES_HERE')}</Typography>
-        </Box>
-      ) : null}
+      {dropzone.isDragActive ? <DropOverlay /> : null}
     </Box>
   )
 }

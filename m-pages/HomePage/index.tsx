@@ -1,16 +1,15 @@
 'use client'
 
-import { Box, Button, Chip, Grid, Typography } from '@mui/material'
+import { Box, Button, Grid, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import Link from 'next/link'
 
 import { ROUTES } from '@/common'
 import { PageWrapper } from '@/components'
 import { useIsMobile } from '@/hooks'
-import { AVAILABLE_PARSERS } from '@/utils/Parser'
 import { useTranslation } from '@/lib/i18n'
 
-import { CARD_ITEMS, STEPS } from './actions'
+import { CARD_ITEMS, getBanksByCountry, getFlagEmoji, STEPS } from './actions'
 import { Hero } from './components'
 import { ctaButton, ui } from './styled'
 
@@ -74,11 +73,27 @@ const Page = () => {
         <Typography variant="h6" sx={sx.sectionTitle}>
           {t('HOME_PAGE.SUPPORTED_BANKS')}
         </Typography>
-        <Box sx={sx.bankGrid}>
-          {Array.from(new Set(Object.values(AVAILABLE_PARSERS).map((parser) => parser.bankName))).map((bankName) => (
-            <Chip key={bankName} label={bankName} sx={sx.bankChip} />
+        <Grid container spacing={isMobile ? 2 : 3} sx={sx.countryGrid}>
+          {Object.entries(getBanksByCountry()).map(([country, bankNames]) => (
+            <Grid size={isMobile ? 12 : 4} key={country}>
+              <Box sx={sx.trustCard}>
+                <Box component="span" role="img" aria-hidden sx={sx.countryFlag}>
+                  {getFlagEmoji(country)}
+                </Box>
+                <Typography variant="h6" component="h3" sx={sx.trustTitle}>
+                  {t(`COUNTRY.${country}`)}
+                </Typography>
+                <Box component="ul" sx={sx.bankList}>
+                  {bankNames.map((bankName) => (
+                    <Box component="li" key={bankName} sx={sx.bankItem}>
+                      {bankName}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
       </Box>
     </PageWrapper>
   )

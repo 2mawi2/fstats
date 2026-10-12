@@ -11,13 +11,14 @@ type EmptyDisplayProps = {
   title: string
   subtitle: ReactNode
   caption?: string
+  actions?: ReactNode
   onClick?: () => void
 }
 
 /**
  * Pictogram with a title, shown in place of the data.
  */
-const Component = ({ icon: Icon, title, subtitle, caption, onClick }: EmptyDisplayProps) => {
+const Component = ({ icon: Icon, title, subtitle, caption, actions, onClick }: EmptyDisplayProps) => {
   const sx = ui()
 
   return (
@@ -35,6 +36,7 @@ const Component = ({ icon: Icon, title, subtitle, caption, onClick }: EmptyDispl
             {caption}
           </Typography>
         ) : null}
+        {actions ? <Box sx={sx.actions}>{actions}</Box> : null}
       </Box>
     </Box>
   )

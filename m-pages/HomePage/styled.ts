@@ -117,25 +117,30 @@ export const ui = (theme: Theme, isMobile: boolean) => {
       mt: isMobile ? 5 : 7,
     },
 
-    bankGrid: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: 1.5,
+    countryGrid: {
       justifyContent: 'center',
     },
 
-    bankChip: {
-      border: '1px solid rgba(0,96,100,0.2)',
-      color: Color.cyanDark,
-      backgroundColor: 'rgba(0,96,100,0.05)',
+    countryFlag: {
+      fontSize: 30,
+      lineHeight: 1,
+      mb: 1.5,
+    },
+
+    bankList: {
+      m: 0,
+      p: 0,
+      listStyle: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 0.75,
+    },
+
+    bankItem: {
+      fontSize: 15,
       fontWeight: 600,
-      fontSize: 14,
-      height: 38,
-      ...darkStyles(theme, {
-        borderColor: 'rgba(0,188,212,0.3)',
-        color: Color.cyan,
-        backgroundColor: 'rgba(0,188,212,0.08)',
-      }),
+      ...accentColor(theme),
     },
   }
 }

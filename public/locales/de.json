@@ -51,17 +51,22 @@
     "STEPS": {
       "ADD_FILES": {
         "TITLE": "Dateien hinzufügen",
-        "DESCRIPTION": "Ziehe deine Kontoauszüge hierher oder wähle sie aus"
+        "DESCRIPTION": "Ziehe CSV-Kontoauszüge oder einen ganzen Ordner auf die Daten-Seite."
       },
-      "CONTINUE": {
-        "TITLE": "Auf „Weiter“ klicken",
-        "DESCRIPTION": "Dateien werden automatisch auf deinem Gerät ausgewertet"
+      "SELECT_FILES": {
+        "TITLE": "Dateien auswählen",
+        "DESCRIPTION": "Dateien werden auf deinem Gerät ausgewertet, wähle die aus, die du analysieren willst."
       },
       "VIEW_STATS": {
         "TITLE": "Statistiken ansehen",
-        "DESCRIPTION": "Gewinne Einblicke in dein Ausgabeverhalten"
+        "DESCRIPTION": "Sieh dir Saldo, Kategorien und Cashflow der ausgewählten Dateien an."
       }
     }
+  },
+  "COUNTRY": {
+    "DE": "Deutschland",
+    "GB": "Vereinigtes Königreich",
+    "ZA": "Südafrika"
   },
   "DATA_PAGE": {
     "NO_FILE_SELECTED": "Keine Datei ausgewählt",
@@ -127,6 +132,10 @@
     }
   },
   "STATS_PAGE": {
+    "DATE_RANGE": "{{start}} bis {{end}}",
+    "NO_DATA": "Keine Daten zum Analysieren",
+    "NO_DATA_BLURB": "Lade eine CSV-Datei hoch, um deine Statistiken zu sehen.",
+    "UPLOAD_FILES": "Dateien hochladen",
     "AT_A_GLANCE": "Auf einen Blick",
     "CASHFLOW": "Cashflow",
     "ALL_ACCOUNTS": "Alle Konten",
@@ -144,11 +153,6 @@
     "NO_TRANSACTIONS_FOUND": "Keine Umsätze gefunden",
     "ROWS_PER_PAGE": "Zeilen pro Seite:",
     "DISPLAYED_ROWS": "{{from}}–{{to}} von {{total}}"
-  },
-  "EMPTY_STATS_PAGE": {
-    "TITLE": "Keine Daten zum <accent>Analysieren</accent>",
-    "BLURB": "Lade eine CSV-Datei hoch und komm dann zurück, um deine Statistiken zu sehen.",
-    "UPLOAD_FILES": "Dateien hochladen"
   },
   "SETTINGS_PAGE": {
     "DEVICE": {

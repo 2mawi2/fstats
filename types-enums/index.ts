@@ -138,6 +138,19 @@ export type Currency = z.infer<typeof zCurrency>
 // -------------------------------------------------------
 
 /**
+ * Country of a bank, ISO 3166-1 alpha-2.
+ */
+export const Country = {
+  DE: 'DE',
+  GB: 'GB',
+  ZA: 'ZA',
+} as const
+
+export type Country = (typeof Country)[keyof typeof Country]
+
+// -------------------------------------------------------
+
+/**
  * Part of the persisted parser and bank account IDs.
  */
 export const AccountType = {

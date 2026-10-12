@@ -8,23 +8,52 @@ export const ui = () => {
       gap: 2,
     },
 
-    tile: sxTile(),
-
-    tileHeader: {
+    // Icon on the left of the title and the current value
+    tile: {
+      ...sxTile(),
       display: 'flex',
       alignItems: 'center',
-      gap: 1,
-      mb: 1,
+      gap: 1.5,
+      width: '100%',
+    },
+
+    iconCircle: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+      width: 40,
+      height: 40,
+      borderRadius: '50%',
+      bgcolor: 'action.hover',
+      color: 'secondary.main',
+      '& svg': { fontSize: 22 },
+    },
+
+    text: {
+      flexGrow: 1,
+      minWidth: 0,
     },
 
     tileTitle: {
-      fontWeight: 600,
-      color: 'text.primary',
+      display: 'block',
+      color: 'text.secondary',
+      lineHeight: 1.4,
     },
 
     value: {
-      fontSize: 16,
-      color: 'secondary.main',
+      fontSize: 15,
+      fontWeight: 500,
+      color: 'text.primary',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+
+    chevron: {
+      flexShrink: 0,
+      fontSize: 20,
+      color: 'text.secondary',
     },
   }
 }

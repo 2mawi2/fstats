@@ -1,8 +1,8 @@
 import type { AmountColumnDef, BankDef, DescriptionColumnDef, FormatDef, HeaderDef, ValidFormats } from '@/types'
 
 export const defineBank = <const Id extends string, const F extends readonly FormatDef[]>(
-  bank: Omit<BankDef, 'id' | 'formats'> & { id: Id; formats: F & ValidFormats<F> },
-): Omit<BankDef, 'id' | 'formats'> & { id: Id; formats: F } => {
+  bank: Omit<BankDef, 'id' | 'formats'> & Required<Pick<BankDef, 'country'>> & { id: Id; formats: F & ValidFormats<F> },
+): Omit<BankDef, 'id' | 'formats'> & Required<Pick<BankDef, 'country'>> & { id: Id; formats: F } => {
   return bank
 }
 

@@ -2,23 +2,20 @@
 
 import { parseISO } from 'date-fns'
 
-import { ParsedStatsFile, SelectOptionBankAccountId, Transaction, TransactionRangeItem } from '@/types'
+import { ParsedStatsFile, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { DEMO_TRANSACTIONS } from '@/common'
 import { splitDuplicates } from '@/m-stats-file/service'
-import { getBankAccountId } from '@/utils/Parser'
 
 import { getTransactionsGroupedByDay } from './helper'
 
 export const useTransactionHelper = ({
   isDemoMode,
-  selectedId,
   files,
   locale,
   dateFormat,
 }: {
   isDemoMode: boolean
-  selectedId: SelectOptionBankAccountId
   files: ParsedStatsFile[]
   locale: UserLocale
   dateFormat: DateFormat
@@ -32,10 +29,7 @@ export const useTransactionHelper = ({
   if (isDemoMode) {
     allTransactions = DEMO_TRANSACTIONS
   } else {
-    allTransactions = files
-      .flatMap((file) => file.sections)
-      .filter((section) => selectedId === 'all' || getBankAccountId(section.parserId) === selectedId)
-      .flatMap((section) => section.transactions)
+    allTransactions = files.flatMap((file) => file.sections).flatMap((section) => section.transactions)
   }
 
   if (!allTransactions.length) {

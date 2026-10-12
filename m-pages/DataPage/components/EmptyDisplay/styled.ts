@@ -41,5 +41,12 @@ export const ui = () => {
     subtitle: {
       maxWidth: 320,
     },
+    actions: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 1.5,
+      mt: 2,
+    },
   }
 }

@@ -1,100 +1,105 @@
 'use client'
 
-import { Card, Grid } from '@mui/material'
+import { Box, Divider, Stack } from '@mui/material'
+import type { SxProps, Theme } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import type { ReactNode } from 'react'
+import { Fragment, useRef } from 'react'
 
-import type { StatsPageForm } from '@/types'
-import { PageWrapper } from '@/components'
-import { useFileHelper, useTransactionHelper, useUserPreferences } from '@/hooks'
-import { useTranslation } from '@/lib/i18n'
+import { resizeColumns } from '@/m-pages/DataPage/actions'
+import { DropOverlay, FileExplorer, FileSidebar, NoSelectionDisplay } from '@/m-pages/DataPage/components'
+import { useFileDropzone } from '@/m-pages/DataPage/useFileDropzone'
+import { useDataLayout, useFileHelper, useResizeHandle, useTransactionHelper, useUserPreferences } from '@/hooks'
 
-import { getBankSelectOptions, getCurrencyForSelection } from './actions'
-import {
-  BankSelector,
-  CardTitle,
-  CategoryBreakdown,
-  DemoBanner,
-  ProfitLossSummary,
-  SummaryChart,
-  TransactionChart,
-  TransactionInfo,
-  TransactionsTable,
-} from './components'
+import { getCurrency } from './actions'
+import { CategoryBreakdown, DemoBanner, NoDataDisplay, SummaryChart, TransactionChart } from './components'
+import { ui } from './styled'
 
 const Component = () => {
-  const { t } = useTranslation()
+  const sx = ui()
+  const containerRef = useRef<HTMLDivElement>(null)
   const { locale, dateFormat } = useUserPreferences()
-  const { selectedFiles } = useFileHelper()
+  const { files, selectedFiles } = useFileHelper()
   const searchParams = useSearchParams()
   const isDemoMode = searchParams.get('demo') === 'true'
-  const bankOptions = getBankSelectOptions(isDemoMode ? [] : selectedFiles)
-  const values: StatsPageForm = {
-    selectedId: bankOptions.length ? bankOptions[0].value : '',
-  }
-  const methods = useForm<StatsPageForm>({
-    defaultValues: values,
-    values,
-  })
-  const selectedId = useWatch({ control: methods.control, name: 'selectedId' })
-  const { transactions, duplicates, transactionRangeItems } = useTransactionHelper({
+  const { transactions, transactionRangeItems } = useTransactionHelper({
     isDemoMode,
-    selectedId,
     files: selectedFiles,
     locale,
     dateFormat,
   })
-  const currency = getCurrencyForSelection(selectedId, transactions)
+  const currency = getCurrency(transactions)
+  // Shares the column widths with the data page
+  const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
+  const { dropzone, addFolder } = useFileDropzone()
+  const startResize = useResizeHandle(containerRef, 'x')
+
+  const columns: {
+    id: string
+    sx?: SxProps<Theme>
+    content: ReactNode
+  }[] = [
+    {
+      id: 'left',
+      sx: { ...sx.stickyColumn, ...sx.toolbarColumn },
+      content: <FileExplorer onAddFiles={dropzone.open} onAddFolder={addFolder} />,
+    },
+    {
+      id: 'middle',
+      sx: { ...sx.stickyColumn, ...sx.middleColumn },
+      content:
+        !files.length && !isDemoMode ? (
+          <NoDataDisplay onAddFiles={dropzone.open} />
+        ) : !selectedFiles.length && !isDemoMode ? (
+          <NoSelectionDisplay />
+        ) : (
+          <Stack divider={<Divider flexItem />}>
+            {isDemoMode ? (
+              <Box sx={sx.section}>
+                <DemoBanner />
+              </Box>
+            ) : null}
+
+            <Box sx={sx.section}>
+              <SummaryChart transactionRangeItems={transactionRangeItems} />
+            </Box>
+
+            <Box sx={sx.section}>
+              <CategoryBreakdown transactions={transactions} currency={currency} />
+            </Box>
+
+            <Box sx={sx.section}>
+              <TransactionChart transactions={transactions} currency={currency} />
+            </Box>
+          </Stack>
+        ),
+    },
+    {
+      id: 'right',
+      sx: { ...sx.stickyColumn, ...sx.toolbarColumn, ...sx.rightColumn },
+      // Duplicates are excluded from the stats
+      content: <FileSidebar includeDuplicates={false} />,
+    },
+  ]
 
   return (
-    <FormProvider {...methods}>
-      <PageWrapper>
-        <Grid container spacing={3}>
-          {isDemoMode ? (
-            <Grid size={12}>
-              <DemoBanner />
-            </Grid>
-          ) : null}
-
-          {bankOptions.length ? (
-            <Grid size={{ xs: 12, sm: 2 }}>
-              <BankSelector options={bankOptions} />
-            </Grid>
-          ) : null}
-
-          {!isDemoMode ? (
-            <Grid size="grow">
-              <TransactionInfo total={transactions.length + duplicates.length} duplicates={duplicates.length} />
-            </Grid>
-          ) : null}
-
-          {/* <Grid size={2}>Date range</Grid> */}
-          {/* <Grid size={2}>Display currency</Grid> */}
-          {/* <Grid size={2}>Compress x-axis</Grid> */}
-          {/* <Grid size={2}>Combine datasets</Grid> */}
-
-          <Grid size={12}>
-            <Card>
-              <CardTitle>{t('STATS_PAGE.AT_A_GLANCE')}</CardTitle>
-              <SummaryChart transactionRangeItems={transactionRangeItems} />
-              <ProfitLossSummary transactions={transactions} currency={currency} />
-            </Card>
-          </Grid>
-
-          <Grid size={12}>
-            <CategoryBreakdown transactions={transactions} currency={currency} />
-          </Grid>
-
-          <Grid size={12}>
-            <TransactionChart transactions={transactions} currency={currency} />
-          </Grid>
-
-          <Grid size={12}>
-            <TransactionsTable transactions={transactions} currency={currency} />
-          </Grid>
-        </Grid>
-      </PageWrapper>
-    </FormProvider>
+    <Box {...dropzone.getRootProps()} sx={sx.dropzone}>
+      <input {...dropzone.getInputProps()} />
+      <Box ref={containerRef} sx={sx.container}>
+        {columns.map((column, index) => (
+          <Fragment key={column.id}>
+            {index > 0 ? (
+              <Box
+                sx={sx.divider}
+                onPointerDown={startResize((delta) => setWidths(resizeColumns(widths, index - 1, delta)))}
+              />
+            ) : null}
+            <Box sx={{ ...sx.column, ...column.sx, flexBasis: `${widths[index]}%` }}>{column.content}</Box>
+          </Fragment>
+        ))}
+      </Box>
+      {dropzone.isDragActive ? <DropOverlay /> : null}
+    </Box>
   )
 }
 

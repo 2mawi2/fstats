@@ -1,5 +1,6 @@
 'use client'
 
+import { ChevronRight } from '@mui/icons-material'
 import { Box, ButtonBase, Typography } from '@mui/material'
 
 import type { OptionSwitcherTriggerProps } from '@/components'
@@ -18,13 +19,14 @@ const PreferenceTile = ({ title, icon, label, onOpen }: PreferenceTileProps) => 
 
   return (
     <ButtonBase onClick={onOpen} sx={sx.tile}>
-      <Box sx={sx.tileHeader}>
-        {icon}
+      <Box sx={sx.iconCircle}>{icon}</Box>
+      <Box sx={sx.text}>
         <Typography variant="caption" component="p" sx={sx.tileTitle}>
           {title}
         </Typography>
+        <Typography sx={sx.value}>{label}</Typography>
       </Box>
-      <Typography sx={sx.value}>{label}</Typography>
+      <ChevronRight sx={sx.chevron} />
     </ButtonBase>
   )
 }

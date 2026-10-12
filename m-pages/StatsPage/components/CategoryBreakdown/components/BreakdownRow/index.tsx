@@ -25,7 +25,7 @@ const Component = ({ category, parentCategoryTotal, currency }: BreakdownRowProp
   const subcategories = getSortedCategories(Object.values(category.subcategories), 'totalDesc')
 
   return (
-    <ButtonBase sx={sx.button(expanded)} onClick={() => setExpanded(!expanded)}>
+    <ButtonBase sx={sx.button} onClick={() => setExpanded(!expanded)}>
       <BreakdownCells
         label={category.label}
         total={category.total}

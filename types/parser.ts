@@ -1,4 +1,4 @@
-import { AccountType, Currency } from '@/types-enums'
+import { AccountType, Country, Currency } from '@/types-enums'
 import type { BankAccountId, ParserId } from '@/utils/Parser/registry'
 
 import type { RowData } from './services/stats-file'
@@ -89,6 +89,10 @@ export type BankDef = {
    */
   id: string
   name: string
+  /**
+   * Required for built-in banks (see `defineBank`), custom formats have none.
+   */
+  country?: Country
   currency: Currency
   formats: readonly FormatDef[]
 }

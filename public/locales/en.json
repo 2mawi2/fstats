@@ -51,17 +51,22 @@
     "STEPS": {
       "ADD_FILES": {
         "TITLE": "Add your files",
-        "DESCRIPTION": "Drag & drop or browse for your bank statements"
+        "DESCRIPTION": "Drop CSV statements or a whole folder on the Data page."
       },
-      "CONTINUE": {
-        "TITLE": "Click \"Continue\"",
-        "DESCRIPTION": "Files are automatically parsed on your device"
+      "SELECT_FILES": {
+        "TITLE": "Select your files",
+        "DESCRIPTION": "Files are parsed on your device, select the ones you want to analyse."
       },
       "VIEW_STATS": {
         "TITLE": "View your stats",
-        "DESCRIPTION": "Gain insights into your spending habits"
+        "DESCRIPTION": "See the balance, categories and cashflow of your selected files."
       }
     }
+  },
+  "COUNTRY": {
+    "DE": "Germany",
+    "GB": "United Kingdom",
+    "ZA": "South Africa"
   },
   "DATA_PAGE": {
     "NO_FILE_SELECTED": "No file selected",
@@ -127,6 +132,10 @@
     }
   },
   "STATS_PAGE": {
+    "DATE_RANGE": "{{start}} to {{end}}",
+    "NO_DATA": "No data to analyse",
+    "NO_DATA_BLURB": "Upload a CSV file to view your stats.",
+    "UPLOAD_FILES": "Upload files",
     "AT_A_GLANCE": "At a glance",
     "CASHFLOW": "Cashflow",
     "ALL_ACCOUNTS": "All accounts",
@@ -144,11 +153,6 @@
     "NO_TRANSACTIONS_FOUND": "No transactions found",
     "ROWS_PER_PAGE": "Rows per page:",
     "DISPLAYED_ROWS": "{{from}}-{{to}} of {{total}}"
-  },
-  "EMPTY_STATS_PAGE": {
-    "TITLE": "No data to <accent>analyse</accent>",
-    "BLURB": "Upload a CSV file and then come back to view your stats.",
-    "UPLOAD_FILES": "Upload files"
   },
   "SETTINGS_PAGE": {
     "DEVICE": {

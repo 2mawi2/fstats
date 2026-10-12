@@ -1,4 +1,4 @@
-import { Box, Card, FormControlLabel, Switch } from '@mui/material'
+import { Box, FormControlLabel, Switch } from '@mui/material'
 import { useState } from 'react'
 
 import type { Transaction } from '@/types'
@@ -25,18 +25,21 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
   const [showAll, setShowAll] = useState(false)
 
   return (
-    <Card sx={{ height: '100%' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <CardTitle>{t('STATS_PAGE.BREAKDOWN_BY_CATEGORY')}</CardTitle>
+    <Box>
+      <CardTitle
+        action={
+          <FormControlLabel
+            control={<Switch size="small" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} />}
+            label={t('STATS_PAGE.SHOW_ALL_CATEGORIES')}
+            slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
+            sx={{ mr: 0 }}
+          />
+        }
+      >
+        {t('STATS_PAGE.BREAKDOWN_BY_CATEGORY')}
+      </CardTitle>
 
-        <FormControlLabel
-          control={<Switch color="primary" value={showAll} onChange={() => setShowAll(!showAll)} />}
-          label={t('STATS_PAGE.SHOW_ALL_CATEGORIES')}
-          sx={{ color: showAll ? 'text.primary' : 'text.secondary' }}
-        />
-      </Box>
-
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 3 }}>
         <BreakdownTable
           title={t('MISC.INCOME')}
           emptyText={t('STATS_PAGE.NO_INCOME')}
@@ -55,7 +58,7 @@ const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
         currency={currency}
         showAll={showAll}
       />
-    </Card>
+    </Box>
   )
 }
 

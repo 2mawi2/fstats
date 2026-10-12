@@ -23,4 +23,4 @@ export const NAV_ITEMS_BOTTOM: NavItem[] = [
 /**
  * Routes rendered edge to edge, i.e. without the max width container.
  */
-export const FULL_WIDTH_ROUTES: string[] = [ROUTES.DATA]
+export const FULL_WIDTH_ROUTES: string[] = [ROUTES.DATA, ROUTES.STATS]

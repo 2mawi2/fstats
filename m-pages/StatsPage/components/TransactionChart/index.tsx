@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Card } from '@mui/material'
+import { Box } from '@mui/material'
 import type { ChartData, ChartDataset } from 'chart.js'
 import { useRef, useState } from 'react'
 import type { RefObject } from 'react'
@@ -53,14 +53,14 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
   const chartOptions = getChartOptions({ currency, locale })
 
   return (
-    <Card>
+    <Box>
       <CardTitle>{t('STATS_PAGE.CASHFLOW')}</CardTitle>
 
       <Box sx={sx.chartCard} ref={ref}>
         {/* @ts-expect-error Type '"line"' is not assignable to type '"bar"'. */}
         <BarChart type="bar" data={chartData} options={chartOptions} />
       </Box>
-    </Card>
+    </Box>
   )
 }
 

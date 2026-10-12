@@ -1,10 +1,11 @@
-import { AccountType, Currency } from '@/types-enums'
+import { AccountType, Country, Currency } from '@/types-enums'
 
 import { defineBank } from '../definition'
 
 export const capitec = defineBank({
   id: 'capitec',
   name: 'Capitec',
+  country: Country.ZA,
   currency: Currency.ZAR,
   formats: [
     {

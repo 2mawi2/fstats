@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { AccountType, Currency } from '@/types-enums'
+import { AccountType, Country, Currency } from '@/types-enums'
 import type { BankAccountId, ParserId } from '@/utils/Parser'
 import {
   AVAILABLE_PARSERS,
@@ -86,6 +86,7 @@ describe('createParser', () => {
   const bank = defineBank({
     id: 'test',
     name: 'Test',
+    country: Country.DE,
     currency: Currency.EUR,
     formats: [
       {
@@ -125,6 +126,7 @@ describe('transaction IDs', () => {
     defineBank({
       id,
       name: id,
+      country: Country.DE,
       currency: Currency.EUR,
       formats: [
         {

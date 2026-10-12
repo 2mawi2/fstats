@@ -7,8 +7,8 @@ import { ColorMode } from '@/types-enums'
 export type BreakdownCellsSize = 'md' | 'sm'
 
 const SIZES = {
-  md: { fontSize: 15, barHeight: 10 },
-  sm: { fontSize: 13, barHeight: 6 },
+  md: { fontSize: 13, barHeight: 6 },
+  sm: { fontSize: 12, barHeight: 4 },
 } as const
 
 export const ui = (theme: Theme, size: BreakdownCellsSize) => {

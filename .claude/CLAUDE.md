@@ -32,13 +32,14 @@ Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Pa
 
 1. Create `utils/Parser/banks/new_bank.ts` (or add a format to an existing bank):
 ```typescript
-import { AccountType, Currency } from '@/types-enums'
+import { AccountType, Country, Currency } from '@/types-enums'
 
 import { defineBank } from '../definition'
 
 export const newBank = defineBank({
   id: 'new_bank',
   name: 'New Bank',
+  country: Country.DE, // shown on the home page, add new countries to `Country` and the `COUNTRY` translations
   currency: Currency.EUR,
   formats: [
     {

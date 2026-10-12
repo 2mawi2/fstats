@@ -1,9 +1,7 @@
 import type { SvgIconComponent } from '@mui/icons-material'
 import type { Locale } from 'date-fns'
 
-import type { BankAccountId } from '@/utils/Parser/registry'
-
-import type { DateRange, SelectOptionWithType } from './global'
+import type { DateRange } from './global'
 import type { CategoryCode, Transaction } from './services/transaction'
 
 export type DateFnsLocale = Locale
@@ -11,14 +9,6 @@ export type DateFnsLocale = Locale
 export type Size = {
   width?: number
   height?: number
-}
-
-export type SelectOptionBankAccountId = BankAccountId | 'all' | ''
-
-export type BankSelectOption = SelectOptionWithType<SelectOptionBankAccountId>
-
-export type StatsPageForm = {
-  selectedId: BankSelectOption['value']
 }
 
 export type TransactionRangeItem = {

@@ -44,8 +44,8 @@ const Component = ({
           <Box sx={sx.tableHeader} onClick={() => setSortingPref(sortingPref === 'asc' ? 'desc' : 'asc')}>
             <Box sx={sx.tableHeaderContent}>
               {title}
-              {sortingPref === 'asc' ? <ArrowUpward sx={{ fontSize: 13 }} /> : null}
-              {sortingPref === 'desc' ? <ArrowDownward sx={{ fontSize: 13 }} /> : null}
+              {sortingPref === 'asc' ? <ArrowUpward sx={{ fontSize: 12 }} /> : null}
+              {sortingPref === 'desc' ? <ArrowDownward sx={{ fontSize: 12 }} /> : null}
             </Box>
           </Box>
         </Grid>
@@ -56,8 +56,8 @@ const Component = ({
           >
             <Box sx={sx.tableHeaderContent}>
               {t('MISC.TOTAL_WITH_CURRENCY', { currency: getCurrencySymbol(currency) })}
-              {sortingPref === 'totalAsc' ? <ArrowUpward sx={{ fontSize: 13 }} /> : null}
-              {sortingPref === 'totalDesc' ? <ArrowDownward sx={{ fontSize: 13 }} /> : null}
+              {sortingPref === 'totalAsc' ? <ArrowUpward sx={{ fontSize: 12 }} /> : null}
+              {sortingPref === 'totalDesc' ? <ArrowDownward sx={{ fontSize: 12 }} /> : null}
             </Box>
           </Box>
         </Grid>
@@ -66,7 +66,7 @@ const Component = ({
         </Grid>
       </Grid>
 
-      <Divider sx={{ mt: 0.5, mb: 1.5 }} />
+      <Divider sx={{ mt: 0.5, mb: 0.5 }} />
 
       {categoriesToShow.length ? (
         categoriesToShow.map((category) => {
@@ -75,7 +75,7 @@ const Component = ({
           )
         })
       ) : (
-        <Typography variant="body2" noWrap sx={{ fontSize: 15, mb: 0, color: 'text.secondary', ml: 1 }}>
+        <Typography variant="body2" noWrap sx={{ fontSize: 13, mb: 0, color: 'text.secondary', ml: 1, mt: 1 }}>
           {emptyText}
         </Typography>
       )}
