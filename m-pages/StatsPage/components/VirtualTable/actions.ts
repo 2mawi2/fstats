@@ -1,7 +1,7 @@
 import type { VirtualTableColumn } from '.'
 
-// Estimate only, rows are measured once rendered
-export const ROW_HEIGHT = 25 // px
+// Of the header and each row, including the border. Also the estimate of the virtualizer, which measures rows
+export const ROW_HEIGHT = 28 // px
 
 // Relative, columns without a width get an equal share
 export const DEFAULT_COLUMN_WIDTH = 100

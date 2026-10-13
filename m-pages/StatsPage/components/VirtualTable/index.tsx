@@ -123,7 +123,8 @@ const Component = ({
     <Box
       sx={{
         ...sx.wrapper,
-        ...(stickyHeaderTop === undefined ? null : sx.stickyWrapper),
+        // The header row draws the top border, see `sx.table`
+        ...(columns ? sx.headerWrapper : null),
         ...(minColumnWidth === undefined ? null : sx.scrollWrapper),
       }}
     >
@@ -147,7 +148,7 @@ const Component = ({
                   // eslint-disable-next-line react/no-array-index-key
                   key={index}
                   title={column.label}
-                  className={stickyHeaderTop === undefined ? undefined : 'sticky'}
+                  // Sticks only with a `top`
                   style={{ textAlign: column.align, top: stickyHeaderTop }}
                 >
                   {column.hideLabel ? null : column.label}
