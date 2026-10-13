@@ -4,12 +4,13 @@ import { ArrowDownward, ArrowUpward } from '@mui/icons-material'
 import { Box, Divider, Grid, Typography } from '@mui/material'
 import { useState } from 'react'
 
-import type { NumberString, ParentCategoryWithTransactions, SortingPref } from '@/types'
+import type { NumberString, SortingPref } from '@/types'
 import { Currency } from '@/types-enums'
 import { getCurrencySymbol } from '@/utils/Currency'
 import { useTranslation } from '@/lib/i18n'
 
 import { COL_SPACING, COL1, COL2, COL3, getSortedCategories } from '../../actions'
+import type { ParentCategoryWithTransactions } from '../../actions'
 import BreakdownRow from '../BreakdownRow'
 import { ui } from './styled'
 

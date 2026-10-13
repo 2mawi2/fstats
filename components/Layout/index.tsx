@@ -63,7 +63,7 @@ const Component = ({ children }: LayoutProps) => {
       </Container>
 
       <SwipeableDrawer
-        title={t('DATA_DISPLAY.MENU')}
+        title={t('NAVIGATION.MENU')}
         anchor="left"
         open={open}
         onClose={onClose}

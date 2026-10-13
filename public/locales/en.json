@@ -31,7 +31,8 @@
     "ABOUT": "About",
     "GITHUB": "GitHub",
     "EXPAND_MENU": "Expand menu",
-    "COLLAPSE_MENU": "Collapse menu"
+    "COLLAPSE_MENU": "Collapse menu",
+    "MENU": "Menu"
   },
   "HOME_PAGE": {
     "HERO_TITLE": "Analyse bank statements <accent>privately</accent>",
@@ -238,9 +239,6 @@
     "TITLE": "About",
     "BLURB": "fstats is open source. Browse the code, report issues or contribute on GitHub.",
     "VIEW_ON_GITHUB": "View on GitHub"
-  },
-  "DATA_DISPLAY": {
-    "MENU": "Menu"
   },
   "PAGE_404": {
     "TITLE": "The URL in the address bar does not exist!",

@@ -3,7 +3,7 @@ import { countBy, sumBy } from 'lodash'
 
 import type { ParentCategory, ParentCategoryCode, Transaction } from '@/types'
 import { ALL_CATEGORIES, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
-import { getCategoryLabel } from '@/utils/TransactionParser'
+import { getCategoryLabel } from '@/utils/Category'
 
 import { getCategoryKey, NO_CATEGORY } from '../../actions'
 

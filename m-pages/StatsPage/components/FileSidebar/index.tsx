@@ -1,6 +1,6 @@
 'use client'
 
-import { Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 
 import { useTranslation } from '@/lib/i18n'
@@ -28,11 +28,15 @@ const Component = () => {
   const { categoryFilter } = useTransactionFilter()
 
   if (!checkedFiles.length) {
-    return <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
+    return (
+      <Box sx={sx.sidebar}>
+        <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
+      </Box>
+    )
   }
 
   return (
-    <>
+    <Box sx={sx.sidebar}>
       {checkedParsedFiles.length ? (
         <>
           {isCsv ? (
@@ -52,7 +56,7 @@ const Component = () => {
           <FileDetails key={file.id} file={file} filter={categoryFilter} />
         ))}
       </StatsCard>
-    </>
+    </Box>
   )
 }
 

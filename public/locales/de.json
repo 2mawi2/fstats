@@ -31,7 +31,8 @@
     "ABOUT": "Über",
     "GITHUB": "GitHub",
     "EXPAND_MENU": "Menü ausklappen",
-    "COLLAPSE_MENU": "Menü einklappen"
+    "COLLAPSE_MENU": "Menü einklappen",
+    "MENU": "Menü"
   },
   "HOME_PAGE": {
     "HERO_TITLE": "Kontoauszüge <accent>privat</accent> analysieren",
@@ -238,9 +239,6 @@
     "TITLE": "Über",
     "BLURB": "fstats ist Open Source. Sieh dir den Code an, melde Probleme oder trage auf GitHub bei.",
     "VIEW_ON_GITHUB": "Auf GitHub ansehen"
-  },
-  "DATA_DISPLAY": {
-    "MENU": "Menü"
   },
   "PAGE_404": {
     "TITLE": "Die URL in der Adresszeile existiert nicht!",

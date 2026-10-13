@@ -1,4 +1,10 @@
+import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
+
+import { ColorMode } from '@/types-enums'
+import { MISC } from '@/common'
+
+import { Color } from './colors'
 
 export const sxMenuPaper = (theme: Theme, isMobile = false) => {
   return {
@@ -39,3 +45,28 @@ export const sxTile = (isSelected = false) => {
     '&:hover': { borderColor: isSelected ? 'primary.main' : 'text.secondary' },
   }
 }
+
+/**
+ * Translucent, blurred background, e.g. for the menu bar and drawers.
+ */
+export const sxGlass = (theme: Theme, opacity: number = MISC.GLASS_EFFECT) => {
+  return {
+    background: alpha(Color.white, opacity),
+    [theme.getColorSchemeSelector(ColorMode.DARK)]: {
+      background: alpha(Color.kycoGrey, opacity),
+    },
+    backdropFilter: 'blur(10px)',
+  }
+}
+
+/**
+ * Small uppercase heading of a group, e.g. in menus and sidebars.
+ */
+export const sxSubheaderText = {
+  fontSize: 11,
+  fontWeight: 'medium',
+  lineHeight: 1.5,
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  color: 'text.secondary',
+} as const

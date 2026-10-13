@@ -14,7 +14,7 @@ export type SelectedCurrency = Currency | typeof ALL_CURRENCIES
  * were unchecked).
  */
 export const useCurrencySelect = (currencies: Currency[]) => {
-  const [storedCurrency, setSelected] = useLocalStorage<SelectedCurrency>(MISC.LS_DATA_CURRENCY_KEY, ALL_CURRENCIES, {
+  const [storedCurrency, setSelected] = useLocalStorage<SelectedCurrency>(MISC.LS_STATS_CURRENCY_KEY, ALL_CURRENCIES, {
     initializeWithValue: false,
   })
   const selected = currencies.includes(storedCurrency as Currency) ? storedCurrency : ALL_CURRENCIES

@@ -50,9 +50,7 @@ const Component = ({
         paper: { sx: sx.drawer(mainMenu) },
         backdrop: { sx: sx.backdrop },
       }}
-      sx={{
-        zIndex: mainMenu ? theme.zIndex.drawer + 1 : theme.zIndex.drawer + 1,
-      }}
+      sx={{ zIndex: theme.zIndex.drawer + 1 }}
     >
       <Box role="presentation">
         <Box sx={sx.subheaderWrapper(fixedHeader)}>

@@ -5,7 +5,7 @@ export const ui = (isMobile: boolean) => {
     banner: {
       backgroundColor: '#000',
       color: '#fff',
-      // Edge to edge below the toolbar, aligned with its content
+      // Edge to edge above the columns
       flexShrink: 0,
       py: 0.5,
       px: 2,

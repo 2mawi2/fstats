@@ -1,6 +1,6 @@
 import { parse } from 'papaparse'
 
-import type { PPRowData, RowData, StatsFile, StatsFileSection, StatsFileState } from '@/types'
+import type { RowData, StatsFile, StatsFileSection, StatsFileState } from '@/types'
 import { zStatsFileState } from '@/types'
 import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
 import { findSections, PARSER_VERSION } from '@/utils/Parser'
@@ -69,7 +69,7 @@ export const readCsvRows = async (file: Blob): Promise<RowData[]> => {
   const text = await readFileText(file)
 
   return new Promise((resolve, reject) => {
-    parse<PPRowData>(text, {
+    parse<RowData>(text, {
       header: false,
       skipEmptyLines: 'greedy',
       worker: true,

@@ -4,16 +4,16 @@ import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
 
-export const DEFAULT_DATA_COLUMN_WIDTHS = [20, 55, 25] // %
+export const DEFAULT_STATS_COLUMN_WIDTHS = [20, 55, 25] // %
 
-export const DEFAULT_DATA_EXPLORER_SPLIT = 60 // %
+export const DEFAULT_STATS_EXPLORER_SPLIT = 60 // %
 
-export const DataLayout = {
+export const StatsLayout = {
   DEFAULT: 'default',
   CUSTOM: 'custom',
 } as const
 
-export type DataLayout = (typeof DataLayout)[keyof typeof DataLayout]
+export type StatsLayout = (typeof StatsLayout)[keyof typeof StatsLayout]
 
 /**
  * Resizable layout of the stats page: the column widths and the split of the left column.
@@ -21,30 +21,30 @@ export type DataLayout = (typeof DataLayout)[keyof typeof DataLayout]
  * There are always two versions, the default and the user's custom layout. Resizing while the default is active
  * starts a new custom layout from the default values (overwriting the previous one) and activates it.
  */
-export const useDataLayout = () => {
-  const [activeLayout, setActiveLayout] = useLocalStorage<DataLayout>(MISC.LS_DATA_LAYOUT_KEY, DataLayout.DEFAULT, {
+export const useStatsLayout = () => {
+  const [activeLayout, setActiveLayout] = useLocalStorage<StatsLayout>(MISC.LS_STATS_LAYOUT_KEY, StatsLayout.DEFAULT, {
     initializeWithValue: false,
   })
   const [storedWidths, setCustomColumnWidths] = useLocalStorage<number[]>(
-    MISC.LS_DATA_COLUMN_WIDTHS_KEY,
-    DEFAULT_DATA_COLUMN_WIDTHS,
+    MISC.LS_STATS_COLUMN_WIDTHS_KEY,
+    DEFAULT_STATS_COLUMN_WIDTHS,
     { initializeWithValue: false },
   )
   const [customExplorerSplit, setCustomExplorerSplit] = useLocalStorage<number>(
-    MISC.LS_DATA_EXPLORER_SPLIT_KEY,
-    DEFAULT_DATA_EXPLORER_SPLIT,
+    MISC.LS_STATS_EXPLORER_SPLIT_KEY,
+    DEFAULT_STATS_EXPLORER_SPLIT,
     { initializeWithValue: false },
   )
   // Ignore stored widths from a different column layout
   const customColumnWidths =
-    storedWidths.length === DEFAULT_DATA_COLUMN_WIDTHS.length ? storedWidths : DEFAULT_DATA_COLUMN_WIDTHS
-  const isDefaultActive = activeLayout === DataLayout.DEFAULT
+    storedWidths.length === DEFAULT_STATS_COLUMN_WIDTHS.length ? storedWidths : DEFAULT_STATS_COLUMN_WIDTHS
+  const isDefaultActive = activeLayout === StatsLayout.DEFAULT
 
   const startCustomLayout = () => {
     if (isDefaultActive) {
-      setCustomColumnWidths(DEFAULT_DATA_COLUMN_WIDTHS)
-      setCustomExplorerSplit(DEFAULT_DATA_EXPLORER_SPLIT)
-      setActiveLayout(DataLayout.CUSTOM)
+      setCustomColumnWidths(DEFAULT_STATS_COLUMN_WIDTHS)
+      setCustomExplorerSplit(DEFAULT_STATS_EXPLORER_SPLIT)
+      setActiveLayout(StatsLayout.CUSTOM)
     }
   }
 
@@ -59,8 +59,8 @@ export const useDataLayout = () => {
   }
 
   return {
-    columnWidths: isDefaultActive ? DEFAULT_DATA_COLUMN_WIDTHS : customColumnWidths,
-    explorerSplit: isDefaultActive ? DEFAULT_DATA_EXPLORER_SPLIT : customExplorerSplit,
+    columnWidths: isDefaultActive ? DEFAULT_STATS_COLUMN_WIDTHS : customColumnWidths,
+    explorerSplit: isDefaultActive ? DEFAULT_STATS_EXPLORER_SPLIT : customExplorerSplit,
     setColumnWidths,
     setExplorerSplit,
     customColumnWidths,

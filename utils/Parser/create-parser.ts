@@ -2,11 +2,11 @@ import { formatISO, isValid, parse, parseISO } from 'date-fns'
 
 import type { BankDef, ExtraField, FormatDef, Parser, RowData, Transaction } from '@/types'
 import { SortOrder } from '@/types-enums'
+import { getCategoryCode } from '@/utils/Category'
 import { getUniqueTimestamps, toDate } from '@/utils/Date'
-import { CYRB53 } from '@/utils/Encryption'
+import { cyrb53 } from '@/utils/Hash'
 import { logger } from '@/utils/Logger'
 import { parseGermanNumber } from '@/utils/Number'
-import { getCategoryCode } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
 
 import { getDescriptionHeaders, getFormatHeaders, toAccountId, toParserId } from './definition'
@@ -157,7 +157,7 @@ const createTransactionIdGenerator = (accountId: string) => {
 
   return ({ date, description, value, currency, extra }: Omit<Transaction, 'id' | 'category'>): string => {
     const sortedExtra = extra ? Object.entries(extra).sort(([a], [b]) => a.localeCompare(b)) : null
-    const id = CYRB53.encrypt(JSON.stringify([accountId, date, description, value, currency, sortedExtra]))
+    const id = cyrb53(JSON.stringify([accountId, date, description, value, currency, sortedExtra]))
     const count = (seen.get(id) ?? 0) + 1
     seen.set(id, count)
     return count === 1 ? id : `${id}-${count}`

@@ -20,11 +20,11 @@ const NO_CATEGORIES = new Set<string>()
 export const useTransactionFilter = () => {
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const [amountFilter, setAmountFilter] = useLocalStorage<AmountFilter>(
-    MISC.LS_DATA_AMOUNT_FILTER_KEY,
+    MISC.LS_STATS_AMOUNT_FILTER_KEY,
     AmountFilter.ALL,
     { initializeWithValue: false },
   )
-  const [storedCategories, setStoredCategories] = useLocalStorage<string[]>(MISC.LS_DATA_EXCLUDED_CATEGORIES_KEY, [], {
+  const [storedCategories, setStoredCategories] = useLocalStorage<string[]>(MISC.LS_STATS_EXCLUDED_CATEGORIES_KEY, [], {
     initializeWithValue: false,
   })
   const excludedCategories = useMemo(

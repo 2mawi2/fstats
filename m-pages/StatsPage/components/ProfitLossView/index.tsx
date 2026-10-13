@@ -39,7 +39,7 @@ const Component = () => {
   const { files, checkedFiles, selectedFiles } = useWorkspaceFiles()
   const { all, shown, byCurrency, deselectedDays, count } = useStatsTransactions()
   const [period, setPeriod] = useLocalStorage<BreakdownPeriod>(
-    MISC.LS_DATA_BREAKDOWN_PERIOD_KEY,
+    MISC.LS_STATS_BREAKDOWN_PERIOD_KEY,
     BreakdownPeriod.MONTH,
     { initializeWithValue: false },
   )

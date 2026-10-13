@@ -1,26 +1,15 @@
+import { sxListRow, sxListRowTitle, sxSmallCheckbox } from '../../styled'
+
 export const ui = () => {
   return {
     row: {
+      ...sxListRow,
       gap: 0.75,
-      minHeight: 34,
-      py: 0,
       pl: 1,
       pr: 1.25,
     },
-    checkbox: {
-      p: 0.5,
-      '& .MuiSvgIcon-root': { fontSize: 18 },
-    },
-    name: {
-      flexGrow: 1,
-      minWidth: 0,
-      m: 0,
-      fontSize: 13,
-      lineHeight: 1.4,
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-    },
+    checkbox: sxSmallCheckbox,
+    name: sxListRowTitle,
     status: {
       flexShrink: 0,
       fontSize: 16,

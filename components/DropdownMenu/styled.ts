@@ -1,3 +1,5 @@
+import { sxSubheaderText } from '@/styles/styled'
+
 export const ui = () => {
   return {
     menu: {
@@ -42,12 +44,7 @@ export const ui = () => {
     subheader: {
       px: 1.5,
       py: 0.5,
-      fontSize: 11,
-      fontWeight: 'medium',
-      lineHeight: 1.5,
-      letterSpacing: '0.04em',
-      textTransform: 'uppercase',
-      color: 'text.secondary',
+      ...sxSubheaderText,
       bgcolor: 'transparent',
       position: 'static',
     },

@@ -5,11 +5,11 @@ import type { CategoryCode, NumberString, ParsedStatsFile, Transaction } from '@
 import type { Currency, UserLocale } from '@/types-enums'
 import { EXPENSE_CATEGORIES } from '@/common'
 import { splitDuplicates } from '@/m-stats-file/service'
+import { getCategoryLabel, getParentCategoryCode } from '@/utils/Category'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import type { BankAccountId } from '@/utils/Parser'
 import { getBankAccountId } from '@/utils/Parser'
 import { getPercentage, isExpense, isIncome, sumValues } from '@/utils/Stats'
-import { getCategoryLabel, getParentCategoryCode } from '@/utils/TransactionParser'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 

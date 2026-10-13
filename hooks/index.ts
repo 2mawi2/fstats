@@ -1,5 +1,5 @@
 export * from './useDarkModeMetaTagUpdater'
-export * from './useDataLayout'
+export * from './useStatsLayout'
 export * from './useFileHelper'
 export * from './useIsDarkMode'
 export * from './useIsMobile'

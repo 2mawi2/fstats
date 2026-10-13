@@ -66,14 +66,14 @@ export const getAmountColor = (value: NumberString) => {
   return Big(value).lt(0) ? 'error.main' : undefined
 }
 
-export const MIN_COLUMN_WIDTH = 10 // %
+export const MIN_COLUMN_WIDTH_PERCENT = 10
 
 /**
  * Moves the divider between column `index` and `index + 1` by `delta` percent, respecting the minimum width.
  */
 export const resizeColumns = (widths: number[], index: number, delta: number) => {
   const total = widths[index] + widths[index + 1]
-  const left = Math.min(Math.max(widths[index] + delta, MIN_COLUMN_WIDTH), total - MIN_COLUMN_WIDTH)
+  const left = Math.min(Math.max(widths[index] + delta, MIN_COLUMN_WIDTH_PERCENT), total - MIN_COLUMN_WIDTH_PERCENT)
   const next = [...widths]
   next[index] = left
   next[index + 1] = total - left

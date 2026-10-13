@@ -5,8 +5,8 @@ export const getColumnCount = (header: string[] | null, rows: string[][]) => {
 // Files with more columns don't fit the width, so their columns keep a minimum width and the table scrolls horizontally
 const MAX_FITTING_COLUMNS = 10
 
-const MIN_COLUMN_WIDTH = 120 // px
+const MIN_COLUMN_WIDTH_PX = 120
 
 export const getMinColumnWidth = (columnCount: number) => {
-  return columnCount > MAX_FITTING_COLUMNS ? MIN_COLUMN_WIDTH : undefined
+  return columnCount > MAX_FITTING_COLUMNS ? MIN_COLUMN_WIDTH_PX : undefined
 }

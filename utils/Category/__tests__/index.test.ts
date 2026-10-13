@@ -1,18 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Transaction } from '@/types'
-import { Currency } from '@/types-enums'
-import { getCategoryCode } from '@/utils/TransactionParser'
+import { getCategoryCode } from '@/utils/Category'
 
-const expense = (description: string): Transaction => ({
-  id: '1',
-  date: '2026-01-01T00:00:00.000Z',
-  description,
-  value: '-10.00',
-  currency: Currency.EUR,
-  category: null,
-  extra: null,
-})
+const expense = (description: string) => ({ description, value: '-10.00' })
 
 describe('getCategoryCode', () => {
   it('should match keywords as whole words, ignoring case', () => {

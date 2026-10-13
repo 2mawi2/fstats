@@ -44,7 +44,7 @@ const Component = () => {
   const [middleColumn, setMiddleColumn] = useState<HTMLDivElement | null>(null)
   const isTransactions = getView(useSearchParams()) === WorkspaceView.TRANSACTIONS
   const [transactionsLayout, setTransactionsLayout] = useLocalStorage<TransactionsLayout>(
-    MISC.LS_DATA_TRANSACTIONS_LAYOUT_KEY,
+    MISC.LS_STATS_TRANSACTIONS_LAYOUT_KEY,
     TransactionsLayout.COMBINED,
     { initializeWithValue: false },
   )

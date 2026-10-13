@@ -1,4 +1,9 @@
-import type { KeywordRule } from '@/types'
+import type { CategoryCode } from '@/types'
+
+type KeywordRule = {
+  keywords: string[]
+  category: CategoryCode
+}
 
 const RAW_INCOME_KEYWORD_RULES: KeywordRule[] = [
   {
@@ -127,7 +132,7 @@ const RAW_EXPENSE_KEYWORD_RULES: KeywordRule[] = [
   },
 ]
 
-export type KeywordMatcher = {
+type KeywordMatcher = {
   category: KeywordRule['category']
   keywords: { pattern: RegExp; length: number }[]
 }

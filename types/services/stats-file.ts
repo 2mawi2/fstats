@@ -33,25 +33,31 @@ const zStatsFileErrorState = z.object({ status: z.literal(StatsFileStatus.ERROR)
 /**
  * Transactions of one account. Most files have one section, some have one per account (e.g. Giro + Visa).
  */
-const zStatsFileSection = z.object({ parserId: zParserId, transactions: z.array(zTransaction) })
+const makeStatsFileSection = <T extends z.ZodType>(transaction: T) => {
+  return z.object({ parserId: zParserId, transactions: z.array(transaction) })
+}
 
-export type StatsFileSection = z.infer<typeof zStatsFileSection>
+export type StatsFileSection = z.infer<ReturnType<typeof makeStatsFileSection<typeof zTransaction>>>
 
 /**
  * The status dependent part of a file, i.e. the result of parsing.
  */
-export const zStatsFileState = z.discriminatedUnion('status', [
-  zStatsFileParsing,
-  z.object({
-    status: z.literal(StatsFileStatus.PARSED),
-    sections: z.array(zStatsFileSection).min(1),
-    /**
-     * `PARSER_VERSION` at parse time, files parsed with an older version are re-parsed. Missing for old files.
-     */
-    parserVersion: z.number().int().optional(),
-  }),
-  zStatsFileErrorState,
-])
+const makeStatsFileState = <T extends z.ZodType>(transaction: T) => {
+  return z.discriminatedUnion('status', [
+    zStatsFileParsing,
+    z.object({
+      status: z.literal(StatsFileStatus.PARSED),
+      sections: z.array(makeStatsFileSection(transaction)).min(1),
+      /**
+       * `PARSER_VERSION` at parse time, files parsed with an older version are re-parsed. Missing for old files.
+       */
+      parserVersion: z.number().int().optional(),
+    }),
+    zStatsFileErrorState,
+  ])
+}
+
+export const zStatsFileState = makeStatsFileState(zTransaction)
 
 export type StatsFileState = z.infer<typeof zStatsFileState>
 
@@ -69,20 +75,8 @@ export type NewStatsFile = {
   rejection?: string
 }
 
-export const zStatsFileAtRest = z.intersection(
-  zStatsFileMeta,
-  z.discriminatedUnion('status', [
-    zStatsFileParsing,
-    z.object({
-      status: z.literal(StatsFileStatus.PARSED),
-      sections: z.array(z.object({ parserId: zParserId, transactions: z.array(zTransactionAtRest) })).min(1),
-      parserVersion: z.number().int().optional(),
-    }),
-    zStatsFileErrorState,
-  ]),
-)
-
-export type StatsFileAtRest = z.infer<typeof zStatsFileAtRest>
+export type StatsFileAtRest = z.infer<typeof zStatsFileMeta> &
+  z.infer<ReturnType<typeof makeStatsFileState<typeof zTransactionAtRest>>>
 
 // Safety checks
 true satisfies _KeysCheck<StatsFile, StatsFileAtRest>

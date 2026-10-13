@@ -5,10 +5,10 @@ import { isExpense } from '@/utils/Stats'
 
 import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './keyword-rules'
 
-export const getCategoryCode = (row: Transaction): CategoryCode => {
+export const getCategoryCode = (row: Pick<Transaction, 'description' | 'value'>): CategoryCode => {
   // Zero amounts are categorised as income
-  const isIncome = !isExpense(row)
-  const keywordRules = isIncome ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
+  const isIncomeOrZero = !isExpense(row)
+  const keywordRules = isIncomeOrZero ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
 
   let matchedCategory: CategoryCode | null = null
   let matchedKeywordLength = -1
@@ -28,7 +28,7 @@ export const getCategoryCode = (row: Transaction): CategoryCode => {
   }
 
   // Uncategorised
-  return isIncome ? 'TFI_02' : 'TFO_02'
+  return isIncomeOrZero ? 'TFI_02' : 'TFO_02'
 }
 
 /**

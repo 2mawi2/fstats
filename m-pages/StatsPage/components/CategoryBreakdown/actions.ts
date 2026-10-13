@@ -2,18 +2,31 @@ import type { TFunction } from 'i18next'
 import { mapValues } from 'lodash'
 
 import type {
+  Category,
   CategoryCode,
-  CategoryWithTransactions,
   NumberString,
+  ParentCategory,
   ParentCategoryCode,
-  ParentCategoryWithTransactions,
   SortingPref,
   Transaction,
 } from '@/types'
 import { ALL_CATEGORIES } from '@/common'
+import { getCategoryLabel, getParentCategoryCode } from '@/utils/Category'
 import { sumValues } from '@/utils/Stats'
-import { getCategoryLabel, getParentCategoryCode } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
+
+type CategoryWithTransactions = Category & {
+  label: string
+  transactions: Transaction[]
+  total: NumberString
+}
+
+export type ParentCategoryWithTransactions = Omit<ParentCategory, 'subcategories'> & {
+  label: string
+  subcategories: Record<CategoryCode, CategoryWithTransactions>
+  transactions: Transaction[]
+  total: NumberString
+}
 
 export const COL_SPACING = { xs: 1, sm: 2 }
 export const COL1 = [4.5, 3]

@@ -1,10 +1,5 @@
-import type { SvgIconComponent } from '@mui/icons-material'
-import type { Locale } from 'date-fns'
-
 import type { DateRange } from './global'
-import type { CategoryCode, Transaction } from './services/transaction'
-
-export type DateFnsLocale = Locale
+import type { Transaction } from './services/transaction'
 
 export type Size = {
   width?: number
@@ -27,19 +22,6 @@ export type FixedLocaleOptions = {
 
 export type FixedLocaleAmountOptions = FixedLocaleOptions & {
   showPlusSign?: boolean
-}
-
-export type KeywordRule = {
-  keywords: string[]
-  category: CategoryCode
-}
-
-export type NavItem = {
-  route: string
-  labelKey: string
-  icon: SvgIconComponent
-  iconActive: SvgIconComponent
-  isExternal?: boolean
 }
 
 export type SortingPref = 'asc' | 'desc' | 'totalAsc' | 'totalDesc'

@@ -4,7 +4,7 @@ import { Box, List, Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { useRef } from 'react'
 
-import { useDataLayout, useResizeHandle } from '@/hooks'
+import { useResizeHandle, useStatsLayout } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace, useWorkspaceFiles } from '../../context'
@@ -24,7 +24,7 @@ const Component = () => {
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const { files, checkedFiles, isChecked, toggleFile } = useWorkspaceFiles()
   const panesRef = useRef<HTMLDivElement>(null)
-  const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
+  const { explorerSplit: split, setExplorerSplit: setSplit } = useStatsLayout()
   const startResize = useResizeHandle(panesRef, 'y')
 
   return (

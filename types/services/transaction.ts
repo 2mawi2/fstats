@@ -35,13 +35,16 @@ export const zTransaction = z.object({
   value: zNumberString,
   currency: zCurrency,
   category: zCategoryCode.nullable(),
+  /**
+   * Optional bank specific columns, see `extraColumns` in the bank definitions (`utils/Parser/banks/`).
+   */
   extra: z
     .object({
-      parentCategory: z.string().optional(), // Capitec (parentCategory)
-      category: z.string().optional(), // Capitec (category)
-      balance: zNumberString.optional(), // Capitec (balance), FNB (balance), ING (saldo), Lloyds (balance)
-      reference: z.string().optional(), // Comdirect Visa (referenz), ING (verwendungszweck)
-      transactionType: z.string().optional(), // Comdirect Giro & Visa (vorgang), ING (buchungstext)
+      parentCategory: z.string().optional(),
+      category: z.string().optional(),
+      balance: zNumberString.optional(),
+      reference: z.string().optional(),
+      transactionType: z.string().optional(),
     })
     .nullable(),
 })

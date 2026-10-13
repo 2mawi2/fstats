@@ -1,9 +1,9 @@
-import { differenceInCalendarDays, parseISO, startOfMonth, startOfWeek } from 'date-fns'
+import { differenceInCalendarDays, eachDayOfInterval, parseISO, startOfMonth, startOfWeek } from 'date-fns'
 
 import type { DateRange, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { groupInOrder } from '@/utils/Array'
-import { getDaysInRange, getTransactionDay, toDayKey, toDisplayDate } from '@/utils/Date'
+import { getTransactionDay, toDayKey, toDisplayDate } from '@/utils/Date'
 
 export const RangeGranularity = {
   DAY: 'day',
@@ -64,7 +64,7 @@ export const getTransactionRangeItems = ({
   granularity?: RangeGranularity
 }): TransactionRangeItem[] => {
   const transactionsByDay = groupInOrder(transactions, getTransactionDay)
-  const daysByBucket = groupInOrder(getDaysInRange(dateRange), (day) => toDayKey(getBucketStart(day, granularity)))
+  const daysByBucket = groupInOrder(eachDayOfInterval(dateRange), (day) => toDayKey(getBucketStart(day, granularity)))
 
   return [...daysByBucket.values()].map((days) => {
     const dayKeys = days.map(toDayKey)

@@ -1,7 +1,7 @@
 import type { StatsFile, StatsFileAtRest } from '@/types'
 import { zStatsFile } from '@/types'
 import { Currency, StatsFileStatus } from '@/types-enums'
-import { SHA256 } from '@/utils/Encryption'
+import { sha256 } from '@/utils/Hash'
 import { parseOrThrow } from '@/lib/zod'
 
 export const syncStatsFile = (dataToSync: StatsFile): StatsFileAtRest => {
@@ -26,5 +26,5 @@ export const parseStatsFile = (dataToParse: StatsFileAtRest): StatsFile => {
 }
 
 export const getFileHash = async (file: Blob): Promise<string> => {
-  return SHA256.encrypt(await file.arrayBuffer())
+  return sha256(await file.arrayBuffer())
 }

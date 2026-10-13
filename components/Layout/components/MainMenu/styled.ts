@@ -1,7 +1,7 @@
 import type { Theme } from '@mui/material/styles'
 
-import { ColorMode } from '@/types-enums'
-import { LAYOUT, MISC } from '@/common'
+import { LAYOUT } from '@/common'
+import { sxGlass } from '@/styles/styled'
 
 export const ui = (theme: Theme) => {
   return {
@@ -10,11 +10,7 @@ export const ui = (theme: Theme) => {
       position: 'sticky',
       top: 0,
       width: '100%',
-      background: `rgba(255, 255, 255, ${MISC.GLASS_EFFECT})`,
-      [theme.getColorSchemeSelector(ColorMode.DARK)]: {
-        background: `rgba(42, 46, 54, ${MISC.GLASS_EFFECT})`,
-      },
-      backdropFilter: 'blur(10px)',
+      ...sxGlass(theme),
     },
 
     menuWrapper: {
