@@ -42,47 +42,7 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Parser/registry.ts` is the single registry; `ParserId`, `BankAccountId` and `zParserId` are derived from it.
 
-1. Create `utils/Parser/banks/new_bank.ts` (or add a format to an existing bank):
-```typescript
-import { AccountType, Country, Currency } from '@/types-enums'
-
-import { defineBank } from '../definition'
-
-export const newBank = defineBank({
-  id: 'new_bank',
-  name: 'New Bank',
-  country: Country.DE, // shown on the home page, add new countries to `Country` and the `COUNTRY` translations
-  currency: Currency.EUR,
-  formats: [
-    {
-      accountType: AccountType.CURRENT, // bank account ID `new_bank__current`
-      accountName: 'Giro', // display name
-      variant: 'default', // parser ID `new_bank__current__default`; additional formats of the same account get descriptive names (e.g. 'legacy')
-      dateFormat: 'dd.MM.yyyy',
-      numberFormat: 'de', // '1.234,56', or 'en' for '1,234.56'
-      // All CSV headers of the file (any order, header row found automatically). Used for detection: all
-      // non-optional headers must be present, unlisted headers still match but are logged.
-      headers: ['Buchung', 'Datum', 'Empfänger', 'Verwendungszweck', { header: 'Saldo', optional: true }, 'Betrag'],
-      // Headers below must be listed in `headers` (type-checked)
-      columns: {
-        date: 'Datum',
-        description: 'Empfänger',
-        amount: { type: 'signed', header: 'Betrag' },
-        // | { type: 'inOut', in: 'Haben', out: 'Soll' } (out can be positive or negative in the file, always stored as negative)
-        // | { type: 'firstOf', headers: ['In', 'Out', 'Fee'] } (first non-empty)
-      },
-      // All fields required, `null` if the file has no such column
-      extraColumns: {
-        balance: 'Saldo',
-        reference: 'Verwendungszweck',
-        transactionType: null,
-        category: null,
-        parentCategory: null,
-      },
-    },
-  ],
-})
-```
+1. Copy `utils/Parser/banks/_template.ts` (documents every field) to `utils/Parser/banks/new_bank.ts`, or add a format to an existing bank
 2. Export from `utils/Parser/banks/index.ts` and add to `BANKS` in `utils/Parser/registry.ts`
    - New account type: add it to `AccountType` in `types-enums/index.ts`
    - Update the expected IDs in the "should derive literal ID types" test (`utils/Parser/__tests__/index.test.ts`)
