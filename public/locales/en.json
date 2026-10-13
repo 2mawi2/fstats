@@ -132,7 +132,7 @@
     "DEMO": {
       "BANNER": "You are viewing demo data",
       "END": "End demo",
-      "UPLOAD_YOUR_DATA": "Upload your data"
+      "UPLOAD_YOUR_DATA": "Use your own files"
     },
     "DATA_VIEW": {
       "SHOW_DATE_EXCLUDED": "Show excluded by date",
