@@ -46,7 +46,10 @@ const Component = () => {
   )
   // Income and expenses are both part of it, so the amount filter doesn't apply
   const { categoryFilter: filter } = useTransactionFilter()
-  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
+  const emptyReason = useMemo(
+    () => getEmptyReason(allParsedFiles, selectedFiles, filter),
+    [allParsedFiles, selectedFiles, filter],
+  )
   const countsByCurrency = useMemo(
     () =>
       mapValues(
@@ -62,7 +65,7 @@ const Component = () => {
     () => getProfitLoss(filterFiles(selectedFiles, filter), period, t),
     [selectedFiles, filter, period, t],
   )
-  const currencies = profitLosses.map((profitLoss) => profitLoss.currency)
+  const currencies = useMemo(() => profitLosses.map((profitLoss) => profitLoss.currency), [profitLosses])
   const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (

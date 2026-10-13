@@ -2,7 +2,7 @@
 
 import { Box } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { useDeferredValue, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
@@ -62,7 +62,11 @@ const Component = () => {
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
   const visibleParsedFiles = includeDateExcluded ? checkedParsedFiles : shownParsedFiles
   // The filters don't apply to the CSV view
-  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, visibleParsedFiles, filter) : null
+  // Memoized, the view re-renders on each search keystroke
+  const emptyReason = useMemo(
+    () => (isTransactions ? getEmptyReason(checkedParsedFiles, visibleParsedFiles, filter) : null),
+    [isTransactions, checkedParsedFiles, visibleParsedFiles, filter],
+  )
   const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && isTransactions
@@ -70,8 +74,10 @@ const Component = () => {
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // The combined table can be shown per currency, like the breakdown and stats views
-  const filesByCurrency = groupFilesByCurrency(checkedParsedFiles)
-  const currencies = getFilteredCurrencies(visibleParsedFiles, filter)
+  const filesByCurrency = useMemo(() => groupFilesByCurrency(checkedParsedFiles), [checkedParsedFiles])
+  const currencies = useMemo(() => getFilteredCurrencies(visibleParsedFiles, filter), [visibleParsedFiles, filter])
+  // Stable arrays per file for the split tables, as `TransactionsPreview` memoizes on `files`
+  const splitFiles = useMemo(() => checkedFiles.map((file) => [file]), [checkedFiles])
   const {
     selected: selectedCurrency,
     setSelected: setSelectedCurrency,
@@ -86,9 +92,10 @@ const Component = () => {
     scrollElement: middleColumn,
     search: searchQuery,
   }
-  const counts = getTransactionCounts(
-    filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter),
-    deselectedDays,
+  const counts = useMemo(
+    () =>
+      getTransactionCounts(filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter), deselectedDays),
+    [checkedParsedFiles, filter, deselectedDays],
   )
   // Only the combined table has duplicates
   const duplicateCount = isCombined && !isTransactionsSplit ? counts.duplicateCount : 0
@@ -163,8 +170,8 @@ const Component = () => {
             <NoTransactionsDisplay reason={emptyReason} />
           ) : isTransactions ? (
             isTransactionsSplit ? (
-              checkedFiles.map((file) => (
-                <TransactionsPreview key={file.id} files={[file]} showFileName {...previewProps} />
+              splitFiles.map((fileGroup) => (
+                <TransactionsPreview key={fileGroup[0].id} files={fileGroup} showFileName {...previewProps} />
               ))
             ) : isPerCurrency ? (
               shownCurrencies.map((currency) => (

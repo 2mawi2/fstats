@@ -45,13 +45,12 @@ const Component = () => {
     () => getDateTree(selectedFiles.flatMap(getFileTransactions).map(getTransactionDay)),
     [selectedFiles],
   )
-  // Memoized by hand, the virtualizer re-renders on scroll and the compiler skips this component
+  // Memoized, the virtualizer re-renders on scroll
   const defaultExpanded = useMemo(() => getDefaultExpanded(tree), [tree])
   const expanded = expandedKeys ?? defaultExpanded
   const rows = useMemo(() => getVisibleRows(tree, expanded), [tree, expanded])
   const deselectedCounts = useMemo(() => getDeselectedCounts(tree, deselectedDays), [tree, deselectedDays])
 
-  // Not compatible with React Compiler memoization, the compiler skips this component
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: rows.length,

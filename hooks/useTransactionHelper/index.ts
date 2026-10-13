@@ -1,5 +1,3 @@
-'use client'
-
 import { parseISO } from 'date-fns'
 
 import { ParsedStatsFile, Transaction, TransactionRangeItem } from '@/types'
@@ -10,7 +8,7 @@ import { getTransactionRangeItems, getTransactionsDateRange } from './helper'
 
 export { getTransactionRangeItems, getTransactionsDateRange, RangeGranularity } from './helper'
 
-export const useTransactionHelper = ({
+export const getTransactionHelper = ({
   files,
   locale,
   dateFormat,

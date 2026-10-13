@@ -2,6 +2,7 @@
 
 import { InsertChartOutlined } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
+import { useMemo } from 'react'
 
 import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
@@ -27,11 +28,14 @@ const Component = () => {
   const { files } = useWorkspaceFiles()
   const { parsedFiles: selectedFiles, allParsedFiles } = useShownFiles()
   const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
-  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
-  const filesByCurrency = groupFilesByCurrency(selectedFiles)
-  const allFilesByCurrency = groupFilesByCurrency(allParsedFiles)
+  const emptyReason = useMemo(
+    () => getEmptyReason(allParsedFiles, selectedFiles, filter),
+    [allParsedFiles, selectedFiles, filter],
+  )
+  const filesByCurrency = useMemo(() => groupFilesByCurrency(selectedFiles), [selectedFiles])
+  const allFilesByCurrency = useMemo(() => groupFilesByCurrency(allParsedFiles), [allParsedFiles])
   // Only those with transactions left by the filters
-  const currencies = getFilteredCurrencies(selectedFiles, filter)
+  const currencies = useMemo(() => getFilteredCurrencies(selectedFiles, filter), [selectedFiles, filter])
   const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (

@@ -1,11 +1,12 @@
 'use client'
 
 import { Box, Divider, Stack } from '@mui/material'
+import { useMemo } from 'react'
 
 import type { ParsedStatsFile } from '@/types'
 import type { Currency } from '@/types-enums'
 import { getFileTransactions } from '@/m-stats-file/service'
-import { useTransactionHelper, useUserPreferences } from '@/hooks'
+import { getTransactionHelper, useUserPreferences } from '@/hooks'
 
 import { filterTransactions, getTransactionCounts } from '../../../../actions'
 import { useShownFiles } from '../../../../context'
@@ -40,14 +41,21 @@ const Component = ({ currency, files, allFiles, chip }: CurrencyStatsProps) => {
   const { locale, dateFormat } = useUserPreferences()
   const { deselectedDays, excludedDayCount } = useShownFiles()
   const { filter, amountFilter } = useTransactionFilter()
-  const { transactions, transactionRangeItems } = useTransactionHelper({
-    files,
-    locale,
-    dateFormat,
-    filterTransactions: (unique) => filterTransactions(unique, filter),
-    excludedDays: deselectedDays,
-  })
-  const counts = getTransactionCounts(filterTransactions(allFiles.flatMap(getFileTransactions), filter), deselectedDays)
+  const { transactions, transactionRangeItems } = useMemo(
+    () =>
+      getTransactionHelper({
+        files,
+        locale,
+        dateFormat,
+        filterTransactions: (unique) => filterTransactions(unique, filter),
+        excludedDays: deselectedDays,
+      }),
+    [files, locale, dateFormat, filter, deselectedDays],
+  )
+  const counts = useMemo(
+    () => getTransactionCounts(filterTransactions(allFiles.flatMap(getFileTransactions), filter), deselectedDays),
+    [allFiles, filter, deselectedDays],
+  )
 
   return (
     <Stack divider={<Divider flexItem />}>
