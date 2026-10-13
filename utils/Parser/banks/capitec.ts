@@ -32,7 +32,10 @@ export const capitec = defineBank({
       columns: {
         date: 'Transaction Date',
         description: 'Description',
-        amount: { type: 'firstOf', headers: ['Money In', 'Money Out', 'Fee'] },
+        amount: {
+          type: 'firstOf',
+          headers: ['Money In', 'Money Out', 'Fee'],
+        },
       },
       extraColumns: {
         balance: 'Balance',
@@ -64,7 +67,11 @@ export const capitec = defineBank({
       columns: {
         date: 'Transaction Date',
         description: 'Statement Description',
-        amount: { type: 'inOut', in: 'Credit Amount', out: 'Debit Amount' },
+        amount: {
+          type: 'inOut',
+          in: 'Credit Amount',
+          out: 'Debit Amount',
+        },
       },
       extraColumns: {
         balance: 'Balance',
