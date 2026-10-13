@@ -124,7 +124,7 @@
     },
     "FILTERS": {
       "TITLE": "Filter",
-      "SHOW": "Anzeigen",
+      "TABLE": "Tabelle",
       "CURRENCY": "Währung",
       "ALL_CURRENCIES": "Alle"
     },

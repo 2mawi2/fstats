@@ -33,7 +33,7 @@ export type FilterOption = {
 
 export type CurrencyFilter = {
   /**
-   * Shown currencies, one can be selected when there are several.
+   * Shown currencies, one can be selected when there are several (hidden with one).
    */
   currencies: Currency[]
   value: SelectedCurrency
@@ -80,8 +80,8 @@ const Component = ({ options, currency }: FiltersProps) => {
   const currencyCounts = useMemo(() => countBy(transactions, (transaction) => transaction.currency), [transactions])
   const disabled = !checkedFiles.length || view === WorkspaceView.CSV
   const currencies = currency?.currencies ?? []
+  // Hidden with a single currency
   const hasCurrencyChoice = currencies.length > 1
-  // With one currency, it's shown but can't be changed
   const canSelectCurrency = hasCurrencyChoice && !currency?.disabled
   const selectedCurrency = canSelectCurrency ? currency?.value : ALL_CURRENCIES
   const currencyOptions: { value: SelectedCurrency; label: string; count: number }[] = hasCurrencyChoice
@@ -96,7 +96,7 @@ const Component = ({ options, currency }: FiltersProps) => {
           ? currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 }))
           : []),
       ]
-    : currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 }))
+    : []
   const hasOptions = options.length > 0 || currencyOptions.length > 0
   const allKeys = groups.flatMap((group) => group.parents.flatMap((parent) => parent.keys))
   const isActive =
@@ -219,7 +219,7 @@ const Component = ({ options, currency }: FiltersProps) => {
                 <Box role="radiogroup" aria-label={t('STATS_PAGE.FILTERS.CURRENCY')} sx={sx.section}>
                   <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.CURRENCY')}</Box>
                   {currencyOptions.map((option) => {
-                    const isChecked = !hasCurrencyChoice || option.value === selectedCurrency
+                    const isChecked = option.value === selectedCurrency
 
                     return (
                       <Box
@@ -250,7 +250,7 @@ const Component = ({ options, currency }: FiltersProps) => {
                   })}
                 </Box>
               ) : null}
-              {options.length ? <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.SHOW')}</Box> : null}
+              {options.length ? <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.TABLE')}</Box> : null}
               {options.map((option) => (
                 <Box
                   key={option.key}

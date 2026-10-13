@@ -124,7 +124,7 @@
     },
     "FILTERS": {
       "TITLE": "Filters",
-      "SHOW": "Show",
+      "TABLE": "Table",
       "CURRENCY": "Currency",
       "ALL_CURRENCIES": "All"
     },
