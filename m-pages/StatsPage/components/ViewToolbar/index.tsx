@@ -16,7 +16,7 @@ type ViewToolbarProps = {
 }
 
 /**
- * Toolbar of the middle column: switches between the CSV, transactions and stats views, followed by the view's own controls.
+ * Toolbar of the middle column: switches between the CSV, transactions, stats and breakdown views, followed by the view's own controls.
  */
 const Component = ({ children }: ViewToolbarProps) => {
   const sx = ui()
@@ -27,6 +27,7 @@ const Component = ({ children }: ViewToolbarProps) => {
     { view: WorkspaceView.CSV, label: t('STATS_PAGE.VIEW.CSV') },
     { view: WorkspaceView.TRANSACTIONS, label: t('STATS_PAGE.VIEW.TRANSACTIONS') },
     { view: WorkspaceView.STATS, label: t('STATS_PAGE.VIEW.STATS') },
+    { view: WorkspaceView.BREAKDOWN, label: t('STATS_PAGE.VIEW.BREAKDOWN') },
   ]
 
   return (

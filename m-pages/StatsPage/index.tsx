@@ -12,7 +12,7 @@ import { PageWrapper } from '@/components'
 import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
 
 import { resizeColumns } from './actions'
-import { DataView, DemoBanner, DropOverlay, FileExplorer, FileSidebar, StatsView } from './components'
+import { DataView, DemoBanner, DropOverlay, FileExplorer, FileSidebar, ProfitLossView, StatsView } from './components'
 import { WorkspaceContext } from './context'
 import { getEndDemoHref, getView, isDemo, WorkspaceView } from './params'
 import { ui } from './styled'
@@ -20,7 +20,7 @@ import { useDayFilter } from './useDayFilter'
 import { useFileDropzone } from './useFileDropzone'
 
 /**
- * Workspace of the stats page: file explorer, the transactions, stats or CSV view (`view` param) in the middle column, and the file
+ * Workspace of the stats page: file explorer, the transactions, stats, breakdown or CSV view (`view` param) in the middle column, and the file
  * summary.
  */
 const Component = () => {
@@ -59,7 +59,14 @@ const Component = () => {
     {
       id: 'middle',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn },
-      content: view === WorkspaceView.STATS ? <StatsView /> : <DataView />,
+      content:
+        view === WorkspaceView.STATS ? (
+          <StatsView />
+        ) : view === WorkspaceView.BREAKDOWN ? (
+          <ProfitLossView />
+        ) : (
+          <DataView />
+        ),
     },
     {
       id: 'right',

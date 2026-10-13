@@ -70,7 +70,8 @@
     "VIEW": {
       "CSV": "CSV",
       "TRANSACTIONS": "Transactions",
-      "STATS": "Stats"
+      "STATS": "Stats",
+      "BREAKDOWN": "Breakdown"
     },
     "CSV_DISABLED": "Switch to Transactions or Stats",
     "FILE_TOOLBAR": {
@@ -168,6 +169,24 @@
       "SHOW_ALL_CATEGORIES": "Show all categories",
       "NO_INCOME": "No income for the selected period",
       "NO_EXPENSES": "No expenses for the selected period"
+    },
+    "PROFIT_LOSS": {
+      "TITLE": "Profit and loss",
+      "PERIOD": {
+        "MONTH": "Month",
+        "QUARTER": "Quarter",
+        "YEAR": "Year"
+      },
+      "UNCATEGORISED": "Uncategorised",
+      "TOTAL_INCOME": "Total income",
+      "TOTAL_EXPENSES": "Total expenses",
+      "NET": "Net result",
+      "TRANSFERS": "Internal transfers",
+      "TRANSFERS_NOTE_one": "{{count}} transaction between your accounts, not counted as income or expenses",
+      "TRANSFERS_NOTE_other": "{{count}} transactions between your accounts, not counted as income or expenses",
+      "TRANSFERS_IN": "Transfers in",
+      "TRANSFERS_OUT": "Transfers out",
+      "TRANSFERS_NET": "Net transfers"
     }
   },
   "SETTINGS_PAGE": {

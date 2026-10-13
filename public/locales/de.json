@@ -70,7 +70,8 @@
     "VIEW": {
       "CSV": "CSV",
       "TRANSACTIONS": "Umsätze",
-      "STATS": "Statistiken"
+      "STATS": "Statistiken",
+      "BREAKDOWN": "Aufstellung"
     },
     "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln",
     "FILE_TOOLBAR": {
@@ -168,6 +169,24 @@
       "SHOW_ALL_CATEGORIES": "Alle Kategorien anzeigen",
       "NO_INCOME": "Keine Einnahmen im ausgewählten Zeitraum",
       "NO_EXPENSES": "Keine Ausgaben im ausgewählten Zeitraum"
+    },
+    "PROFIT_LOSS": {
+      "TITLE": "Gewinn- und Verlustrechnung",
+      "PERIOD": {
+        "MONTH": "Monat",
+        "QUARTER": "Quartal",
+        "YEAR": "Jahr"
+      },
+      "UNCATEGORISED": "Nicht kategorisiert",
+      "TOTAL_INCOME": "Einnahmen gesamt",
+      "TOTAL_EXPENSES": "Ausgaben gesamt",
+      "NET": "Ergebnis",
+      "TRANSFERS": "Interne Umbuchungen",
+      "TRANSFERS_NOTE_one": "{{count}} Buchung zwischen deinen Konten, nicht als Einnahme oder Ausgabe gezählt",
+      "TRANSFERS_NOTE_other": "{{count}} Buchungen zwischen deinen Konten, nicht als Einnahmen oder Ausgaben gezählt",
+      "TRANSFERS_IN": "Eingehende Umbuchungen",
+      "TRANSFERS_OUT": "Ausgehende Umbuchungen",
+      "TRANSFERS_NET": "Umbuchungen netto"
     }
   },
   "SETTINGS_PAGE": {

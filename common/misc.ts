@@ -21,6 +21,7 @@ export const MISC = {
   LS_DATA_INCLUDE_DUPLICATES_KEY: 'fstats__data_include_duplicates',
   LS_DATA_AMOUNT_FILTER_KEY: 'fstats__data_amount_filter',
   LS_DATA_DESELECTED_DAYS_KEY: 'fstats__data_deselected_days',
+  LS_DATA_BREAKDOWN_PERIOD_KEY: 'fstats__data_breakdown_period',
   LS_DEMO_FIRST_VIEWED_KEY: 'fstats__demo_first_viewed',
   SS_SESSION_KEY: 'fstats__session',
   USER_KEY: 'current_user',
