@@ -15,6 +15,7 @@ import { useTranslation } from '@/lib/i18n'
 import type { TransactionCounts } from '../../actions'
 import { getAmountColor } from '../../actions'
 import StatsList from '../StatsList'
+import TextChip from '../TextChip'
 import { ui } from './styled'
 
 type StatsRowProps = {
@@ -71,11 +72,7 @@ const Component = ({
         >
           {title}
         </Typography>
-        {chip ? (
-          <Box component="span" sx={sx.chip}>
-            {chip}
-          </Box>
-        ) : null}
+        {chip ? <TextChip sx={sx.chip}>{chip}</TextChip> : null}
         {counts?.dateExcludedCount ? (
           <Tooltip title={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')}>
             <EventNoteOutlined sx={sx.dateFiltered} aria-label={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')} />

@@ -10,8 +10,8 @@ export const ALL_CURRENCIES = 'all'
 export type SelectedCurrency = Currency | typeof ALL_CURRENCIES
 
 /**
- * Selected currency of the breakdown and stats views, shared by both. All currencies when the stored one isn't among
- * `currencies` (e.g. its files were unchecked).
+ * Selected currency, shared by the views. All currencies when the stored one isn't among `currencies` (e.g. its files
+ * were unchecked).
  */
 export const useCurrencySelect = (currencies: Currency[]) => {
   const [storedCurrency, setSelected] = useLocalStorage<SelectedCurrency>(MISC.LS_DATA_CURRENCY_KEY, ALL_CURRENCIES, {

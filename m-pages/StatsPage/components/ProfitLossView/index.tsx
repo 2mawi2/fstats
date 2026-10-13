@@ -78,9 +78,7 @@ const Component = () => {
         />
       </ViewToolbar>
       {/* Below the toolbar, outside the scroll container like it */}
-      {currencies.length > 1 && selectedFiles.length && !emptyReason ? (
-        <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} />
-      ) : null}
+      {!emptyReason ? <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} /> : null}
       <Box sx={sx.scroll}>
         {!files.length ? (
           <DropZoneDisplay
@@ -93,29 +91,27 @@ const Component = () => {
         ) : emptyReason ? (
           <NoTransactionsDisplay reason={emptyReason} />
         ) : (
-          <>
-            {/* Sections like the transactions view, so the headings line up when switching. Padded per currency, so
-            the dividers between them go edge to edge. */}
-            <Stack divider={<FletchingDivider />}>
-              {profitLosses
-                .filter((profitLoss) => shownCurrencies.includes(profitLoss.currency))
-                .map((profitLoss) => (
-                  <Box key={profitLoss.currency} sx={sx.section}>
-                    <PreviewSection
-                      title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
-                      chip={currencies.length > 1 ? profitLoss.currency : undefined}
-                      caption={
-                        countsByCurrency[profitLoss.currency]
-                          ? getTransactionCountText(countsByCurrency[profitLoss.currency])
-                          : undefined
-                      }
-                    >
-                      <ProfitLossTable profitLoss={profitLoss} period={period} />
-                    </PreviewSection>
-                  </Box>
-                ))}
-            </Stack>
-          </>
+          // Sections like the transactions view, so the headings line up when switching. Padded per currency, so the
+          // dividers between them go edge to edge.
+          <Stack divider={<FletchingDivider />}>
+            {profitLosses
+              .filter((profitLoss) => shownCurrencies.includes(profitLoss.currency))
+              .map((profitLoss) => (
+                <Box key={profitLoss.currency} sx={sx.section}>
+                  <PreviewSection
+                    title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
+                    chip={currencies.length > 1 ? profitLoss.currency : undefined}
+                    caption={
+                      countsByCurrency[profitLoss.currency]
+                        ? getTransactionCountText(countsByCurrency[profitLoss.currency])
+                        : undefined
+                    }
+                  >
+                    <ProfitLossTable profitLoss={profitLoss} period={period} />
+                  </PreviewSection>
+                </Box>
+              ))}
+          </Stack>
         )}
       </Box>
     </>

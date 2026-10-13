@@ -32,7 +32,7 @@ const Component = () => {
   const filesByCurrency = groupFilesByCurrency(selectedFiles)
   const allFilesByCurrency = groupFilesByCurrency(allParsedFiles)
   // Only those with transactions left by the filters
-  const currencies = getFilteredCurrencies(filesByCurrency, filter)
+  const currencies = getFilteredCurrencies(selectedFiles, filter)
   const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (
@@ -47,9 +47,7 @@ const Component = () => {
         />
       </ViewToolbar>
       {/* Below the toolbar, outside the scroll container like it */}
-      {currencies.length > 1 && selectedFiles.length && !emptyReason ? (
-        <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} />
-      ) : null}
+      {!emptyReason ? <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} /> : null}
       <Box sx={sx.scroll}>
         {!files.length ? (
           <DropZoneDisplay
@@ -63,19 +61,17 @@ const Component = () => {
           <NoTransactionsDisplay reason={emptyReason} />
         ) : (
           // One block per currency, as amounts in different currencies can't be summed up
-          <>
-            <Stack divider={<FletchingDivider />}>
-              {shownCurrencies.map((currency) => (
-                <CurrencyStats
-                  key={currency}
-                  currency={currency}
-                  files={filesByCurrency[currency]}
-                  allFiles={allFilesByCurrency[currency]}
-                  chip={currencies.length > 1 ? currency : undefined}
-                />
-              ))}
-            </Stack>
-          </>
+          <Stack divider={<FletchingDivider />}>
+            {shownCurrencies.map((currency) => (
+              <CurrencyStats
+                key={currency}
+                currency={currency}
+                files={filesByCurrency[currency]}
+                allFiles={allFilesByCurrency[currency]}
+                chip={currencies.length > 1 ? currency : undefined}
+              />
+            ))}
+          </Stack>
         )}
       </Box>
     </>

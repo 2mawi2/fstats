@@ -7,6 +7,7 @@ import type { StatsFile } from '@/types'
 import { useTranslation } from '@/lib/i18n'
 
 import { getFileNameColor } from '../../actions'
+import TextChip from '../TextChip'
 import { ui } from './styled'
 
 type PreviewSectionProps = {
@@ -56,11 +57,7 @@ const Component = ({
       <Box sx={isSticky ? { ...sx.header, ...sx.stickyHeader } : sx.header}>
         <Typography variant="body2" sx={file ? { ...sx.title, color: getFileNameColor(file) } : sx.title}>
           {title}
-          {chip ? (
-            <Box component="span" sx={sx.chip}>
-              {chip}
-            </Box>
-          ) : null}
+          {chip ? <TextChip sx={sx.chip}>{chip}</TextChip> : null}
           {caption ? (
             <Box component="span" sx={sx.rowCount}>
               {caption}

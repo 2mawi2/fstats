@@ -30,19 +30,8 @@ export const ui = () => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
-    // Same as the currency chip of the sidebar summary
     chip: {
-      display: 'inline-block',
       ml: 1,
-      px: 0.75,
-      border: 1,
-      borderColor: 'divider',
-      borderRadius: '10px',
-      fontSize: 11,
-      fontWeight: 400,
-      lineHeight: '18px',
-      verticalAlign: 'middle',
-      color: 'text.secondary',
     },
     rowCount: {
       ml: 1,

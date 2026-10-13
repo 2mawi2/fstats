@@ -72,13 +72,21 @@ const Component = () => {
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // The combined table can be shown per currency, like the breakdown and stats views
   const filesByCurrency = groupFilesByCurrency(checkedParsedFiles)
-  const currencies = getFilteredCurrencies(groupFilesByCurrency(visibleParsedFiles), filter)
+  const currencies = getFilteredCurrencies(visibleParsedFiles, filter)
   const {
     selected: selectedCurrency,
     setSelected: setSelectedCurrency,
     shownCurrencies,
   } = useCurrencySelect(currencies)
   const isPerCurrency = isTransactionsView && !isTransactionsSplit && currencies.length > 1
+  // Shared by all transaction tables
+  const previewProps = {
+    filter,
+    includeDuplicates,
+    includeDateExcluded,
+    scrollElement: middleColumn,
+    search: searchQuery,
+  }
   const counts = getTransactionCounts(
     filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter),
     deselectedDays,
@@ -150,27 +158,14 @@ const Component = () => {
           ) : isTransactions ? (
             isTransactionsSplit ? (
               checkedFiles.map((file) => (
-                <TransactionsPreview
-                  key={file.id}
-                  files={[file]}
-                  showFileName
-                  filter={filter}
-                  includeDuplicates={includeDuplicates}
-                  includeDateExcluded={includeDateExcluded}
-                  scrollElement={middleColumn}
-                  search={searchQuery}
-                />
+                <TransactionsPreview key={file.id} files={[file]} showFileName {...previewProps} />
               ))
             ) : isPerCurrency ? (
               shownCurrencies.map((currency) => (
                 <TransactionsPreview
                   key={currency}
                   files={filesByCurrency[currency]}
-                  filter={filter}
-                  includeDuplicates={includeDuplicates}
-                  includeDateExcluded={includeDateExcluded}
-                  scrollElement={middleColumn}
-                  search={searchQuery}
+                  {...previewProps}
                   chip={currency}
                   // Hidden above the first table, see `sx.tables`
                   before={<FletchingDivider />}
@@ -178,14 +173,7 @@ const Component = () => {
                 />
               ))
             ) : (
-              <TransactionsPreview
-                files={checkedFiles}
-                filter={filter}
-                includeDuplicates={includeDuplicates}
-                includeDateExcluded={includeDateExcluded}
-                scrollElement={middleColumn}
-                search={searchQuery}
-              />
+              <TransactionsPreview files={checkedFiles} {...previewProps} />
             )
           ) : (
             checkedFiles.map((file) => (

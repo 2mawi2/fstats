@@ -356,12 +356,10 @@ export const groupFilesByCurrency = (files: ParsedStatsFile[]) => {
 }
 
 /**
- * Currencies with transactions matching the filter, of files grouped by `groupFilesByCurrency`.
+ * Currencies of the files with transactions matching the filter.
  */
-export const getFilteredCurrencies = (
-  filesByCurrency: Record<Currency, ParsedStatsFile[]>,
-  filter: TransactionFilter,
-) => {
+export const getFilteredCurrencies = (files: ParsedStatsFile[], filter: TransactionFilter) => {
+  const filesByCurrency = groupFilesByCurrency(files)
   return (Object.keys(filesByCurrency) as Currency[]).filter(
     (currency) => filterTransactions(filesByCurrency[currency].flatMap(getFileTransactions), filter).length,
   )

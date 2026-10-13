@@ -77,7 +77,7 @@ const Component = ({ profitLoss, period }: ProfitLossTableProps) => {
 
     return (
       <Fragment key={key}>
-        <Box component="tr" sx={sx.row(variant)}>
+        <Box component="tr" data-variant={variant} sx={sx.row}>
           <Box component="th" scope="row" sx={sx.labelCell(variant)} title={label}>
             {/* Fixed width, so long descriptions are truncated rather than widening the cell */}
             <Box sx={sx.labelContent(variant)}>

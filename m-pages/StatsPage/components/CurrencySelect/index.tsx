@@ -17,11 +17,16 @@ type CurrencySelectProps = {
 }
 
 /**
- * Shows all currencies or one, like the view options of the toolbar. Fixed below the toolbar when there are several.
+ * Shows all currencies or one, like the view options of the toolbar. Fixed below the toolbar, only with several.
  */
 const Component = ({ currencies, value, onChange }: CurrencySelectProps) => {
   const sx = ui()
   const { t } = useTranslation()
+
+  if (currencies.length < 2) {
+    return null
+  }
+
   const options: { value: SelectedCurrency; label: string }[] = [
     { value: ALL_CURRENCIES, label: t('STATS_PAGE.CURRENCY_SELECT.ALL') },
     ...currencies.map((currency) => ({ value: currency, label: currency })),

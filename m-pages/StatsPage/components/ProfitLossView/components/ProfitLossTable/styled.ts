@@ -44,6 +44,10 @@ export const ui = () => {
       fontVariantNumeric: 'tabular-nums',
       // The card border replaces the last row's border
       '& tbody:last-of-type tr:last-of-type > *': { borderBottom: 0 },
+      // A solid rule above the net rows, like an income statement
+      '& tr:has(+ tr[data-variant="net"]) > *': { borderBottomColor: 'text.primary' },
+      // The internal transfers are apart from the income statement above them
+      '& tbody + tbody > tr:first-of-type > *': { pt: 4 },
     },
     header: {
       ...cell,
@@ -78,10 +82,9 @@ export const ui = () => {
       fontSize: 12,
       color: 'text.secondary',
     },
-    row: (variant: RowVariant) => ({
+    row: {
       '&:hover > *': { bgcolor: 'action.hover' },
-      ...(variant === 'net' ? { '& > *': { borderTop: 2, borderColor: 'divider' } } : {}),
-    }),
+    },
     labelCell: (variant: RowVariant) => ({
       ...cell,
       ...stickyLabel,
