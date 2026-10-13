@@ -77,11 +77,11 @@
       "STATS": "Stats",
       "BREAKDOWN": "Breakdown"
     },
-    "CSV_DISABLED": "Switch to Transactions or Stats",
+    "CSV_DISABLED": "Not available in CSV view",
     "FILE_TOOLBAR": {
       "SELECT_ALL": "All",
       "SELECT_NONE": "None",
-      "SELECT_PARSED": "Parsed",
+      "SELECT_SUPPORTED": "Supported",
       "SELECT_UNSUPPORTED": "Unsupported",
       "SELECT_INVALID": "Invalid",
       "BANK_ACCOUNTS": "Bank accounts",

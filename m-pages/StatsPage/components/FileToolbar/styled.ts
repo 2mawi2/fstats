@@ -22,6 +22,13 @@ export const ui = () => {
       p: 0.5,
       '& .MuiSvgIcon-root': { fontSize: 18 },
     },
+    // The item handles the click
+    menuCheckbox: {
+      p: 0,
+      ml: -0.25,
+      pointerEvents: 'none',
+      '& .MuiSvgIcon-root': { fontSize: 18 },
+    },
     selectMenuButton: {
       p: 0,
       ml: -0.5,

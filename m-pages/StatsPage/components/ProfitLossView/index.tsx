@@ -1,7 +1,7 @@
 'use client'
 
 import { ReceiptLongOutlined } from '@mui/icons-material'
-import { Box, Divider, Stack } from '@mui/material'
+import { Box } from '@mui/material'
 import { groupBy, mapValues } from 'lodash'
 import { useMemo } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
@@ -12,10 +12,10 @@ import { useTranslation } from '@/lib/i18n'
 
 import { AmountFilter, getEmptyReason, getTransactionCounts, getTransactionCountText } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
-import CardTitle from '../CardTitle'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
 import NoTransactionsDisplay from '../NoTransactionsDisplay'
+import PreviewSection from '../PreviewSection'
 import SegmentedToggle from '../SegmentedToggle'
 import ViewToolbar from '../ViewToolbar'
 import { BreakdownPeriod, getBreakdownPeriodOptions, getProfitLoss } from './actions'
@@ -76,14 +76,18 @@ const Component = () => {
         ) : emptyReason ? (
           <NoTransactionsDisplay reason={emptyReason} />
         ) : (
-          <Stack divider={<Divider flexItem />}>
+          // Sections like the transactions view, so the headings line up when switching
+          <Box sx={sx.sections}>
             {profitLosses.map((profitLoss) => (
-              <Box key={profitLoss.currency} sx={sx.section}>
-                <CardTitle caption={getCaption(profitLoss.currency)}>{t('STATS_PAGE.PROFIT_LOSS.TITLE')}</CardTitle>
+              <PreviewSection
+                key={profitLoss.currency}
+                title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
+                caption={getCaption(profitLoss.currency)}
+              >
                 <ProfitLossTable profitLoss={profitLoss} period={period} />
-              </Box>
+              </PreviewSection>
             ))}
-          </Stack>
+          </Box>
         )}
       </Box>
     </>

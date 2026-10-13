@@ -77,11 +77,11 @@
       "STATS": "Statistiken",
       "BREAKDOWN": "Aufstellung"
     },
-    "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln",
+    "CSV_DISABLED": "In der CSV-Ansicht nicht verfügbar",
     "FILE_TOOLBAR": {
       "SELECT_ALL": "Alle",
       "SELECT_NONE": "Keine",
-      "SELECT_PARSED": "Ausgewertet",
+      "SELECT_SUPPORTED": "Unterstützt",
       "SELECT_UNSUPPORTED": "Nicht unterstützt",
       "SELECT_INVALID": "Ungültig",
       "BANK_ACCOUNTS": "Bankkonten",

@@ -6,7 +6,8 @@ export const ui = () => {
       minHeight: 0,
       overflowY: 'auto',
     },
-    section: {
+    // Same padding as the transactions view
+    sections: {
       p: 2,
     },
   }
