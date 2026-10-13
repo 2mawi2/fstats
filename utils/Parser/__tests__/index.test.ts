@@ -19,7 +19,7 @@ import {
 describe('registry', () => {
   it('should derive literal ID types', () => {
     expectTypeOf<ParserId>().toEqualTypeOf<
-      | 'capitec__savings__new'
+      | 'capitec__savings__default'
       | 'capitec__savings__legacy'
       | 'comdirect__current__default'
       | 'comdirect__credit_card__default'

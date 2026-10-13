@@ -83,4 +83,4 @@ export const newBank = defineBank({
    - New account type: add it to `AccountType` in `types-enums/index.ts`
    - Update the expected IDs in the "should derive literal ID types" test (`utils/Parser/__tests__/index.test.ts`)
 3. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.
-4. Changing how existing files are parsed (e.g. transaction IDs): bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
+4. Changing how existing files are parsed (e.g. transaction IDs) or renaming parser IDs (bank `id`, `accountType`, `variant`): bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
