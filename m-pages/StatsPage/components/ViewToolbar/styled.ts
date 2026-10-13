@@ -18,35 +18,6 @@ export const ui = () => {
       alignItems: 'center',
       gap: 2,
     },
-    view: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 0.5,
-      fontSize: 13,
-      color: 'text.secondary',
-      '&:hover': { color: 'text.primary' },
-    },
-    activeView: {
-      fontWeight: 700,
-      color: 'text.primary',
-    },
-    // Always as wide as the wider of the regular and bold label (either can be wider due to kerning), so selecting a
-    // view doesn't shift the layout. The hidden copies and the text share one grid cell.
-    label: {
-      display: 'inline-grid',
-      '& > *, &::before, &::after': { gridArea: '1 / 1' },
-      '&::before, &::after': {
-        content: 'attr(data-label)',
-        visibility: 'hidden',
-        userSelect: 'none',
-        pointerEvents: 'none',
-      },
-      '&::before': { fontWeight: 400 },
-      '&::after': { fontWeight: 700 },
-    },
-    radio: {
-      fontSize: 16,
-    },
     // Pushes the end controls and table options to the right
     spacer: {
       flexGrow: 1,

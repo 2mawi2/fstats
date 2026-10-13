@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 
 import type { StatsFile } from '@/types'
@@ -42,6 +43,22 @@ type TransactionsPreviewProps = {
    * Only transactions containing the query in their shown values are shown, see `toSearchQuery`.
    */
   search: string
+  /**
+   * Next to the title, e.g. the currency.
+   */
+  chip?: string
+  /**
+   * Above the title, e.g. a divider from the previous table.
+   */
+  before?: ReactNode
+  /**
+   * Combined tables keep their title and header row in view, unless there are several in the scroll container.
+   */
+  canStick?: boolean
+  /**
+   * Titled with the file name when showing a single file (e.g. one table per file), otherwise "All transactions".
+   */
+  showFileName?: boolean
 }
 
 /**
@@ -54,14 +71,21 @@ const Component = ({
   includeDateExcluded,
   scrollElement,
   search,
+  chip,
+  before,
+  canStick = true,
+  showFileName = false,
 }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const { deselectedDays } = useWorkspaceDayFilter()
   const parsedFiles = useMemo(() => files.filter(isParsed), [files])
   const isCombined = parsedFiles.length > 1
+  const isSticky = isCombined && canStick
   // Shown on its own, with its status when it couldn't be parsed
   const singleFile = isCombined ? undefined : (parsedFiles[0] ?? files[0])
+  // Also a file that couldn't be parsed, with its status
+  const titleFile = showFileName || !parsedFiles.length ? singleFile : undefined
   const currency = useMemo(() => getSharedCurrency(parsedFiles), [parsedFiles])
   const amountFilter = filter.amount
   const allTransactions = useMemo(
@@ -118,8 +142,10 @@ const Component = ({
 
   return (
     <PreviewSection
-      title={singleFile ? singleFile.file.name : t('MISC.ALL_TRANSACTIONS')}
-      file={singleFile}
+      title={titleFile ? titleFile.file.name : t('MISC.ALL_TRANSACTIONS')}
+      file={titleFile}
+      chip={chip}
+      before={before}
       // Like everywhere else, those greyed out or struck through aren't counted
       caption={
         !parsedFiles.length
@@ -129,7 +155,7 @@ const Component = ({
             : getTransactionCountText(counts)
       }
       // A single table, so its title and header row can stay in view
-      isSticky={isCombined}
+      isSticky={isSticky}
     >
       {parsedFiles.length ? (
         <VirtualTable
@@ -141,7 +167,7 @@ const Component = ({
             ...(isCombined ? [getSourceLabel(transactions[index], t)] : []),
           ]}
           highlight={search}
-          stickyHeaderTop={isCombined ? STICKY_HEADER_OFFSET : undefined}
+          stickyHeaderTop={isSticky ? STICKY_HEADER_OFFSET : undefined}
           getRowStyle={(index) =>
             transactions[index].isDuplicate
               ? DUPLICATE_ROW_STYLE

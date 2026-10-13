@@ -1,55 +1,39 @@
 'use client'
 
 import { InsertChartOutlined } from '@mui/icons-material'
-import { Box, Divider, Stack } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 
-import { getFileTransactions } from '@/m-stats-file/service'
-import { useTransactionHelper, useUserPreferences } from '@/hooks'
+import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
-import {
-  filterTransactions,
-  getAmountFilterOptions,
-  getCurrency,
-  getEmptyReason,
-  getTransactionCounts,
-} from '../../actions'
+import { getAmountFilterOptions, getEmptyReason, getFilteredCurrencies, groupFilesByCurrency } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
+import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
-import BalanceChart from '../BalanceChart'
-import CategoryBreakdown from '../CategoryBreakdown'
+import CurrencySelect from '../CurrencySelect'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
 import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import SegmentedToggle from '../SegmentedToggle'
-import TransactionChart from '../TransactionChart'
-import TransactionCountChart from '../TransactionCountChart'
 import ViewToolbar from '../ViewToolbar'
+import { CurrencyStats } from './components'
 import { ui } from './styled'
 
 /**
- * Stats view of the workspace: charts and category breakdown of the selected files.
+ * Stats view of the workspace: charts and category breakdown of the selected files, per currency.
  */
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  const { locale, dateFormat } = useUserPreferences()
   const { files } = useWorkspaceFiles()
-  const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays, excludedDayCount } = useShownFiles()
+  const { parsedFiles: selectedFiles, allParsedFiles } = useShownFiles()
   const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
-  const { transactions, transactionRangeItems } = useTransactionHelper({
-    files: selectedFiles,
-    locale,
-    dateFormat,
-    filterTransactions: (unique) => filterTransactions(unique, filter),
-    excludedDays: deselectedDays,
-  })
-  const counts = getTransactionCounts(
-    filterTransactions(allParsedFiles.flatMap(getFileTransactions), filter),
-    deselectedDays,
-  )
-  const currency = getCurrency(transactions)
   const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
+  const filesByCurrency = groupFilesByCurrency(selectedFiles)
+  const allFilesByCurrency = groupFilesByCurrency(allParsedFiles)
+  // Only those with transactions left by the filters
+  const currencies = getFilteredCurrencies(filesByCurrency, filter)
+  const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (
     <>
@@ -62,6 +46,10 @@ const Component = () => {
           disabledTooltip={t('STATS_PAGE.NO_SELECTION.TITLE')}
         />
       </ViewToolbar>
+      {/* Below the toolbar, outside the scroll container like it */}
+      {currencies.length > 1 && selectedFiles.length && !emptyReason ? (
+        <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} />
+      ) : null}
       <Box sx={sx.scroll}>
         {!files.length ? (
           <DropZoneDisplay
@@ -74,23 +62,20 @@ const Component = () => {
         ) : emptyReason ? (
           <NoTransactionsDisplay reason={emptyReason} />
         ) : (
-          <Stack divider={<Divider flexItem />}>
-            <Box sx={sx.section}>
-              <BalanceChart transactionRangeItems={transactionRangeItems} excludedDayCount={excludedDayCount} />
-            </Box>
-
-            <Box sx={sx.section}>
-              <TransactionCountChart transactions={transactions} excludedDays={deselectedDays} counts={counts} />
-            </Box>
-
-            <Box sx={sx.section}>
-              <TransactionChart transactions={transactions} currency={currency} />
-            </Box>
-
-            <Box sx={sx.section}>
-              <CategoryBreakdown transactions={transactions} currency={currency} amountFilter={amountFilter} />
-            </Box>
-          </Stack>
+          // One block per currency, as amounts in different currencies can't be summed up
+          <>
+            <Stack divider={<FletchingDivider />}>
+              {shownCurrencies.map((currency) => (
+                <CurrencyStats
+                  key={currency}
+                  currency={currency}
+                  files={filesByCurrency[currency]}
+                  allFiles={allFilesByCurrency[currency]}
+                  chip={currencies.length > 1 ? currency : undefined}
+                />
+              ))}
+            </Stack>
+          </>
         )}
       </Box>
     </>

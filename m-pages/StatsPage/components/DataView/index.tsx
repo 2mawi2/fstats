@@ -6,6 +6,7 @@ import { useDeferredValue, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
+import { FletchingDivider } from '@/components'
 import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
@@ -13,15 +14,19 @@ import {
   filterTransactions,
   getAmountFilterOptions,
   getEmptyReason,
+  getFilteredCurrencies,
   getTransactionCounts,
   getTransactionsLayoutOptions,
+  groupFilesByCurrency,
   TransactionsLayout,
 } from '../../actions'
 import { useShownFiles, useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
+import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import CsvPreview from '../CsvPreview'
+import CurrencySelect from '../CurrencySelect'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSearchResultsDisplay from '../NoSearchResultsDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
@@ -65,6 +70,15 @@ const Component = () => {
   // Multiple parsed files are shown as one, with combined stats above the stats per file
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
+  // The combined table can be shown per currency, like the breakdown and stats views
+  const filesByCurrency = groupFilesByCurrency(checkedParsedFiles)
+  const currencies = getFilteredCurrencies(groupFilesByCurrency(visibleParsedFiles), filter)
+  const {
+    selected: selectedCurrency,
+    setSelected: setSelectedCurrency,
+    shownCurrencies,
+  } = useCurrencySelect(currencies)
+  const isPerCurrency = isTransactionsView && !isTransactionsSplit && currencies.length > 1
   const counts = getTransactionCounts(
     filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter),
     deselectedDays,
@@ -120,9 +134,13 @@ const Component = () => {
           />
         ) : null}
       </ViewToolbar>
+      {/* Below the toolbar, outside the scroll container like it */}
+      {isPerCurrency && !emptyReason ? (
+        <CurrencySelect currencies={currencies} value={selectedCurrency} onChange={setSelectedCurrency} />
+      ) : null}
       <Box ref={setMiddleColumn} sx={sx.middleScroll(isEmpty)}>
         {/* Single child, observed by the tables for layout changes above them */}
-        <div>
+        <Box sx={sx.tables}>
           {!files.length ? (
             <DropZoneDisplay />
           ) : !checkedFiles.length ? (
@@ -135,11 +153,28 @@ const Component = () => {
                 <TransactionsPreview
                   key={file.id}
                   files={[file]}
+                  showFileName
                   filter={filter}
                   includeDuplicates={includeDuplicates}
                   includeDateExcluded={includeDateExcluded}
                   scrollElement={middleColumn}
                   search={searchQuery}
+                />
+              ))
+            ) : isPerCurrency ? (
+              shownCurrencies.map((currency) => (
+                <TransactionsPreview
+                  key={currency}
+                  files={filesByCurrency[currency]}
+                  filter={filter}
+                  includeDuplicates={includeDuplicates}
+                  includeDateExcluded={includeDateExcluded}
+                  scrollElement={middleColumn}
+                  search={searchQuery}
+                  chip={currency}
+                  // Hidden above the first table, see `sx.tables`
+                  before={<FletchingDivider />}
+                  canStick={shownCurrencies.length === 1}
                 />
               ))
             ) : (
@@ -157,7 +192,7 @@ const Component = () => {
               <CsvPreview key={file.id} file={file} scrollElement={middleColumn} search={searchQuery} />
             ))
           )}
-        </div>
+        </Box>
         {/* Shown by CSS once the tables leave the content empty, so they don't need to report their matches */}
         {searchQuery ? (
           <Box sx={sx.noSearchResults}>

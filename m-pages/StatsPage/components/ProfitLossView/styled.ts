@@ -7,8 +7,10 @@ export const ui = () => {
       overflowY: 'auto',
     },
     // Same padding as the transactions view
-    sections: {
+    section: {
       p: 2,
+      // Below a currency divider as much space as above it, where the padding adds to the margin of the preview section
+      '[role="separator"] + &': { pt: 5 },
     },
   }
 }

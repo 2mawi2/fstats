@@ -27,12 +27,16 @@ type TransactionCountChartProps = {
    * Of the transactions before the date explorer, see `getTransactionCounts`.
    */
   counts: TransactionCounts
+  /**
+   * Next to the title, e.g. the currency when several are shown.
+   */
+  chip?: string
 }
 
 /**
  * Number of transactions per month.
  */
-const Component = ({ transactions, excludedDays, counts: transactionCounts }: TransactionCountChartProps) => {
+const Component = ({ transactions, excludedDays, counts: transactionCounts, chip }: TransactionCountChartProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const isDarkMode = useIsDarkMode()
@@ -61,7 +65,7 @@ const Component = ({ transactions, excludedDays, counts: transactionCounts }: Tr
 
   return (
     <Box>
-      <CardTitle caption={getTransactionCountText(transactionCounts)}>
+      <CardTitle chip={chip} caption={getTransactionCountText(transactionCounts)}>
         {t('STATS_PAGE.STATS_VIEW.TRANSACTIONS_PER_MONTH')}
       </CardTitle>
       <Box sx={sx.chartCard}>

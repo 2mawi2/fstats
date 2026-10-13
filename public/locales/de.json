@@ -126,6 +126,9 @@
       "TITLE": "Filter",
       "SHOW": "Anzeigen"
     },
+    "CURRENCY_SELECT": {
+      "ALL": "Alle"
+    },
     "DEMO": {
       "BANNER": "Du siehst Demodaten",
       "END": "Demo beenden",

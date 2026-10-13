@@ -1,9 +1,17 @@
-import { uniq } from 'lodash'
+import { groupBy, uniq } from 'lodash'
 
 import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/types'
+import type { Currency } from '@/types-enums'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
-import { getFileTransactions, isError, isParsed, isUnknown, splitDuplicates } from '@/m-stats-file/service'
+import {
+  getFileCurrency,
+  getFileTransactions,
+  isError,
+  isParsed,
+  isUnknown,
+  splitDuplicates,
+} from '@/m-stats-file/service'
 import { getTransactionDay } from '@/utils/Date'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
 import { isExpense, isIncome } from '@/utils/Stats'
@@ -339,7 +347,22 @@ export const getTransactionCountText = ({ count, dateExcludedCount, duplicateCou
   ].join(` ${MISC.CENTER_DOT} `)
 }
 
+/**
+ * Files per currency, as amounts in different currencies can't be summed up.
+ */
 // TODO: Once we have currency conversion logic, convert files with different currencies
-export const getCurrency = (transactions: Transaction[]) => {
-  return transactions.length ? transactions[0].currency : MISC.DEFAULT_CURRENCY
+export const groupFilesByCurrency = (files: ParsedStatsFile[]) => {
+  return groupBy(files, getFileCurrency) as Record<Currency, ParsedStatsFile[]>
+}
+
+/**
+ * Currencies with transactions matching the filter, of files grouped by `groupFilesByCurrency`.
+ */
+export const getFilteredCurrencies = (
+  filesByCurrency: Record<Currency, ParsedStatsFile[]>,
+  filter: TransactionFilter,
+) => {
+  return (Object.keys(filesByCurrency) as Currency[]).filter(
+    (currency) => filterTransactions(filesByCurrency[currency].flatMap(getFileTransactions), filter).length,
+  )
 }

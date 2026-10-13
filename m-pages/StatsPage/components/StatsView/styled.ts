@@ -6,9 +6,5 @@ export const ui = () => {
       minHeight: 0,
       overflowY: 'auto',
     },
-    // Padded per section, so the dividers between them go edge to edge
-    section: {
-      p: 2,
-    },
   }
 }

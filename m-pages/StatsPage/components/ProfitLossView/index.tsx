@@ -1,12 +1,13 @@
 'use client'
 
 import { ReceiptLongOutlined } from '@mui/icons-material'
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { groupBy, mapValues } from 'lodash'
 import { useMemo } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
+import { FletchingDivider } from '@/components'
 import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
@@ -18,7 +19,9 @@ import {
   getTransactionCountText,
 } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
+import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
+import CurrencySelect from '../CurrencySelect'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
 import NoTransactionsDisplay from '../NoTransactionsDisplay'
@@ -60,6 +63,8 @@ const Component = () => {
     () => getProfitLoss(filterFiles(selectedFiles, filter), period),
     [selectedFiles, filter, period],
   )
+  const currencies = profitLosses.map((profitLoss) => profitLoss.currency)
+  const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (
     <>
@@ -72,6 +77,10 @@ const Component = () => {
           disabledTooltip={t('STATS_PAGE.NO_SELECTION.TITLE')}
         />
       </ViewToolbar>
+      {/* Below the toolbar, outside the scroll container like it */}
+      {currencies.length > 1 && selectedFiles.length && !emptyReason ? (
+        <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} />
+      ) : null}
       <Box sx={sx.scroll}>
         {!files.length ? (
           <DropZoneDisplay
@@ -84,23 +93,29 @@ const Component = () => {
         ) : emptyReason ? (
           <NoTransactionsDisplay reason={emptyReason} />
         ) : (
-          // Sections like the transactions view, so the headings line up when switching
-          <Box sx={sx.sections}>
-            {profitLosses.map((profitLoss) => (
-              <PreviewSection
-                key={profitLoss.currency}
-                title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
-                chip={profitLosses.length > 1 ? profitLoss.currency : undefined}
-                caption={
-                  countsByCurrency[profitLoss.currency]
-                    ? getTransactionCountText(countsByCurrency[profitLoss.currency])
-                    : undefined
-                }
-              >
-                <ProfitLossTable profitLoss={profitLoss} period={period} />
-              </PreviewSection>
-            ))}
-          </Box>
+          <>
+            {/* Sections like the transactions view, so the headings line up when switching. Padded per currency, so
+            the dividers between them go edge to edge. */}
+            <Stack divider={<FletchingDivider />}>
+              {profitLosses
+                .filter((profitLoss) => shownCurrencies.includes(profitLoss.currency))
+                .map((profitLoss) => (
+                  <Box key={profitLoss.currency} sx={sx.section}>
+                    <PreviewSection
+                      title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
+                      chip={currencies.length > 1 ? profitLoss.currency : undefined}
+                      caption={
+                        countsByCurrency[profitLoss.currency]
+                          ? getTransactionCountText(countsByCurrency[profitLoss.currency])
+                          : undefined
+                      }
+                    >
+                      <ProfitLossTable profitLoss={profitLoss} period={period} />
+                    </PreviewSection>
+                  </Box>
+                ))}
+            </Stack>
+          </>
         )}
       </Box>
     </>

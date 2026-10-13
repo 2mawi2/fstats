@@ -24,6 +24,7 @@ export const MISC = {
   LS_DATA_EXCLUDED_CATEGORIES_KEY: 'fstats__data_excluded_categories',
   LS_DATA_DESELECTED_DAYS_KEY: 'fstats__data_deselected_days',
   LS_DATA_BREAKDOWN_PERIOD_KEY: 'fstats__data_breakdown_period',
+  LS_DATA_CURRENCY_KEY: 'fstats__data_currency',
   LS_DEMO_FIRST_VIEWED_KEY: 'fstats__demo_first_viewed',
   SS_SESSION_KEY: 'fstats__session',
   USER_KEY: 'current_user',

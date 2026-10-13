@@ -29,6 +29,10 @@ type PreviewSectionProps = {
    * The title stays at the top while scrolling. Only for the first section of the scroll container.
    */
   isSticky?: boolean
+  /**
+   * Above the header, e.g. a divider from the previous section.
+   */
+  before?: ReactNode
   children?: ReactNode
 }
 
@@ -40,6 +44,7 @@ const Component = ({
   isLoading = false,
   error = null,
   isSticky = false,
+  before,
   children,
 }: PreviewSectionProps) => {
   const sx = ui()
@@ -47,6 +52,7 @@ const Component = ({
 
   return (
     <Box component="section" sx={sx.section}>
+      {before}
       <Box sx={isSticky ? { ...sx.header, ...sx.stickyHeader } : sx.header}>
         <Typography variant="body2" sx={file ? { ...sx.title, color: getFileNameColor(file) } : sx.title}>
           {title}

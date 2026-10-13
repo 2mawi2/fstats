@@ -1,7 +1,6 @@
 'use client'
 
-import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material'
-import { Box, Divider, Link } from '@mui/material'
+import { Box, Divider } from '@mui/material'
 import NextLink from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
@@ -11,6 +10,7 @@ import { useTranslation } from '@/lib/i18n'
 import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
 import type { FilterOption } from '../Filters'
 import Filters from '../Filters'
+import RadioItem from '../RadioItem'
 import { ui } from './styled'
 
 type ViewToolbarProps = {
@@ -48,20 +48,15 @@ const Component = ({ children, end, options }: ViewToolbarProps) => {
           const isActive = view === activeView
 
           return (
-            <Link
+            <RadioItem
               key={view}
               component={NextLink}
               // Keeps e.g. demo mode when switching
               href={getWorkspaceHref(searchParams, getViewChange(view))}
-              underline="none"
+              label={label}
+              isActive={isActive}
               aria-current={isActive ? 'page' : undefined}
-              sx={isActive ? { ...sx.view, ...sx.activeView } : sx.view}
-            >
-              {isActive ? <RadioButtonChecked sx={sx.radio} /> : <RadioButtonUnchecked sx={sx.radio} />}
-              <Box component="span" data-label={label} sx={sx.label}>
-                <span>{label}</span>
-              </Box>
-            </Link>
+            />
           )
         })}
       </Box>
