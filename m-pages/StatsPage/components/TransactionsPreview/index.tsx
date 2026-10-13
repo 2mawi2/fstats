@@ -8,7 +8,8 @@ import { useUserPreferences } from '@/hooks'
 import { getTransactionDay } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
-import { AmountFilter, filterTransactions, getTransactionCounts, getTransactionCountText } from '../../actions'
+import type { TransactionFilter } from '../../actions'
+import { filterTransactions, getTransactionCounts, getTransactionCountText } from '../../actions'
 import { useWorkspaceDayFilter } from '../../context'
 import FileMessage from '../FileMessage'
 import PreviewSection from '../PreviewSection'
@@ -30,7 +31,7 @@ const DUPLICATE_ROW_STYLE = { opacity: 0.4, textDecoration: 'line-through' }
 
 type TransactionsPreviewProps = {
   files: StatsFile[]
-  amountFilter: AmountFilter
+  filter: TransactionFilter
   includeDuplicates: boolean
   /**
    * Transactions on days deselected in the date explorer are greyed out, otherwise hidden.
@@ -48,7 +49,7 @@ type TransactionsPreviewProps = {
  */
 const Component = ({
   files,
-  amountFilter,
+  filter,
   includeDuplicates,
   includeDateExcluded,
   scrollElement,
@@ -62,9 +63,10 @@ const Component = ({
   // Shown on its own, with its status when it couldn't be parsed
   const singleFile = isCombined ? undefined : (parsedFiles[0] ?? files[0])
   const currency = useMemo(() => getSharedCurrency(parsedFiles), [parsedFiles])
+  const amountFilter = filter.amount
   const allTransactions = useMemo(
-    () => filterTransactions(getSourcedTransactions(parsedFiles), amountFilter),
-    [parsedFiles, amountFilter],
+    () => filterTransactions(getSourcedTransactions(parsedFiles), filter),
+    [parsedFiles, filter],
   )
   const shownTransactions = useMemo(
     () => (includeDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),

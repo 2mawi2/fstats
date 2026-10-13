@@ -9,31 +9,35 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
-import type { TableOption } from '../TableOptions'
-import TableOptions from '../TableOptions'
+import type { CategoryFilter, FilterOption } from '../Filters'
+import Filters from '../Filters'
 import { ui } from './styled'
 
 type ViewToolbarProps = {
   children?: ReactNode
   /**
-   * On the right, next to the table options, e.g. a search field.
+   * On the right, next to the filters, e.g. a search field.
    */
   end?: ReactNode
   /**
-   * Overrides why the table options are disabled.
+   * Overrides why the filters are disabled.
    */
-  tableOptionsDisabledTooltip?: string
+  filtersDisabledTooltip?: string
   /**
-   * Options of the transactions table, the button is disabled without them.
+   * Switches of the transactions table.
    */
-  tableOptions?: TableOption[]
+  options?: FilterOption[]
+  /**
+   * The filters button is disabled without it.
+   */
+  categoryFilter?: CategoryFilter
 }
 
 /**
  * Toolbar of the middle column: switches between the CSV, transactions, breakdown and stats views (raw to most summarised), followed by the view's own controls
- * and the options of the transactions table.
+ * and the filters.
  */
-const Component = ({ children, end, tableOptions, tableOptionsDisabledTooltip }: ViewToolbarProps) => {
+const Component = ({ children, end, options, categoryFilter, filtersDisabledTooltip }: ViewToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -74,14 +78,12 @@ const Component = ({ children, end, tableOptions, tableOptionsDisabledTooltip }:
       <Box sx={sx.spacer} />
       {end}
       {/* On every view, so the toolbar doesn't change when switching */}
-      <TableOptions
-        options={tableOptions ?? []}
-        disabled={!tableOptions}
+      <Filters
+        options={options ?? []}
+        categoryFilter={categoryFilter}
         disabledTooltip={
-          tableOptionsDisabledTooltip ??
-          (activeView === WorkspaceView.TRANSACTIONS
-            ? t('STATS_PAGE.NO_SELECTION.TITLE')
-            : t('STATS_PAGE.DATA_VIEW.TABLE_OPTIONS_DISABLED'))
+          filtersDisabledTooltip ??
+          (activeView === WorkspaceView.CSV ? t('STATS_PAGE.CSV_DISABLED') : t('STATS_PAGE.NO_SELECTION.TITLE'))
         }
       />
     </Box>

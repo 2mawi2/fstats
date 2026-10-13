@@ -122,14 +122,16 @@
       "DATE_FILTERED": "Nach Datum gefiltert",
       "FILE_DETAILS": "Dateidetails"
     },
+    "FILTERS": {
+      "TITLE": "Filter",
+      "SHOW": "Anzeigen"
+    },
     "DEMO": {
       "BANNER": "Du siehst Demodaten",
       "END": "Demo beenden",
       "UPLOAD_YOUR_DATA": "Eigene Daten hochladen"
     },
     "DATA_VIEW": {
-      "TABLE_OPTIONS": "Tabellenoptionen",
-      "TABLE_OPTIONS_DISABLED": "Gilt nur für die Transaktionsansicht",
       "SHOW_DATE_EXCLUDED": "Durch Datum ausgeschlossene anzeigen",
       "SHOW_DUPLICATES": "Duplikate anzeigen",
       "DUPLICATE_OF": "Duplikat, auch in {{file}}",

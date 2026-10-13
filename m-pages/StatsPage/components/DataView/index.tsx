@@ -2,7 +2,7 @@
 
 import { Box } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { useDeferredValue, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/i18n'
 import {
   filterTransactions,
   getAmountFilterOptions,
+  getCategoryFilterTransactions,
   getEmptyReason,
   getTransactionCounts,
   getTransactionsLayoutOptions,
@@ -19,8 +20,8 @@ import {
 } from '../../actions'
 import { useShownFiles, useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
-import { useAmountFilter } from '../../useAmountFilter'
 import { useTableOptions } from '../../useTableOptions'
+import { useTransactionFilter } from '../../useTransactionFilter'
 import CsvPreview from '../CsvPreview'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSearchResultsDisplay from '../NoSearchResultsDisplay'
@@ -51,14 +52,14 @@ const Component = () => {
   const [search, setSearch] = useState('')
   const searchQuery = toSearchQuery(useDeferredValue(search))
   const { includeDuplicates, setIncludeDuplicates, includeDateExcluded, setIncludeDateExcluded } = useTableOptions()
-  const [amountFilter, setAmountFilter] = useAmountFilter()
+  const { filter, amountFilter, setAmountFilter, excludedCategories, setExcludedCategories } = useTransactionFilter()
   const { deselectedDays } = useWorkspaceDayFilter()
   const { parsedFiles: shownParsedFiles } = useShownFiles()
   // All transactions, those on days deselected in the date explorer are greyed out or hidden
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
   const visibleParsedFiles = includeDateExcluded ? checkedParsedFiles : shownParsedFiles
   // The filters don't apply to the CSV view
-  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, visibleParsedFiles, amountFilter) : null
+  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, visibleParsedFiles, filter) : null
   const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && isTransactions
@@ -66,19 +67,33 @@ const Component = () => {
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   const counts = getTransactionCounts(
-    filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), amountFilter),
+    filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter),
     deselectedDays,
   )
   // Only the combined table has duplicates
   const duplicateCount = isCombined && !isTransactionsSplit ? counts.duplicateCount : 0
+
+  const categoryTransactions = useMemo(
+    () => getCategoryFilterTransactions(shownParsedFiles, amountFilter),
+    [shownParsedFiles, amountFilter],
+  )
 
   return (
     <>
       {/* Outside the scroll container, so it stays in place */}
       <ViewToolbar
         end={<SearchField value={search} onChange={setSearch} disabled={isEmpty} />}
-        tableOptionsDisabledTooltip={!checkedFiles.length ? t('STATS_PAGE.NO_SELECTION.TITLE') : undefined}
-        tableOptions={
+        filtersDisabledTooltip={!checkedFiles.length ? t('STATS_PAGE.NO_SELECTION.TITLE') : undefined}
+        categoryFilter={
+          isTransactionsView
+            ? {
+                transactions: categoryTransactions,
+                excluded: excludedCategories,
+                onChange: setExcludedCategories,
+              }
+            : undefined
+        }
+        options={
           isTransactionsView
             ? [
                 {
@@ -136,7 +151,7 @@ const Component = () => {
                 <TransactionsPreview
                   key={file.id}
                   files={[file]}
-                  amountFilter={amountFilter}
+                  filter={filter}
                   includeDuplicates={includeDuplicates}
                   includeDateExcluded={includeDateExcluded}
                   scrollElement={middleColumn}
@@ -146,7 +161,7 @@ const Component = () => {
             ) : (
               <TransactionsPreview
                 files={checkedFiles}
-                amountFilter={amountFilter}
+                filter={filter}
                 includeDuplicates={includeDuplicates}
                 includeDateExcluded={includeDateExcluded}
                 scrollElement={middleColumn}

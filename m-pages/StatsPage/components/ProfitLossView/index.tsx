@@ -10,8 +10,17 @@ import { MISC } from '@/common'
 import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
-import { AmountFilter, getEmptyReason, getTransactionCounts, getTransactionCountText } from '../../actions'
+import {
+  AmountFilter,
+  filterFiles,
+  filterTransactions,
+  getCategoryFilterTransactions,
+  getEmptyReason,
+  getTransactionCounts,
+  getTransactionCountText,
+} from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
+import { useTransactionFilter } from '../../useTransactionFilter'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
 import NoTransactionsDisplay from '../NoTransactionsDisplay'
@@ -35,21 +44,39 @@ const Component = () => {
     BreakdownPeriod.MONTH,
     { initializeWithValue: false },
   )
+  const { excludedCategories, setExcludedCategories } = useTransactionFilter()
   // Income and expenses are both part of it, so the amount filter doesn't apply
-  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, AmountFilter.ALL)
+  const filter = useMemo(() => ({ amount: AmountFilter.ALL, excludedCategories }), [excludedCategories])
+  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
   const countsByCurrency = useMemo(
     () =>
       mapValues(
-        groupBy(allParsedFiles.flatMap(getFileTransactions), (transaction) => transaction.currency),
+        groupBy(
+          filterTransactions(allParsedFiles.flatMap(getFileTransactions), filter),
+          (transaction) => transaction.currency,
+        ),
         (transactions) => getTransactionCounts(transactions, deselectedDays),
       ),
-    [allParsedFiles, deselectedDays],
+    [allParsedFiles, filter, deselectedDays],
   )
-  const profitLosses = useMemo(() => getProfitLoss(selectedFiles, period), [selectedFiles, period])
+  const profitLosses = useMemo(
+    () => getProfitLoss(filterFiles(selectedFiles, filter), period),
+    [selectedFiles, filter, period],
+  )
+  const categoryTransactions = useMemo(
+    () => getCategoryFilterTransactions(selectedFiles, AmountFilter.ALL),
+    [selectedFiles],
+  )
 
   return (
     <>
-      <ViewToolbar>
+      <ViewToolbar
+        categoryFilter={
+          selectedFiles.length
+            ? { transactions: categoryTransactions, excluded: excludedCategories, onChange: setExcludedCategories }
+            : undefined
+        }
+      >
         <SegmentedToggle
           value={period}
           options={getBreakdownPeriodOptions()}

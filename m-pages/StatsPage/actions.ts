@@ -170,7 +170,7 @@ export const getAmountFilterOptions = () => [
   },
 ]
 
-export const filterTransactions = <T extends Transaction>(transactions: T[], filter: AmountFilter) => {
+export const filterAmount = <T extends Transaction>(transactions: T[], filter: AmountFilter) => {
   switch (filter) {
     case AmountFilter.IN:
       return transactions.filter(isIncome)
@@ -182,6 +182,41 @@ export const filterTransactions = <T extends Transaction>(transactions: T[], fil
 }
 
 /**
+ * Category filter key of transactions without a category.
+ */
+export const NO_CATEGORY = 'none'
+
+export const getCategoryKey = (transaction: Transaction) => {
+  return transaction.category ?? NO_CATEGORY
+}
+
+export type TransactionFilter = {
+  amount: AmountFilter
+  /**
+   * Category codes (or `NO_CATEGORY`) deselected in the filters.
+   */
+  excludedCategories: Set<string>
+}
+
+export const filterTransactions = <T extends Transaction>(
+  transactions: T[],
+  { amount, excludedCategories }: TransactionFilter,
+) => {
+  const amountTransactions = filterAmount(transactions, amount)
+  return excludedCategories.size
+    ? amountTransactions.filter((transaction) => !excludedCategories.has(getCategoryKey(transaction)))
+    : amountTransactions
+}
+
+/**
+ * Transactions the category filter offers categories of: the counted ones (without duplicates, on selected days) of the
+ * shown files, matching the amount filter.
+ */
+export const getCategoryFilterTransactions = (shownFiles: ParsedStatsFile[], amount: AmountFilter) => {
+  return filterAmount(splitDuplicates(shownFiles.flatMap(getFileTransactions)).unique, amount)
+}
+
+/**
  * Transactions without those on the deselected days of the date explorer.
  */
 export const filterDays = <T extends Transaction>(transactions: T[], deselectedDays: Set<string>) => {
@@ -190,17 +225,18 @@ export const filterDays = <T extends Transaction>(transactions: T[], deselectedD
     : transactions
 }
 
-/**
- * A parsed file with only its transactions on selected days.
- */
-const filterFileDays = (file: ParsedStatsFile, deselectedDays: Set<string>): ParsedStatsFile => {
+const filterFile = (file: ParsedStatsFile, filter: (transactions: Transaction[]) => Transaction[]): ParsedStatsFile => {
   return {
     ...file,
-    sections: file.sections.map((section) => ({
-      ...section,
-      transactions: filterDays(section.transactions, deselectedDays),
-    })),
+    sections: file.sections.map((section) => ({ ...section, transactions: filter(section.transactions) })),
   }
+}
+
+/**
+ * Parsed files with only their transactions matching the filter.
+ */
+export const filterFiles = (files: ParsedStatsFile[], filter: TransactionFilter) => {
+  return files.map((file) => filterFile(file, (transactions) => filterTransactions(transactions, filter)))
 }
 
 /**
@@ -210,7 +246,9 @@ const filterFileDays = (file: ParsedStatsFile, deselectedDays: Set<string>): Par
 export const getShownFiles = (checkedFiles: StatsFile[], deselectedDays: Set<string>) => {
   const allParsedFiles = checkedFiles.filter(isParsed)
   const shownCheckedFiles = deselectedDays.size
-    ? checkedFiles.map((file) => (isParsed(file) ? filterFileDays(file, deselectedDays) : file))
+    ? checkedFiles.map((file) =>
+        isParsed(file) ? filterFile(file, (transactions) => filterDays(transactions, deselectedDays)) : file,
+      )
     : checkedFiles
   const days = new Set(allParsedFiles.flatMap(getFileTransactions).map(getTransactionDay))
 
@@ -240,13 +278,13 @@ export const EmptyReason = {
 export type EmptyReason = (typeof EmptyReason)[keyof typeof EmptyReason]
 
 /**
- * Why the date explorer (`allFiles` vs `shownFiles`) or the amount filter leave no transactions, `null` if some are
- * left (or the files have none).
+ * Why the date explorer (`allFiles` vs `shownFiles`) or the filters leave no transactions, `null` if some are left (or
+ * the files have none).
  */
 export const getEmptyReason = (
   allFiles: ParsedStatsFile[],
   shownFiles: ParsedStatsFile[],
-  amountFilter: AmountFilter,
+  filter: TransactionFilter,
 ) => {
   const shownTransactions = shownFiles.flatMap(getFileTransactions)
 
@@ -258,7 +296,7 @@ export const getEmptyReason = (
     return EmptyReason.NO_DATES
   }
 
-  return filterTransactions(shownTransactions, amountFilter).length ? null : EmptyReason.NO_MATCHES
+  return filterTransactions(shownTransactions, filter).length ? null : EmptyReason.NO_MATCHES
 }
 
 export type TransactionCounts = {

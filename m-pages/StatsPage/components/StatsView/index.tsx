@@ -2,6 +2,7 @@
 
 import { InsertChartOutlined } from '@mui/icons-material'
 import { Box, Divider, Stack } from '@mui/material'
+import { useMemo } from 'react'
 
 import { getFileTransactions } from '@/m-stats-file/service'
 import { useTransactionHelper, useUserPreferences } from '@/hooks'
@@ -10,12 +11,13 @@ import { useTranslation } from '@/lib/i18n'
 import {
   filterTransactions,
   getAmountFilterOptions,
+  getCategoryFilterTransactions,
   getCurrency,
   getEmptyReason,
   getTransactionCounts,
 } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
-import { useAmountFilter } from '../../useAmountFilter'
+import { useTransactionFilter } from '../../useTransactionFilter'
 import BalanceChart from '../BalanceChart'
 import CategoryBreakdown from '../CategoryBreakdown'
 import DropZoneDisplay from '../DropZoneDisplay'
@@ -36,24 +38,39 @@ const Component = () => {
   const { locale, dateFormat } = useUserPreferences()
   const { files } = useWorkspaceFiles()
   const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays, excludedDayCount } = useShownFiles()
-  const [amountFilter, setAmountFilter] = useAmountFilter()
+  const { filter, amountFilter, setAmountFilter, excludedCategories, setExcludedCategories } = useTransactionFilter()
   const { transactions, transactionRangeItems } = useTransactionHelper({
     files: selectedFiles,
     locale,
     dateFormat,
-    filterTransactions: (unique) => filterTransactions(unique, amountFilter),
+    filterTransactions: (unique) => filterTransactions(unique, filter),
     excludedDays: deselectedDays,
   })
   const counts = getTransactionCounts(
-    filterTransactions(allParsedFiles.flatMap(getFileTransactions), amountFilter),
+    filterTransactions(allParsedFiles.flatMap(getFileTransactions), filter),
     deselectedDays,
   )
   const currency = getCurrency(transactions)
-  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, amountFilter)
+  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
+
+  const categoryTransactions = useMemo(
+    () => getCategoryFilterTransactions(selectedFiles, amountFilter),
+    [selectedFiles, amountFilter],
+  )
 
   return (
     <>
-      <ViewToolbar>
+      <ViewToolbar
+        categoryFilter={
+          selectedFiles.length
+            ? {
+                transactions: categoryTransactions,
+                excluded: excludedCategories,
+                onChange: setExcludedCategories,
+              }
+            : undefined
+        }
+      >
         <SegmentedToggle
           value={amountFilter}
           options={getAmountFilterOptions()}
