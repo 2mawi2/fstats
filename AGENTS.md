@@ -66,9 +66,9 @@ export const newBank = defineBank({
       // Headers below must be listed in `headers` (type-checked)
       columns: {
         date: 'Datum',
-        description: 'Empfänger', // or ['Empfänger', 'Verwendungszweck'] (joined)
+        description: 'Empfänger',
         amount: { type: 'signed', header: 'Betrag' },
-        // | { type: 'inOut', in: 'Haben', out: 'Soll' } (out is always negative)
+        // | { type: 'inOut', in: 'Haben', out: 'Soll' } (out can be positive or negative in the file, always stored as negative)
         // | { type: 'firstOf', headers: ['In', 'Out', 'Fee'] } (first non-empty)
       },
       // All fields required, `null` if the file has no such column

@@ -36,18 +36,13 @@ export type HeaderDef<H extends string = string> = H | { readonly header: H; rea
 
 /**
  * - `signed`: one signed column
- * - `inOut`: money in / money out columns, out is always negative
+ * - `inOut`: money in / money out columns, out values are stored as negative whether the file has them positive or negative
  * - `firstOf`: first non-empty signed column
  */
 export type AmountColumnDef<H extends string = string> =
   | { readonly type: 'signed'; readonly header: H }
   | { readonly type: 'inOut'; readonly in: H; readonly out: H }
   | { readonly type: 'firstOf'; readonly headers: readonly H[] }
-
-/**
- * Multiple headers are joined (empty values are skipped).
- */
-export type DescriptionColumnDef<H extends string = string> = H | readonly H[]
 
 export type FormatDef<H extends string = string> = {
   /**
@@ -76,7 +71,7 @@ export type FormatDef<H extends string = string> = {
   /**
    * Core transaction fields, headers must be listed in `headers`.
    */
-  columns: { date: H; description: DescriptionColumnDef<H>; amount: AmountColumnDef<H> }
+  columns: { date: H; description: H; amount: AmountColumnDef<H> }
   /**
    * Stored in `Transaction['extra']`, headers must be listed in `headers`. `null` if the file has no such column.
    */

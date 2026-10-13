@@ -9,7 +9,7 @@ import { logger } from '@/utils/Logger'
 import { parseGermanNumber } from '@/utils/Number'
 import { Big } from '@/lib/w-big'
 
-import { getDescriptionHeaders, getFormatHeaders, toAccountId, toParserId } from './definition'
+import { getFormatHeaders, toAccountId, toParserId } from './definition'
 import type { BankAccountId, ParserId } from './registry'
 
 const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
@@ -31,7 +31,6 @@ type Row = {
 export const createParser = (bank: BankDef, format: FormatDef): Parser => {
   const { columns, extraColumns, dateFormat, numberFormat } = format
   const { amount } = columns
-  const descriptionHeaders = getDescriptionHeaders(columns.description)
   const { headers, required } = getFormatHeaders(format)
 
   const toNumber = (value: string) => (numberFormat === 'de' ? parseGermanNumber(value) : value)
@@ -124,7 +123,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 
       const parsedRows: Omit<Transaction, 'id'>[] = locateRows(section).rows.map((row) => ({
         date: formatISO(toDate(row.get(columns.date), { formatFrom: dateFormat })),
-        description: descriptionHeaders.map(row.get).filter(Boolean).join(' '),
+        description: row.get(columns.description),
         value: getValue(row) || '0',
         category: null,
         currency: bank.currency,
