@@ -1,8 +1,8 @@
 import { ROUTES } from '@/common'
 
-export const VIEW_PARAM = 'view'
+const VIEW_PARAM = 'view'
 
-export const DEMO_PARAM = 'demo'
+const DEMO_PARAM = 'demo'
 
 /**
  * View of the middle column, `transactions` when the URL has none (or an unknown one).

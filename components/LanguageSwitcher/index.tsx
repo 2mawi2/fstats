@@ -13,11 +13,10 @@ import type { OptionSwitcherTriggerProps } from '../OptionSwitcher'
 const LOCALES = [UserLocale.EN, UserLocale.DE]
 
 type LanguageSwitcherProps = {
-  showLabel?: boolean
   renderTrigger?: (props: OptionSwitcherTriggerProps) => ReactNode
 }
 
-const Component = ({ showLabel = false, renderTrigger }: LanguageSwitcherProps) => {
+const Component = ({ renderTrigger }: LanguageSwitcherProps) => {
   const { t, i18n } = useTranslation()
   const { setLocale } = useUserPreferences()
   const selectedLocale = i18n.language === UserLocale.DE ? UserLocale.DE.toUpperCase() : UserLocale.EN.toUpperCase()
@@ -33,7 +32,6 @@ const Component = ({ showLabel = false, renderTrigger }: LanguageSwitcherProps) 
       title={t('COMPONENTS.LANGUAGE_SWITCHER.CHANGE_LANGUAGE')}
       icon={<Translate color="secondary" sx={{ fontSize: 18 }} />}
       label={activeLabel}
-      showLabel={showLabel}
       renderTrigger={renderTrigger}
       listSx={{ pt: 0 }}
       options={LOCALES.map((locale) => ({

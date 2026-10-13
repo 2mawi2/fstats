@@ -3,7 +3,7 @@ import type { Theme } from '@mui/material/styles'
 import { ColorMode } from '@/types-enums'
 import { LAYOUT, MISC } from '@/common'
 
-export const ui = (theme: Theme, isDarkMode: boolean, isMobile: boolean) => {
+export const ui = (theme: Theme) => {
   return {
     menuContainer: {
       zIndex: LAYOUT.NAV_Z_INDEX,
@@ -21,25 +21,24 @@ export const ui = (theme: Theme, isDarkMode: boolean, isMobile: boolean) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      height: isMobile ? LAYOUT.NAV_HEIGHT_MOBILE : LAYOUT.NAV_HEIGHT,
+      height: LAYOUT.NAV_HEIGHT_MOBILE,
     },
 
     menu: {
       display: 'flex',
       alignItems: 'center',
-      gap: isMobile ? 0.5 : 1,
+      gap: 0.5,
     },
 
     iconMenu: {
       display: 'flex',
       alignItems: 'center',
-      gap: isMobile ? 0 : 0.5,
       opacity: 0.75,
     },
 
     divider: {
       position: 'sticky',
-      top: isMobile ? LAYOUT.NAV_HEIGHT_MOBILE : LAYOUT.NAV_HEIGHT,
+      top: LAYOUT.NAV_HEIGHT_MOBILE,
       borderWidthBottom: LAYOUT.NAV_BORDER,
       zIndex: LAYOUT.NAV_Z_INDEX + 1,
     },

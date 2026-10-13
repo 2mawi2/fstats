@@ -5,7 +5,7 @@ import type { Theme } from '@mui/material/styles'
 import { ColorMode } from '@/types-enums'
 import { MISC } from '@/common'
 
-export const sxHideScrollbar = {
+const sxHideScrollbar = {
   overflow: 'auto',
   scrollbarWidth: 'none', // Firefox
   msOverflowStyle: 'none', // IE 10+
@@ -19,10 +19,8 @@ const PULLER_HEIGHT = 4
 const PULLER_WIDTH = 30
 const PULLER_WRAPPER_HEIGHT = PULLER_OFFSET_TOP + PULLER_HEIGHT
 
-export const PullerWrapper = styled('div')(({ theme }) => {
-  return {
-    height: PULLER_WRAPPER_HEIGHT,
-  }
+export const PullerWrapper = styled('div')({
+  height: PULLER_WRAPPER_HEIGHT,
 })
 
 export const Puller = styled('div')(({ theme }) => ({

@@ -1,7 +1,6 @@
 import type { TFunction } from 'i18next'
 
-import type { CategoryCode, GradientColorsLightDark, ParentCategoryCode, Transaction } from '@/types'
-import { PARENT_CATEGORY_COLORS } from '@/common'
+import type { CategoryCode, ParentCategoryCode, Transaction } from '@/types'
 import { isExpense } from '@/utils/Stats'
 
 import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './keyword-rules'
@@ -44,12 +43,4 @@ export const getCategoryLabel = (code: CategoryCode | ParentCategoryCode | null,
  */
 export const getParentCategoryCode = (code: CategoryCode): ParentCategoryCode => {
   return code.split('_')[0]
-}
-
-export const getCategoryColor = (code: CategoryCode | null): GradientColorsLightDark | undefined => {
-  if (!code) {
-    return
-  }
-
-  return PARENT_CATEGORY_COLORS[getParentCategoryCode(code)]
 }

@@ -30,7 +30,7 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 - All data processing is **client-side only** — no uploads, no tracking, no accounts
 - Use `Big` from `@/lib/w-big` for monetary calculations (never native numbers)
-- Dates in storage must be ISO strings (`DateTimeString`)
+- Dates in storage must be ISO strings (`zDateTimeString`)
 - Support light/dark themes and EN/DE locales
 - Never change the values of `MISC.LS_*` keys or persisted IDs (would lose users' stored data/preferences)
 

@@ -64,7 +64,7 @@ export const addFiles = async (newFiles: NewStatsFile[]): Promise<StatsFile[]> =
 /**
  * Replaces the status dependent part of a file (e.g. with the parse result).
  */
-export const updateFile = async (id: string, state: StatsFileState): Promise<StatsFile> => {
+const updateFile = async (id: string, state: StatsFileState): Promise<StatsFile> => {
   const file = await db.filesStore.getItem<StatsFileAtRest>(id)
 
   if (!file) {

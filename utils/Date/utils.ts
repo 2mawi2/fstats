@@ -104,7 +104,7 @@ export const getDaysInRange = ({ start, end }: DateRange): Date[] => {
   return eachDayOfInterval(interval)
 }
 
-export const attachUniqueSecondsToDates = ({
+const attachUniqueSecondsToDates = ({
   dates,
   sortOrder,
   getGroupKey,
@@ -135,7 +135,7 @@ export const attachUniqueSecondsToDates = ({
   })
 }
 
-export const getDateFormatPrecision = (
+const getDateFormatPrecision = (
   dateFormat: string,
 ): {
   hasTime: boolean

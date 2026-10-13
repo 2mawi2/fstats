@@ -40,7 +40,7 @@ export const getFileCurrency = (file: ParsedStatsFile) => {
   return getParserCurrency(file.sections[0].parserId)
 }
 
-export type FileBankAccount = {
+type FileBankAccount = {
   bankAccountId: BankAccountId
   label: string
   currency: Currency

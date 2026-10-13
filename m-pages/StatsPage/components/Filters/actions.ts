@@ -7,13 +7,13 @@ import { getCategoryLabel } from '@/utils/TransactionParser'
 
 import { getCategoryKey, NO_CATEGORY } from '../../actions'
 
-export type CategoryOption = {
+type CategoryOption = {
   key: string
   label: string
   count: number
 }
 
-export type ParentCategoryOption = CategoryOption & {
+type ParentCategoryOption = CategoryOption & {
   /**
    * Category filter keys toggled by it, its subcategories with transactions or itself without any.
    */
@@ -21,7 +21,7 @@ export type ParentCategoryOption = CategoryOption & {
   children: CategoryOption[]
 }
 
-export type CategoryGroup = {
+type CategoryGroup = {
   key: string
   label: string
   parents: ParentCategoryOption[]

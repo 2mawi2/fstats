@@ -12,11 +12,10 @@ import OptionSwitcher from '../OptionSwitcher'
 import type { OptionSwitcherTriggerProps } from '../OptionSwitcher'
 
 type DateFormatSwitcherProps = {
-  showLabel?: boolean
   renderTrigger?: (props: OptionSwitcherTriggerProps) => ReactNode
 }
 
-const Component = ({ showLabel = false, renderTrigger }: DateFormatSwitcherProps) => {
+const Component = ({ renderTrigger }: DateFormatSwitcherProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat, setDateFormat } = useUserPreferences()
 
@@ -25,7 +24,6 @@ const Component = ({ showLabel = false, renderTrigger }: DateFormatSwitcherProps
       title={t('COMPONENTS.DATE_FORMAT_SWITCHER.CHANGE_DATE_FORMAT')}
       icon={<DateRangeOutlined color="secondary" sx={{ fontSize: 18 }} />}
       label={toDisplayDate(new Date(), locale, { formatTo: dateFormat })}
-      showLabel={showLabel}
       renderTrigger={renderTrigger}
       fixedHeader
       options={getDateFormatSelectOptions(locale).map((option) => ({

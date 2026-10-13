@@ -39,7 +39,7 @@ const DUPLICATE_TAG_SX = {
 
 const INFO_ICON_SX = { display: 'block', fontSize: 14, color: 'text.secondary' } as const
 
-export type SourcedTransaction = Transaction & {
+type SourcedTransaction = Transaction & {
   /**
    * Name of the file the transaction is from.
    */
@@ -155,7 +155,13 @@ export const getTransactionCells = (
     locale,
     dateFormat,
     t,
-  }: { currency: Currency | null; amountFilter: AmountFilter; locale: UserLocale; dateFormat: DateFormat; t: TFunction },
+  }: {
+    currency: Currency | null
+    amountFilter: AmountFilter
+    locale: UserLocale
+    dateFormat: DateFormat
+    t: TFunction
+  },
 ) => {
   // Signs are redundant when only one direction is shown
   const isSigned = amountFilter === AmountFilter.ALL

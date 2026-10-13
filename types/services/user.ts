@@ -4,7 +4,6 @@ import { zDateFormat, zUserLocale } from '@/types-enums'
 
 import { zDateTimeString, zIdString, zNonEmptyString } from '../global'
 import type { _KeysCheck } from '../key-check'
-import { _zKeysCheck } from '../key-check'
 
 const zUserPreferences = z.object({
   locale: zUserLocale,
@@ -30,12 +29,7 @@ export const zSyncableUser = z.object({
   id: zNonEmptyString,
 })
 
-const zUserAtRest = z.object({
-  ...zSyncableUser.shape,
-})
-
-export type UserAtRest = z.infer<typeof zUserAtRest>
+export type UserAtRest = z.infer<typeof zSyncableUser>
 
 // Safety checks
-const assertKeys: _KeysCheck<User, UserAtRest> = true
-_zKeysCheck(zUser, zUserAtRest, assertKeys)
+true satisfies _KeysCheck<User, UserAtRest>

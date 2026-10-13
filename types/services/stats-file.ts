@@ -5,7 +5,6 @@ import { zParserId } from '@/utils/Parser/registry'
 
 import { zDateTimeString, zIdString, zNonEmptyString } from '../global'
 import type { _KeysCheck } from '../key-check'
-import { _zKeysCheck } from '../key-check'
 import type { RDZFileWithPath } from '../lib/react-dropzone'
 import { zRDZFileWithPath } from '../lib/react-dropzone'
 import { zTransaction, zTransactionAtRest } from './transaction'
@@ -70,7 +69,7 @@ export type NewStatsFile = {
   rejection?: string
 }
 
-const zStatsFileAtRest = z.intersection(
+export const zStatsFileAtRest = z.intersection(
   zStatsFileMeta,
   z.discriminatedUnion('status', [
     zStatsFileParsing,
@@ -86,5 +85,4 @@ const zStatsFileAtRest = z.intersection(
 export type StatsFileAtRest = z.infer<typeof zStatsFileAtRest>
 
 // Safety checks
-const assertKeys: _KeysCheck<StatsFile, StatsFileAtRest> = true
-_zKeysCheck(zStatsFile, zStatsFileAtRest, assertKeys)
+true satisfies _KeysCheck<StatsFile, StatsFileAtRest>

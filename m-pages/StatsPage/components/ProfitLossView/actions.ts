@@ -37,11 +37,11 @@ const UNCATEGORISED_CATEGORIES: CategoryCode[] = ['TFI_02', 'TFO_02']
 /**
  * Bank transfers can take a few days, e.g. over a weekend.
  */
-export const TRANSFER_MAX_DAYS = 3
+const TRANSFER_MAX_DAYS = 3
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-export type AccountTransaction = Transaction & { bankAccountId: BankAccountId }
+type AccountTransaction = Transaction & { bankAccountId: BankAccountId }
 
 /**
  * Transactions of the files without duplicates, with the bank account of their section.
@@ -220,7 +220,7 @@ const getTransferRows = (transfers: Transaction[], period: BreakdownPeriod) => {
 /**
  * Net result as a percentage of the income, `undefined` without income.
  */
-export const getNetMargin = (net: NumberString | undefined, income: NumberString | undefined) => {
+const getNetMargin = (net: NumberString | undefined, income: NumberString | undefined) => {
   return income === undefined || Big(income).eq(0) ? undefined : getPercentage(net ?? '0', income).toString()
 }
 

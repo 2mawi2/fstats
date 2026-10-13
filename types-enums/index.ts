@@ -8,9 +8,7 @@ export const ColorMode = {
   DARK: 'dark',
 } as const
 
-export const zColorMode = z.enum([ColorMode.SYSTEM, ColorMode.LIGHT, ColorMode.DARK] as const)
-
-export type ColorMode = z.infer<typeof zColorMode>
+export type ColorMode = (typeof ColorMode)[keyof typeof ColorMode]
 
 // -------------------------------------------------------
 

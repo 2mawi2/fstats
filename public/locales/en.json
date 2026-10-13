@@ -268,20 +268,7 @@
     },
     "DATE_FORMAT_SWITCHER": {
       "TITLE": "Date format",
-      "CHANGE_DATE_FORMAT": "Change date format",
-      "DATE_FORMAT_OPTIONS": {
-        "DMY_LONG": "English - Long format",
-        "DMY_SHORT": "English - Short format",
-        "MDY_LONG": "American - Long format",
-        "MDY_SHORT": "American - Short format",
-        "DMY_SLASH": "DD/MM/YYYY",
-        "DMY_DOT": "DD.MM.YYYY",
-        "DMY_DASH": "DD-MM-YYYY",
-        "YMD_SLASH": "YYYY/MM/DD",
-        "YMD_DOT": "YYYY.MM.DD",
-        "YMD_DASH": "YYYY-MM-DD",
-        "YMD": "YYYYMMDD"
-      }
+      "CHANGE_DATE_FORMAT": "Change date format"
     }
   }
 }

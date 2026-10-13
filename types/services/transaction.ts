@@ -4,7 +4,6 @@ import { zCurrency } from '@/types-enums'
 
 import { zDateTimeString, zIdString, zNumberString } from '../global'
 import type { _KeysCheck } from '../key-check'
-import { _zKeysCheck } from '../key-check'
 
 const zParentCategoryCode = z.string().regex(/^[A-Z]{3}$/)
 export const zCategoryCode = z.string().regex(/^[A-Z]{3}_\d{2}$/)
@@ -55,5 +54,4 @@ export const zTransactionAtRest = z.object({
 })
 
 // Safety checks
-const assertKeys: _KeysCheck<Transaction, z.infer<typeof zTransactionAtRest>> = true
-_zKeysCheck(zTransaction, zTransactionAtRest, assertKeys)
+true satisfies _KeysCheck<Transaction, z.infer<typeof zTransactionAtRest>>

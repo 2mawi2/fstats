@@ -10,8 +10,8 @@ import { getCurrencySymbol } from '@/utils/Currency'
 import { useTranslation } from '@/lib/i18n'
 
 import { COL_SPACING, COL1, COL2, COL3, getSortedCategories } from '../../actions'
-import { ui } from '../../styled'
 import BreakdownRow from '../BreakdownRow'
+import { ui } from './styled'
 
 type BreakdownTableProps = {
   title: string
