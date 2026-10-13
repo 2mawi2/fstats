@@ -10,7 +10,6 @@ import { getAmountFilterOptions, getEmptyReason, getFilteredCurrencies, groupFil
 import { useShownFiles, useWorkspaceFiles } from '../../context'
 import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
-import CurrencySelect from '../CurrencySelect'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
 import NoTransactionsDisplay from '../NoTransactionsDisplay'
@@ -37,7 +36,7 @@ const Component = () => {
 
   return (
     <>
-      <ViewToolbar>
+      <ViewToolbar currency={{ currencies, value: selected, onChange: setSelected }}>
         <SegmentedToggle
           value={amountFilter}
           options={getAmountFilterOptions()}
@@ -46,8 +45,6 @@ const Component = () => {
           disabledTooltip={t('STATS_PAGE.NO_SELECTION.TITLE')}
         />
       </ViewToolbar>
-      {/* Below the toolbar, outside the scroll container like it */}
-      {!emptyReason ? <CurrencySelect currencies={currencies} value={selected} onChange={setSelected} /> : null}
       <Box sx={sx.scroll}>
         {!files.length ? (
           <DropZoneDisplay

@@ -26,7 +26,6 @@ import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import CsvPreview from '../CsvPreview'
-import CurrencySelect from '../CurrencySelect'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSearchResultsDisplay from '../NoSearchResultsDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
@@ -98,6 +97,17 @@ const Component = () => {
     <>
       {/* Outside the scroll container, so it stays in place */}
       <ViewToolbar
+        currency={
+          isTransactionsView
+            ? {
+                currencies,
+                value: selectedCurrency,
+                onChange: setSelectedCurrency,
+                // The tables are per file
+                disabled: isTransactionsSplit,
+              }
+            : undefined
+        }
         end={<SearchField value={search} onChange={setSearch} disabled={isEmpty} />}
         options={
           isTransactionsView
@@ -142,10 +152,6 @@ const Component = () => {
           />
         ) : null}
       </ViewToolbar>
-      {/* Below the toolbar, outside the scroll container like it */}
-      {isPerCurrency && !emptyReason ? (
-        <CurrencySelect currencies={currencies} value={selectedCurrency} onChange={setSelectedCurrency} />
-      ) : null}
       <Box ref={setMiddleColumn} sx={sx.middleScroll(isEmpty)}>
         {/* Single child, observed by the tables for layout changes above them */}
         <Box sx={sx.tables}>

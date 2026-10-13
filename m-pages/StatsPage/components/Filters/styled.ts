@@ -44,6 +44,12 @@ export const ui = () => {
       textTransform: 'uppercase',
       color: 'text.secondary',
     },
+    // Currencies above the switches
+    section: {
+      display: 'flex',
+      flexDirection: 'column',
+      '& + *': { mt: 0.5 },
+    },
     scroll: {
       maxHeight: { sm: 'min(480px, 60vh)' },
       overflowY: 'auto',
@@ -114,6 +120,17 @@ export const ui = () => {
     expandSpacer: {
       flexShrink: 0,
       width: 22,
+    },
+    // Like `OutlineCheckbox`
+    radio: {
+      flexShrink: 0,
+      p: 0.5,
+      ml: -0.5,
+      color: 'action.disabled',
+      // The row handles the click
+      pointerEvents: 'none',
+      '& .MuiSvgIcon-root': { fontSize: 18 },
+      '&.Mui-checked': { color: 'text.secondary' },
     },
     // Smaller than the small switch, to fit the compact rows
     switch: {

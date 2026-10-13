@@ -124,10 +124,9 @@
     },
     "FILTERS": {
       "TITLE": "Filter",
-      "SHOW": "Anzeigen"
-    },
-    "CURRENCY_SELECT": {
-      "ALL": "Alle"
+      "SHOW": "Anzeigen",
+      "CURRENCY": "Währung",
+      "ALL_CURRENCIES": "Alle"
     },
     "DEMO": {
       "BANNER": "Du siehst Demodaten",

@@ -8,7 +8,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
-import type { FilterOption } from '../Filters'
+import type { CurrencyFilter, FilterOption } from '../Filters'
 import Filters from '../Filters'
 import RadioItem from '../RadioItem'
 import { ui } from './styled'
@@ -23,13 +23,17 @@ type ViewToolbarProps = {
    * Switches of the transactions table.
    */
   options?: FilterOption[]
+  /**
+   * Currencies in the filters, omitted where they don't apply.
+   */
+  currency?: CurrencyFilter
 }
 
 /**
  * Toolbar of the middle column: switches between the CSV, transactions, breakdown and stats views (raw to most summarised), followed by the view's own controls
  * and the filters.
  */
-const Component = ({ children, end, options }: ViewToolbarProps) => {
+const Component = ({ children, end, options, currency }: ViewToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -65,7 +69,7 @@ const Component = ({ children, end, options }: ViewToolbarProps) => {
       <Box sx={sx.spacer} />
       {end}
       {/* On every view, so the toolbar doesn't change when switching */}
-      <Filters options={options ?? []} />
+      <Filters options={options ?? []} currency={currency} />
     </Box>
   )
 }

@@ -124,10 +124,9 @@
     },
     "FILTERS": {
       "TITLE": "Filters",
-      "SHOW": "Show"
-    },
-    "CURRENCY_SELECT": {
-      "ALL": "All"
+      "SHOW": "Show",
+      "CURRENCY": "Currency",
+      "ALL_CURRENCIES": "All"
     },
     "DEMO": {
       "BANNER": "You are viewing demo data",

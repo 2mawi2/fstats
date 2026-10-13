@@ -1,17 +1,20 @@
 'use client'
 
 import { ChevronRight, TuneOutlined } from '@mui/icons-material'
-import { Badge, Box, IconButton, Popover, Switch, Tooltip } from '@mui/material'
-import { sumBy } from 'lodash'
+import { Badge, Box, IconButton, Popover, Radio, Switch, Tooltip } from '@mui/material'
+import { countBy, sumBy } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import type { KeyboardEvent, ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 
+import type { Currency } from '@/types-enums'
 import { useTranslation } from '@/lib/i18n'
 
 import { AmountFilter } from '../../actions'
 import { useShownFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
+import type { SelectedCurrency } from '../../useCurrencySelect'
+import { ALL_CURRENCIES } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import OutlineCheckbox from '../OutlineCheckbox'
 import { getCategoryFilterTransactions, getCategoryGroups, getCheckState, toggleCategories } from './actions'
@@ -28,11 +31,25 @@ export type FilterOption = {
   onChange: (checked: boolean) => void
 }
 
+export type CurrencyFilter = {
+  /**
+   * Shown currencies, one can be selected when there are several.
+   */
+  currencies: Currency[]
+  value: SelectedCurrency
+  onChange: (value: SelectedCurrency) => void
+  /**
+   * Shows all currencies without allowing a selection, e.g. in the split transactions layout.
+   */
+  disabled?: boolean
+}
+
 type FiltersProps = {
   /**
    * Switches of the transactions table.
    */
   options: FilterOption[]
+  currency?: CurrencyFilter
 }
 
 // Rows are buttons, like the rows of the date explorer
@@ -44,11 +61,11 @@ const onRowKeyDown = (event: KeyboardEvent<HTMLElement>) => {
 }
 
 /**
- * Filters button on the right of the toolbar, with a panel of switches for the transactions table and the money in and
- * out categories (of the shown files) as trees, styled like the date explorer. Marked while a filter is on. Disabled in
+ * Filters button on the right of the toolbar, with a panel of the currencies, switches for the transactions table and
+ * the money in and out categories (of the shown files) as trees, styled like the date explorer. Marked while a filter is on. Disabled in
  * the CSV view and without checked files.
  */
-const Component = ({ options }: FiltersProps) => {
+const Component = ({ options, currency }: FiltersProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
@@ -58,14 +75,31 @@ const Component = ({ options }: FiltersProps) => {
   const { amountFilter, excludedCategories: excluded, setExcludedCategories } = useTransactionFilter()
   // The breakdown shows income and expenses, so the amount filter doesn't apply
   const amount = view === WorkspaceView.BREAKDOWN ? AmountFilter.ALL : amountFilter
-  const groups = useMemo(
-    () => getCategoryGroups(getCategoryFilterTransactions(parsedFiles, amount)),
-    [parsedFiles, amount],
-  )
+  const transactions = useMemo(() => getCategoryFilterTransactions(parsedFiles, amount), [parsedFiles, amount])
+  const groups = useMemo(() => getCategoryGroups(transactions), [transactions])
+  const currencyCounts = useMemo(() => countBy(transactions, (transaction) => transaction.currency), [transactions])
   const disabled = !checkedFiles.length || view === WorkspaceView.CSV
-  const hasOptions = options.length > 0
+  const currencies = currency?.currencies ?? []
+  const hasCurrencyChoice = currencies.length > 1
+  // With one currency, it's shown but can't be changed
+  const canSelectCurrency = hasCurrencyChoice && !currency?.disabled
+  const selectedCurrency = canSelectCurrency ? currency?.value : ALL_CURRENCIES
+  const currencyOptions: { value: SelectedCurrency; label: string; count: number }[] = hasCurrencyChoice
+    ? [
+        {
+          value: ALL_CURRENCIES,
+          label: t('STATS_PAGE.FILTERS.ALL_CURRENCIES'),
+          count: sumBy(currencies, (value) => currencyCounts[value] ?? 0),
+        },
+        ...currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 })),
+      ]
+    : currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 }))
+  const hasOptions = options.length > 0 || currencyOptions.length > 0
   const allKeys = groups.flatMap((group) => group.parents.flatMap((parent) => parent.keys))
-  const isActive = options.some((option) => option.checked && option.count) || !getCheckState(excluded, allKeys).checked
+  const isActive =
+    selectedCurrency !== ALL_CURRENCIES ||
+    options.some((option) => option.checked && option.count) ||
+    !getCheckState(excluded, allKeys).checked
 
   const onToggle = (keys: string[]) => setExcludedCategories(toggleCategories(excluded, keys))
 
@@ -178,7 +212,42 @@ const Component = ({ options }: FiltersProps) => {
         <Box sx={sx.columns(hasOptions)}>
           {hasOptions ? (
             <Box sx={sx.column}>
-              <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.SHOW')}</Box>
+              {currencyOptions.length ? (
+                <Box role="radiogroup" aria-label={t('STATS_PAGE.FILTERS.CURRENCY')} sx={sx.section}>
+                  <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.CURRENCY')}</Box>
+                  {currencyOptions.map((option) => {
+                    const isChecked = !hasCurrencyChoice || option.value === selectedCurrency
+
+                    return (
+                      <Box
+                        key={option.value}
+                        onClick={canSelectCurrency ? () => currency?.onChange(option.value) : undefined}
+                        role="radio"
+                        aria-checked={isChecked}
+                        aria-disabled={!canSelectCurrency}
+                        tabIndex={canSelectCurrency ? 0 : -1}
+                        onKeyDown={onRowKeyDown}
+                        sx={{ ...sx.row, ...sx.optionRow, ...(canSelectCurrency ? null : sx.disabledRow) }}
+                      >
+                        <Radio
+                          size="small"
+                          checked={isChecked}
+                          disabled={!canSelectCurrency}
+                          tabIndex={-1}
+                          sx={sx.radio}
+                        />
+                        <Box component="span" sx={sx.label}>
+                          {option.label}
+                        </Box>
+                        <Box component="span" sx={sx.count}>
+                          {option.count}
+                        </Box>
+                      </Box>
+                    )
+                  })}
+                </Box>
+              ) : null}
+              {options.length ? <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.SHOW')}</Box> : null}
               {options.map((option) => (
                 <Box
                   key={option.key}
