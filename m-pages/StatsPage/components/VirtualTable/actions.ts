@@ -1,5 +1,3 @@
-import { escapeRegExp } from 'lodash'
-
 import type { VirtualTableColumn } from '.'
 
 // Estimate only, rows are measured once rendered
@@ -33,18 +31,28 @@ export const getColWidths = (columns: VirtualTableColumn[] | null, columnCount: 
   })
 }
 
+// Accents, e.g. of "ä" once decomposed into "a" and the diaeresis
+const COMBINING_MARKS = /\p{M}/gu
+
 /**
- * Lowercase query of the search field, empty when there is nothing to search for.
+ * Lowercase text without accents and "ß" as "ss", so e.g. "muller" finds "Müller" and "strasse" finds "Straße".
  */
-export const toSearchQuery = (search: string) => {
-  return search.trim().toLowerCase()
+export const foldText = (text: string) => {
+  return text.toLowerCase().normalize('NFD').replace(COMBINING_MARKS, '').replace(/ß/g, 'ss')
 }
 
 /**
- * Lowercase text of the cells to search in, separated so matches don't span cells.
+ * Query of the search field, see `foldText`. Empty when there is nothing to search for.
+ */
+export const toSearchQuery = (search: string) => {
+  return foldText(search.trim())
+}
+
+/**
+ * Text of the cells to search in, see `foldText`. Separated, so matches don't span cells.
  */
 export const toSearchText = (cells: string[]) => {
-  return cells.join('\n').toLowerCase()
+  return foldText(cells.join('\n'))
 }
 
 /**
@@ -55,8 +63,44 @@ export const filterBySearch = <T>(rows: T[], searchTexts: string[], query: strin
 }
 
 /**
- * Splits the text into parts, the odd ones match the query (case-insensitive).
+ * Splits the text into parts, the odd ones match the query (see `toSearchQuery`), e.g. "a" matches the "ä" of "Bäcker".
  */
 export const splitMatches = (text: string, query: string) => {
-  return query ? text.split(new RegExp(`(${escapeRegExp(query)})`, 'gi')) : [text]
+  if (!query) {
+    return [text]
+  }
+
+  // Folded per character with the original range of each folded character, as folding can change the length (ß to ss)
+  let folded = ''
+  const starts: number[] = []
+  const ends: number[] = []
+  let index = 0
+
+  for (const char of text) {
+    const foldedChar = foldText(char)
+    folded += foldedChar
+
+    for (let i = 0; i < foldedChar.length; i++) {
+      starts.push(index)
+      ends.push(index + char.length)
+    }
+    index += char.length
+  }
+
+  const parts: string[] = []
+  let last = 0
+
+  for (let match = folded.indexOf(query); match !== -1; match = folded.indexOf(query, match + query.length)) {
+    const start = starts[match]
+
+    // Skips a match starting within the character the previous one ended in (e.g. "s" in "ß")
+    if (start >= last) {
+      const end = ends[match + query.length - 1]
+      parts.push(text.slice(last, start), text.slice(start, end))
+      last = end
+    }
+  }
+
+  parts.push(text.slice(last))
+  return parts
 }

@@ -26,4 +26,20 @@ describe('search', () => {
     expect(splitMatches('a.b', '.')).toEqual(['a', '.', 'b'])
     expect(splitMatches('Rent', '')).toEqual(['Rent'])
   })
+
+  it('should ignore accents and match ß as ss', () => {
+    const names = [['Müller'], ['Straße'], ['Cafe']]
+    const texts = names.map(toSearchText)
+
+    expect(filterBySearch(names, texts, toSearchQuery('MULLER'))).toEqual([names[0]])
+    expect(filterBySearch(names, texts, toSearchQuery('strasse'))).toEqual([names[1]])
+    expect(filterBySearch(names, texts, toSearchQuery('café'))).toEqual([names[2]])
+  })
+
+  it('should highlight the original characters', () => {
+    expect(splitMatches('Bäcker', toSearchQuery('a'))).toEqual(['B', 'ä', 'cker'])
+    expect(splitMatches('Straße', toSearchQuery('ss'))).toEqual(['Stra', 'ß', 'e'])
+    expect(splitMatches('Straße', toSearchQuery('s'))).toEqual(['', 'S', 'tra', 'ß', 'e'])
+    expect(splitMatches('Cafe\u0301', toSearchQuery('cafe'))).toEqual(['', 'Cafe', '\u0301'])
+  })
 })
