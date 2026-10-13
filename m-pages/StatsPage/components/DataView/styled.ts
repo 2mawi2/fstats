@@ -7,8 +7,8 @@ export const ui = () => {
       p: isEmpty ? 0 : 2,
     }),
     tables: {
-      // Edge to edge, as much space below as above, where the margin of the previous table adds to it
-      '& section > [role="separator"]': { mx: -2, mb: 5 },
+      // Edge to edge, with the same margin above and below
+      '& section > [role="separator"]': { mx: -2, my: 5 },
       // Only between tables, those without search matches aren't rendered
       '& > section:first-of-type > [role="separator"]': { display: 'none' },
     },

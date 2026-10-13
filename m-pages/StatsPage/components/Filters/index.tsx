@@ -91,7 +91,10 @@ const Component = ({ options, currency }: FiltersProps) => {
           label: t('STATS_PAGE.FILTERS.ALL_CURRENCIES'),
           count: sumBy(currencies, (value) => currencyCounts[value] ?? 0),
         },
-        ...currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 })),
+        // Only "All" when disabled
+        ...(canSelectCurrency
+          ? currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 }))
+          : []),
       ]
     : currencies.map((value) => ({ value, label: value, count: currencyCounts[value] ?? 0 }))
   const hasOptions = options.length > 0 || currencyOptions.length > 0
