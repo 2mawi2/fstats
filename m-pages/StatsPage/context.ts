@@ -2,11 +2,9 @@
 
 import { createContext, useContext } from 'react'
 
-import type { ParsedStatsFile } from '@/types'
-import { useFileHelper } from '@/hooks'
+import type { useFileHelper } from '@/hooks'
 
-import type { CheckedTransactions, StatsTransactions } from './actions'
-import { getCheckedTransactions, getStatsTransactions } from './actions'
+import type { StatsTransactions } from './actions'
 import type { DayFilter } from './useDayFilter'
 import type { DemoState } from './useViewStorage'
 
@@ -19,29 +17,33 @@ type WorkspaceContextValue = {
   onAddFolder: () => void
   dayFilter: DayFilter
   demoState: DemoState
+  /**
+   * Shared, so all components get the same (memoized) values.
+   */
+  files: ReturnType<typeof useFileHelper>
+  stats: StatsTransactions
 }
 
 /**
- * Lets the views inside the workspace use its file picker. Synchronous UI state only.
+ * Lets the views inside the workspace use its file picker, files and transactions. Synchronous state only.
  */
-export const WorkspaceContext = createContext<WorkspaceContextValue>({
-  isDemoMode: false,
-  onAddFiles: () => {},
-  onAddFolder: () => {},
-  dayFilter: { deselectedDays: new Set(), setDeselectedDays: () => {} },
-  demoState: { values: {}, setValues: () => {} },
-})
+export const WorkspaceContext = createContext<WorkspaceContextValue | null>(null)
 
 export const useWorkspace = () => {
-  return useContext(WorkspaceContext)
+  const value = useContext(WorkspaceContext)
+
+  if (!value) {
+    throw new Error('useWorkspace must be used inside the workspace')
+  }
+
+  return value
 }
 
 /**
  * The files shown in the workspace, only the demo file in demo mode.
  */
 export const useWorkspaceFiles = () => {
-  const { isDemoMode } = useWorkspace()
-  return useFileHelper({ isDemoMode })
+  return useWorkspace().files
 }
 
 /**
@@ -51,32 +53,9 @@ export const useWorkspaceDayFilter = () => {
   return useWorkspace().dayFilter
 }
 
-// Per checked files and deselected days (both memoized), so all components share one computation. The part that
-// only depends on the files is kept when (de)selecting days.
-const cache = new WeakMap<
-  ParsedStatsFile[],
-  { files: CheckedTransactions; byDays: WeakMap<Set<string>, StatsTransactions> }
->()
-
 /**
  * Transactions of the checked parsed files, computed once for all components, see `getStatsTransactions`.
  */
 export const useStatsTransactions = () => {
-  const { selectedFiles } = useWorkspaceFiles()
-  const { deselectedDays } = useWorkspaceDayFilter()
-  let entry = cache.get(selectedFiles)
-
-  if (!entry) {
-    entry = { files: getCheckedTransactions(selectedFiles), byDays: new WeakMap() }
-    cache.set(selectedFiles, entry)
-  }
-
-  let stats = entry.byDays.get(deselectedDays)
-
-  if (!stats) {
-    stats = getStatsTransactions(entry.files, deselectedDays)
-    entry.byDays.set(deselectedDays, stats)
-  }
-
-  return stats
+  return useWorkspace().stats
 }

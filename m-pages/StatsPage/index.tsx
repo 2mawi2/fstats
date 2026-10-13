@@ -3,13 +3,13 @@
 import { Box } from '@mui/material'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Fragment, useRef } from 'react'
+import { Fragment, useMemo, useRef } from 'react'
 
 import { getEndDemoHref, getView, isDemo, WorkspaceView } from '@/common'
 import { PageWrapper } from '@/components'
 import { useFileHelper, useResizeHandle, useStatsLayout } from '@/hooks'
 
-import { resizeColumns } from './actions'
+import { getCheckedTransactions, getStatsTransactions, resizeColumns } from './actions'
 import { DataView, DemoBanner, DropOverlay, FileExplorer, FileSidebar, ProfitLossView, StatsView } from './components'
 import { WorkspaceContext } from './context'
 import { ui } from './styled'
@@ -28,8 +28,14 @@ const Component = () => {
   const searchParams = useSearchParams()
   const view = getView(searchParams)
   const isDemoMode = isDemo(searchParams)
-  const { isLoadingFiles } = useFileHelper()
+  const files = useFileHelper({ isDemoMode })
   const dayFilter = useDayFilter({ isDemoMode, isDisabled: view === WorkspaceView.CSV })
+  // Once for all components, the part only depending on the files is kept when (de)selecting days
+  const checkedTransactions = useMemo(() => getCheckedTransactions(files.selectedFiles), [files.selectedFiles])
+  const stats = useMemo(
+    () => getStatsTransactions(checkedTransactions, dayFilter.deselectedDays),
+    [checkedTransactions, dayFilter.deselectedDays],
+  )
   const demoState = useDemoState(isDemoMode)
   const { columnWidths: widths, setColumnWidths: setWidths } = useStatsLayout()
   // Leave demo mode once real files are added, so they are shown
@@ -38,7 +44,7 @@ const Component = () => {
   })
   const startResize = useResizeHandle(containerRef, 'x')
 
-  if (isLoadingFiles) {
+  if (files.isLoadingFiles) {
     return <PageWrapper />
   }
 
@@ -69,7 +75,7 @@ const Component = () => {
 
   return (
     <WorkspaceContext.Provider
-      value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder, dayFilter, demoState }}
+      value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder, dayFilter, demoState, files, stats }}
     >
       <Box {...dropzone.getRootProps()} sx={sx.dropzone}>
         <input {...dropzone.getInputProps()} />
