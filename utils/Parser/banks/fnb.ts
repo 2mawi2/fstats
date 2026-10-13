@@ -13,6 +13,7 @@ export const fnb = defineBank({
       accountName: 'Credit Card',
       variant: 'default',
       dateFormat: 'yyyy/MM/dd',
+      numberFormat: 'en',
       headers: ['Date', 'Amount', 'Balance', 'Description'],
       columns: {
         date: 'Date',

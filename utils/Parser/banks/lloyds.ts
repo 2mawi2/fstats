@@ -13,6 +13,7 @@ export const lloyds = defineBank({
       accountName: 'Current Account',
       variant: 'default',
       dateFormat: 'dd/MM/yyyy',
+      numberFormat: 'en',
       headers: [
         'Transaction Date',
         'Transaction Type',

@@ -29,7 +29,7 @@ type Row = {
  * the next section (see `findSections`).
  */
 export const createParser = (bank: BankDef, format: FormatDef): Parser => {
-  const { columns, extraColumns, dateFormat, numberFormat = 'en' } = format
+  const { columns, extraColumns, dateFormat, numberFormat } = format
   const { amount } = columns
   const descriptionHeaders = getDescriptionHeaders(columns.description)
   const { headers, required } = getFormatHeaders(format)

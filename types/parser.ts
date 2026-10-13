@@ -65,9 +65,9 @@ export type FormatDef<H extends string = string> = {
   variant: string
   dateFormat: string
   /**
-   * 'de' = "1.234,56". 'en' = "1,234.56". Defaults to 'en'.
+   * 'de' = "1.234,56". 'en' = "1,234.56".
    */
-  numberFormat?: 'en' | 'de'
+  numberFormat: 'en' | 'de'
   /**
    * All CSV headers of the file, used for detection. A file matches if all non-optional headers are present (any
    * order), unlisted headers are logged but still match.

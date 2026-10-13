@@ -59,7 +59,7 @@ export const newBank = defineBank({
       accountName: 'Giro', // display name
       variant: 'default', // parser ID `new_bank__current__default`; additional formats of the same account get descriptive names (e.g. 'legacy')
       dateFormat: 'dd.MM.yyyy',
-      numberFormat: 'de', // optional, '1.234,56'
+      numberFormat: 'de', // '1.234,56', or 'en' for '1,234.56'
       // All CSV headers of the file (any order, header row found automatically). Used for detection: all
       // non-optional headers must be present, unlisted headers still match but are logged.
       headers: ['Buchung', 'Datum', 'Empfänger', 'Verwendungszweck', { header: 'Saldo', optional: true }, 'Betrag'],
