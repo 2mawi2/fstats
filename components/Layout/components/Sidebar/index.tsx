@@ -46,6 +46,7 @@ const Component = ({ expanded, onToggle }: SidebarProps) => {
             icon={pathname === item.route ? item.iconActive : item.icon}
             expanded={expanded}
             isActive={pathname === item.route}
+            isExternal={item.isExternal}
           />
         ))}
 

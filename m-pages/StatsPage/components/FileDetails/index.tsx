@@ -16,9 +16,13 @@ import { ui } from './styled'
 
 type FileDetailsProps = {
   file: StatsFile
+  /**
+   * Transactions on days deselected in the date explorer, `file` is without them.
+   */
+  dateExcludedCount: number
 }
 
-const Component = ({ file }: FileDetailsProps) => {
+const Component = ({ file, dateExcludedCount }: FileDetailsProps) => {
   const sx = ui()
   const { locale } = useUserPreferences()
 
@@ -57,6 +61,7 @@ const Component = ({ file }: FileDetailsProps) => {
       title={file.file.name}
       titleColor={getFileNameColor(file)}
       stats={isParsed(file) ? { transactions: getFileTransactions(file), currency: getFileCurrency(file) } : null}
+      dateExcludedCount={dateExcludedCount}
     >
       <Box sx={sx.info}>
         {renderAccount()}

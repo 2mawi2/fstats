@@ -10,16 +10,25 @@ type MenuDrawerNavButtonProps = {
   onClose: VoidFunction
   children: ReactNode
   isActive?: boolean
+  isExternal?: boolean
 }
 
-const Component = ({ route, onClose, children, isActive = false }: MenuDrawerNavButtonProps) => {
+const Component = ({
+  route,
+  onClose,
+  children,
+  isActive = false,
+  isExternal = false,
+}: MenuDrawerNavButtonProps) => {
   const theme = useTheme()
+  const linkProps = isExternal
+    ? { component: 'a', href: route, target: '_blank', rel: 'noopener noreferrer' }
+    : { component: Link, href: route }
 
   return (
     <ListItem disablePadding>
       <ListItemButton
-        component={Link}
-        href={route}
+        {...linkProps}
         onClick={onClose}
         sx={{
           mx: 1.5,

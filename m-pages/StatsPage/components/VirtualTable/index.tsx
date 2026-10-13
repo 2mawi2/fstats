@@ -30,7 +30,7 @@ export type VirtualTableColumn = {
   /**
    * Cell content, by value. Replaces the value and its tooltip.
    */
-  renderCell?: (value: string) => ReactNode
+  renderCell?: (value: string, rowIndex: number) => ReactNode
 }
 
 type VirtualTableProps = {
@@ -169,7 +169,7 @@ const Component = ({
                     title={column?.renderCell ? undefined : cell}
                     style={{ textAlign: column?.align, ...column?.getStyle?.(cell) }}
                   >
-                    {column?.renderCell ? column.renderCell(cell) : cell}
+                    {column?.renderCell ? column.renderCell(cell, item.index) : cell}
                   </td>
                 )
               })}

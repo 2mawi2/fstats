@@ -6,15 +6,17 @@ import { Box, Divider, Stack } from '@mui/material'
 import { useTransactionHelper, useUserPreferences } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
-import { getCurrency, getTableViewOptions } from '../../actions'
-import { useWorkspaceFiles } from '../../context'
-import { useTableView } from '../../useTableView'
+import { filterTransactions, getAmountFilterOptions, getCurrency, getEmptyReason } from '../../actions'
+import { useShownFiles, useWorkspaceFiles } from '../../context'
+import { useAmountFilter } from '../../useAmountFilter'
+import BalanceChart from '../BalanceChart'
 import CategoryBreakdown from '../CategoryBreakdown'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
+import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import SegmentedToggle from '../SegmentedToggle'
-import SummaryChart from '../SummaryChart'
 import TransactionChart from '../TransactionChart'
+import TransactionCountChart from '../TransactionCountChart'
 import ViewToolbar from '../ViewToolbar'
 import { ui } from './styled'
 
@@ -25,20 +27,29 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
-  const { files, selectedFiles } = useWorkspaceFiles()
+  const { files } = useWorkspaceFiles()
+  const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays, excludedDayCount } = useShownFiles()
+  const [amountFilter, setAmountFilter] = useAmountFilter()
   const { transactions, transactionRangeItems } = useTransactionHelper({
     files: selectedFiles,
     locale,
     dateFormat,
+    filterTransactions: (unique) => filterTransactions(unique, amountFilter),
+    excludedDays: deselectedDays,
   })
   const currency = getCurrency(transactions)
-  // Only applies to the data view, shown disabled so the toolbar doesn't change when switching
-  const [tableView] = useTableView()
+  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, amountFilter)
 
   return (
     <>
       <ViewToolbar>
-        <SegmentedToggle value={tableView} options={getTableViewOptions()} onChange={() => {}} disabled />
+        <SegmentedToggle
+          value={amountFilter}
+          options={getAmountFilterOptions()}
+          onChange={setAmountFilter}
+          disabled={!selectedFiles.length}
+          disabledTooltip={t('STATS_PAGE.NO_SELECTION.TITLE')}
+        />
       </ViewToolbar>
       <Box sx={sx.scroll}>
         {!files.length ? (
@@ -49,18 +60,24 @@ const Component = () => {
           />
         ) : !selectedFiles.length ? (
           <NoSelectionDisplay />
+        ) : emptyReason ? (
+          <NoTransactionsDisplay reason={emptyReason} />
         ) : (
           <Stack divider={<Divider flexItem />}>
             <Box sx={sx.section}>
-              <SummaryChart transactionRangeItems={transactionRangeItems} />
+              <BalanceChart transactionRangeItems={transactionRangeItems} excludedDayCount={excludedDayCount} />
             </Box>
 
             <Box sx={sx.section}>
-              <CategoryBreakdown transactions={transactions} currency={currency} />
+              <TransactionCountChart transactions={transactions} excludedDays={deselectedDays} />
             </Box>
 
             <Box sx={sx.section}>
               <TransactionChart transactions={transactions} currency={currency} />
+            </Box>
+
+            <Box sx={sx.section}>
+              <CategoryBreakdown transactions={transactions} currency={currency} amountFilter={amountFilter} />
             </Box>
           </Stack>
         )}

@@ -1,8 +1,11 @@
 'use client'
 
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 
 import { useFileHelper } from '@/hooks'
+
+import { getShownFiles } from './actions'
+import type { DayFilter } from './useDayFilter'
 
 type WorkspaceContextValue = {
   /**
@@ -11,6 +14,7 @@ type WorkspaceContextValue = {
   isDemoMode: boolean
   onAddFiles: () => void
   onAddFolder: () => void
+  dayFilter: DayFilter
 }
 
 /**
@@ -20,6 +24,7 @@ export const WorkspaceContext = createContext<WorkspaceContextValue>({
   isDemoMode: false,
   onAddFiles: () => {},
   onAddFolder: () => {},
+  dayFilter: { deselectedDays: new Set(), setDeselectedDays: () => {} },
 })
 
 export const useWorkspace = () => {
@@ -32,4 +37,21 @@ export const useWorkspace = () => {
 export const useWorkspaceFiles = () => {
   const { isDemoMode } = useWorkspace()
   return useFileHelper({ isDemoMode })
+}
+
+/**
+ * Days deselected in the date explorer, see `useDayFilter`.
+ */
+export const useWorkspaceDayFilter = () => {
+  return useWorkspace().dayFilter
+}
+
+/**
+ * The checked files as shown by the date explorer, the single source of the day filtered transactions, see
+ * `getShownFiles`.
+ */
+export const useShownFiles = () => {
+  const { checkedFiles } = useWorkspaceFiles()
+  const { deselectedDays } = useWorkspaceDayFilter()
+  return useMemo(() => getShownFiles(checkedFiles, deselectedDays), [checkedFiles, deselectedDays])
 }

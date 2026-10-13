@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles'
 import type { ChartOptions, ScriptableContext } from 'chart.js'
 import { merge } from 'lodash'
 
@@ -37,6 +38,25 @@ export const getGradient = ({
   return gradient
 }
 
+// By color scheme class and variable name, scriptable options read them on every draw
+const themeColors = new Map<string, string>()
+
+/**
+ * Current value of a theme CSS variable (e.g. `--mui-palette-divider`). Canvases can't use the variables, and with CSS
+ * variables `theme.palette` only has the light mode colors, so read it while drawing (scriptable options).
+ */
+export const getThemeColor = (name: string) => {
+  const key = `${document.documentElement.className}|${name}`
+  let color = themeColors.get(key)
+
+  if (color === undefined) {
+    color = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+    themeColors.set(key, color)
+  }
+
+  return color
+}
+
 /**
  * Options shared by all charts, deep merged with `options`.
  */
@@ -47,6 +67,25 @@ export const getBaseChartOptions = <T extends 'line' | 'bar'>(options: ChartOpti
     interaction: {
       intersect: false,
       mode: 'index',
+    },
+    plugins: {
+      // White box with a grey border like the cards, from the theme's CSS variables so it follows the color mode
+      tooltip: {
+        backgroundColor: () => getThemeColor('--mui-palette-background-paper'),
+        borderColor: () => getThemeColor('--mui-palette-divider'),
+        borderWidth: 1,
+        titleColor: () => getThemeColor('--mui-palette-text-secondary'),
+        bodyColor: () => getThemeColor('--mui-palette-text-primary'),
+        titleFont: { size: 11, weight: 500 },
+        bodyFont: { size: 12, weight: 600 },
+        titleMarginBottom: 2,
+        padding: { x: 10, y: 8 },
+        cornerRadius: 6,
+        caretSize: 0,
+        caretPadding: 8,
+        // A single series per chart, the color box adds nothing
+        displayColors: false,
+      },
     },
     scales: {
       x: {
@@ -66,4 +105,17 @@ export const getBaseChartOptions = <T extends 'line' | 'bar'>(options: ChartOpti
   }
 
   return merge({}, baseOptions, options) as ChartOptions<T>
+}
+
+/**
+ * Soft area below the line, fading out towards the axis.
+ */
+export const getAreaFill = (color: string, opacity = 0.16) => {
+  return (context: ScriptableContext<'line'>) => {
+    return getGradient({
+      context,
+      colors: { start: alpha(color, 0), end: alpha(color, opacity) },
+      direction: 'vertical',
+    })
+  }
 }

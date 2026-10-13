@@ -1,38 +1,83 @@
-import { formatISO } from 'date-fns'
+import { differenceInCalendarDays, parseISO, startOfMonth, startOfWeek } from 'date-fns'
 
 import type { DateRange, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
-import { getDaysInRange, toDisplayDate } from '@/utils/Date'
+import { groupInOrder } from '@/utils/Array'
+import { getDaysInRange, getTransactionDay, toDayKey, toDisplayDate } from '@/utils/Date'
+
+export const RangeGranularity = {
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+} as const
+
+export type RangeGranularity = (typeof RangeGranularity)[keyof typeof RangeGranularity]
 
 /**
- * One item per day in the range (including days without transactions).
+ * Days up to about 3 months, weeks up to 2 years, months beyond, so long ranges have fewer, more readable points.
  */
-export const getTransactionsGroupedByDay = ({
+export const getRangeGranularity = ({ start, end }: DateRange): RangeGranularity => {
+  const dayCount = differenceInCalendarDays(end, start) + 1
+  return dayCount <= 92 ? RangeGranularity.DAY : dayCount <= 730 ? RangeGranularity.WEEK : RangeGranularity.MONTH
+}
+
+/**
+ * From the first to the last of the sorted transactions.
+ */
+export const getTransactionsDateRange = (transactions: Transaction[]): DateRange => {
+  return { start: parseISO(transactions[0].date), end: parseISO(transactions[transactions.length - 1].date) }
+}
+
+const getBucketStart = (day: Date, granularity: RangeGranularity) => {
+  switch (granularity) {
+    case RangeGranularity.WEEK:
+      return startOfWeek(day, { weekStartsOn: 1 })
+    case RangeGranularity.MONTH:
+      return startOfMonth(day)
+    default:
+      return day
+  }
+}
+
+/**
+ * One item per day, week or month in the range (including those without transactions), see `getRangeGranularity`.
+ */
+export const getTransactionRangeItems = ({
   dateRange,
   transactions,
   locale,
   dateFormat,
+  excludedDays = new Set(),
+  granularity = getRangeGranularity(dateRange),
 }: {
   dateRange: DateRange
   transactions: Transaction[]
   locale: UserLocale
   dateFormat: DateFormat
+  /**
+   * Days (`yyyy-MM-dd`) whose transactions were filtered out, items without any other transactions are excluded.
+   */
+  excludedDays?: Set<string>
+  /**
+   * By default based on the length of the range.
+   */
+  granularity?: RangeGranularity
 }): TransactionRangeItem[] => {
-  const transactionsByDay = new Map<string, Transaction[]>()
+  const transactionsByDay = groupInOrder(transactions, getTransactionDay)
+  const daysByBucket = groupInOrder(getDaysInRange(dateRange), (day) => toDayKey(getBucketStart(day, granularity)))
 
-  transactions.forEach((transaction) => {
-    const day = transaction.date.split('T')[0]
-    const dayTransactions = transactionsByDay.get(day)
-    if (dayTransactions) {
-      dayTransactions.push(transaction)
-    } else {
-      transactionsByDay.set(day, [transaction])
+  return [...daysByBucket.values()].map((days) => {
+    const dayKeys = days.map(toDayKey)
+    const bucketTransactions = dayKeys.flatMap((day) => transactionsByDay.get(day) ?? [])
+
+    return {
+      range: { start: days[0], end: days[days.length - 1] },
+      label: toDisplayDate(days[0], locale, {
+        formatTo: granularity === RangeGranularity.MONTH ? 'MMM yyyy' : dateFormat,
+      }),
+      transactions: bucketTransactions,
+      // Shown as a gap rather than as a period without transactions
+      isExcluded: !bucketTransactions.length && dayKeys.some((day) => excludedDays.has(day)),
     }
   })
-
-  return getDaysInRange(dateRange).map((day) => ({
-    range: { start: day, end: day },
-    label: toDisplayDate(day, locale, { formatTo: dateFormat }),
-    transactions: transactionsByDay.get(formatISO(day).split('T')[0]) ?? [],
-  }))
 }

@@ -14,6 +14,19 @@ import type { VirtualTableColumn } from '../VirtualTable'
 // Equal width digits, so numbers align across rows
 const TABULAR_NUMS = { fontVariantNumeric: 'tabular-nums' } as const
 
+// Same as the bank chip of the file rows. Inline block, so the strikethrough of the row doesn't reach it
+const DUPLICATE_TAG_SX = {
+  display: 'inline-block',
+  px: 0.75,
+  cursor: 'default',
+  border: 1,
+  borderColor: 'divider',
+  borderRadius: '10px',
+  fontSize: 11,
+  lineHeight: '16px',
+  color: 'text.secondary',
+} as const
+
 export type SourcedTransaction = Transaction & {
   /**
    * Name of the file the transaction is from.
@@ -30,8 +43,9 @@ export type SourcedTransaction = Transaction & {
 }
 
 /**
- * Transactions of all files in a single list, sorted by date. Stable, so the order within a file is kept for equal
- * dates. The first occurrence of a transaction in multiple files is the original, the others are duplicates.
+ * Transactions of all files in a single list, newest first like the date explorer. Stable, so the order of files is
+ * kept for equal dates. The first occurrence of a transaction in multiple files is the original, the others are
+ * duplicates.
  */
 export const getSourcedTransactions = (files: ParsedStatsFile[]): SourcedTransaction[] => {
   const transactions = files.flatMap((file) =>
@@ -46,7 +60,7 @@ export const getSourcedTransactions = (files: ParsedStatsFile[]): SourcedTransac
       sources: sourcesById[transaction.id].map(({ source }) => source),
       isDuplicate: duplicates.has(transaction),
     }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
 /**
@@ -76,6 +90,10 @@ export const getTransactionColumns = (
   showSource: boolean,
   amountFilter: AmountFilter,
   t: TFunction,
+  /**
+   * Shows a "Duplicate" tag next to the source of duplicates, only when some are shown.
+   */
+  isDuplicate?: (rowIndex: number) => boolean,
 ): VirtualTableColumn[] => [
   { label: t('MISC.DATE'), width: 100, getStyle: () => TABULAR_NUMS },
   { label: t('MISC.DESCRIPTION'), width: 320 },
@@ -93,12 +111,19 @@ export const getTransactionColumns = (
     ? [
         {
           label: t('MISC.SOURCE'),
-          fixedWidth: 32,
+          fixedWidth: isDuplicate ? 84 : 32,
           hideLabel: true,
-          align: 'center' as const,
-          renderCell: (source: string) => (
+          align: 'right' as const,
+          renderCell: (source: string, rowIndex: number) => (
+            // Duplicates show a tag instead of the icon, with the same tooltip
             <Tooltip title={<Box sx={{ whiteSpace: 'pre-line' }}>{source}</Box>} placement="left">
-              <InfoOutlined sx={{ display: 'block', mx: 'auto', fontSize: 14, color: 'text.secondary' }} />
+              {isDuplicate?.(rowIndex) ? (
+                <Box component="span" sx={DUPLICATE_TAG_SX}>
+                  {t('STATS_PAGE.DATA_VIEW.DUPLICATE_TAG')}
+                </Box>
+              ) : (
+                <InfoOutlined sx={{ display: 'block', ml: 'auto', fontSize: 14, color: 'text.secondary' }} />
+              )}
             </Tooltip>
           ),
         },

@@ -4,6 +4,7 @@ import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/ty
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
 import { getFileTransactions, isError, isParsed, isUnknown, splitDuplicates } from '@/m-stats-file/service'
+import { getTransactionDay } from '@/utils/Date'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
 import { isExpense, isIncome } from '@/utils/Stats'
 import { i18n } from '@/lib/i18n'
@@ -56,18 +57,6 @@ export const getFileFormat = (file: StatsFile) => {
 export const getAmountColor = (value: NumberString) => {
   return Big(value).lt(0) ? 'error.main' : undefined
 }
-
-export const TableView = {
-  RAW: 'raw',
-  TRANSACTIONS: 'transactions',
-} as const
-
-export type TableView = (typeof TableView)[keyof typeof TableView]
-
-export const getTableViewOptions = () => [
-  { value: TableView.RAW, label: i18n.t('STATS_PAGE.TABLE_VIEW.RAW') },
-  { value: TableView.TRANSACTIONS, label: i18n.t('STATS_PAGE.TABLE_VIEW.TRANSACTIONS') },
-]
 
 export const MIN_COLUMN_WIDTH = 10 // %
 
@@ -190,6 +179,96 @@ export const filterTransactions = <T extends Transaction>(transactions: T[], fil
     default:
       return transactions
   }
+}
+
+/**
+ * Transactions without those on the deselected days of the date explorer.
+ */
+export const filterDays = <T extends Transaction>(transactions: T[], deselectedDays: Set<string>) => {
+  return deselectedDays.size
+    ? transactions.filter((transaction) => !deselectedDays.has(getTransactionDay(transaction)))
+    : transactions
+}
+
+/**
+ * A parsed file with only its transactions on selected days.
+ */
+const filterFileDays = (file: ParsedStatsFile, deselectedDays: Set<string>): ParsedStatsFile => {
+  return {
+    ...file,
+    sections: file.sections.map((section) => ({
+      ...section,
+      transactions: filterDays(section.transactions, deselectedDays),
+    })),
+  }
+}
+
+/**
+ * The checked files as shown by the date explorer: parsed files only with their transactions on selected days, see
+ * `useShownFiles`.
+ */
+export const getShownFiles = (checkedFiles: StatsFile[], deselectedDays: Set<string>) => {
+  const allParsedFiles = checkedFiles.filter(isParsed)
+  const shownCheckedFiles = deselectedDays.size
+    ? checkedFiles.map((file) => (isParsed(file) ? filterFileDays(file, deselectedDays) : file))
+    : checkedFiles
+  const excludedCounts = new Map(
+    allParsedFiles.map((file) => [
+      file.id,
+      getFileTransactions(file).filter((t) => deselectedDays.has(getTransactionDay(t))).length,
+    ]),
+  )
+  const days = new Set(allParsedFiles.flatMap(getFileTransactions).map(getTransactionDay))
+
+  return {
+    /**
+     * Checked files, parsed ones without the transactions on deselected days.
+     */
+    checkedFiles: shownCheckedFiles,
+    parsedFiles: shownCheckedFiles.filter(isParsed),
+    /**
+     * The checked parsed files with all their transactions.
+     */
+    allParsedFiles,
+    deselectedDays,
+    /**
+     * Days with transactions of the checked files that are deselected.
+     */
+    excludedDayCount: [...days].filter((day) => deselectedDays.has(day)).length,
+    /**
+     * Transactions of a checked file on deselected days.
+     */
+    getExcludedCount: (fileId: string) => excludedCounts.get(fileId) ?? 0,
+  }
+}
+
+export const EmptyReason = {
+  NO_DATES: 'noDates',
+  NO_MATCHES: 'noMatches',
+} as const
+
+export type EmptyReason = (typeof EmptyReason)[keyof typeof EmptyReason]
+
+/**
+ * Why the date explorer (`allFiles` vs `shownFiles`) or the amount filter leave no transactions, `null` if some are
+ * left (or the files have none).
+ */
+export const getEmptyReason = (
+  allFiles: ParsedStatsFile[],
+  shownFiles: ParsedStatsFile[],
+  amountFilter: AmountFilter,
+) => {
+  const shownTransactions = shownFiles.flatMap(getFileTransactions)
+
+  if (!allFiles.some((file) => getFileTransactions(file).length)) {
+    return null
+  }
+
+  if (!shownTransactions.length) {
+    return EmptyReason.NO_DATES
+  }
+
+  return filterTransactions(shownTransactions, amountFilter).length ? null : EmptyReason.NO_MATCHES
 }
 
 /**

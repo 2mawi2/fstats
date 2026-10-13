@@ -1,46 +1,31 @@
-import { LockOutlined, PersonOffOutlined, Public } from '@mui/icons-material'
+import { PersonOffOutlined, VisibilityOffOutlined, WifiOff } from '@mui/icons-material'
 
-import type { Country } from '@/types-enums'
+import { Country } from '@/types-enums'
 import { BANKS } from '@/utils/Parser'
 
-export const CARD_ITEMS = [
-  {
-    Icon: LockOutlined,
-    key: 'ON_DEVICE',
-  },
-  {
-    Icon: Public,
-    key: 'IN_BROWSER',
-  },
-  {
-    Icon: PersonOffOutlined,
-    key: 'NO_ACCOUNT',
-  },
+export const BADGES = [
+  { Icon: VisibilityOffOutlined, key: 'NO_TRACKING' },
+  { Icon: PersonOffOutlined, key: 'NO_ACCOUNT' },
+  { Icon: WifiOff, key: 'WORKS_OFFLINE' },
 ] as const
 
 export const STEPS = [
-  {
-    step: 1,
-    key: 'ADD_FILES',
-  },
-  {
-    step: 2,
-    key: 'SELECT_FILES',
-  },
-  {
-    step: 3,
-    key: 'VIEW_STATS',
-  },
+  { step: 1, key: 'GO_OFFLINE' },
+  { step: 2, key: 'ADD_FILES' },
+  { step: 3, key: 'VIEW_STATS' },
 ] as const
 
+const COUNTRY_ORDER: Country[] = [Country.GB, Country.DE, Country.ZA]
+
 /**
- * Supported bank names per country, in registry order.
+ * Supported banks, grouped by country in `COUNTRY_ORDER` (unlisted countries last).
  */
-export const getBanksByCountry = () => {
-  return BANKS.reduce<Partial<Record<Country, string[]>>>((acc, bank) => {
-    acc[bank.country] = [...(acc[bank.country] ?? []), bank.name]
-    return acc
-  }, {})
+export const getSupportedBanks = () => {
+  const countries = [...new Set([...COUNTRY_ORDER, ...BANKS.map((bank) => bank.country)])]
+
+  return countries.flatMap((country) =>
+    BANKS.filter((bank) => bank.country === country).map((bank) => ({ name: bank.name, country })),
+  )
 }
 
 /**

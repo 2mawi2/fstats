@@ -1,48 +1,37 @@
 import { grey } from '@mui/material/colors'
-import { alpha } from '@mui/material/styles'
-import type { Theme } from '@mui/material/styles'
 import type { ChartOptions } from 'chart.js'
 
 import type { TransactionRangeItem } from '@/types'
-import { getBaseChartOptions } from '@/utils/Chart'
+import { getBaseChartOptions, getThemeColor } from '@/utils/Chart'
 import { Big } from '@/lib/w-big'
 
-export const getChartColors = (isDarkMode: boolean) => {
-  return {
-    both: {
-      start: isDarkMode ? alpha(grey[500], 0.1) : grey[500],
-      end: isDarkMode ? grey[200] : grey[900],
-    },
-  }
+export const getLineColor = (isDarkMode: boolean) => {
+  return isDarkMode ? grey[300] : grey[800]
 }
 
-export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
+export const getChartOptions = (): ChartOptions<'line'> => {
   return getBaseChartOptions<'line'>({
     plugins: {
+      // A single series, the tooltip names it
       legend: {
-        position: 'bottom',
-        align: 'start',
-        onClick: () => {},
-        labels: {
-          boxHeight: 6,
-          boxWidth: 6,
-          useBorderRadius: true,
-          borderRadius: 1,
-        },
+        display: false,
       },
       tooltip: {
         enabled: true,
       },
     },
     elements: {
+      // Points only on hover, hollow like the transactions per month chart
       point: {
         radius: 0,
+        hoverRadius: 4,
+        hoverBorderWidth: 2,
       },
     },
     scales: {
       x: {
         grid: {
-          display: true,
+          display: false,
         },
         ticks: {
           display: true,
@@ -52,7 +41,7 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
         grid: {
           display: true,
           color: (ctx) => {
-            return ctx.tick.value === 0 ? theme.palette.divider : 'transparent'
+            return ctx.tick.value === 0 ? getThemeColor('--mui-palette-divider') : 'transparent'
           },
         },
         ticks: {
@@ -66,11 +55,14 @@ export const getChartOptions = (theme: Theme): ChartOptions<'line'> => {
   })
 }
 
-export const accumulateValues = (transactionRangeItems: TransactionRangeItem[]): number[] => {
+/**
+ * Running balance, `null` (a gap in the line) for items excluded by date.
+ */
+export const accumulateValues = (transactionRangeItems: TransactionRangeItem[]): (number | null)[] => {
   let total = Big(0)
 
   return transactionRangeItems.map((item) => {
     total = item.transactions.reduce((acc, transaction) => acc.add(transaction.value), total)
-    return total.toNumber()
+    return item.isExcluded ? null : total.toNumber()
   })
 }

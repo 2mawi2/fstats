@@ -10,5 +10,8 @@ export const ui = () => {
       fontSize: 12,
       textTransform: 'none',
     },
+    tooltipWrapper: {
+      display: 'inline-flex',
+    },
   }
 }

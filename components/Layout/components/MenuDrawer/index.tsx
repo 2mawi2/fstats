@@ -20,7 +20,13 @@ const Component = ({ onClose }: MenuDrawerProps) => {
     <List disablePadding>
       <Box sx={{ mt: 3 }}>
         {[...NAV_ITEMS_TOP, ...NAV_ITEMS_BOTTOM].map((item) => (
-          <MenuDrawerNavButton key={item.route} route={item.route} isActive={pathname === item.route} onClose={onClose}>
+          <MenuDrawerNavButton
+            key={item.route}
+            route={item.route}
+            isActive={pathname === item.route}
+            isExternal={item.isExternal}
+            onClose={onClose}
+          >
             {t(item.labelKey)}
           </MenuDrawerNavButton>
         ))}

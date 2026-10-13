@@ -10,7 +10,7 @@ import { MISC } from '@/common'
 import { Trans, useTranslation } from '@/lib/i18n'
 
 import { useWorkspace } from '../../context'
-import { getDemoHref } from '../../params'
+import { getDemoHref, WorkspaceView } from '../../params'
 import EmptyDisplay from '../EmptyDisplay'
 
 type DropZoneDisplayProps = {
@@ -62,7 +62,7 @@ const Component = ({
       actions={
         <>
           <Divider sx={{ width: 240, fontSize: 12, color: 'text.secondary' }}>{t('MISC.OR')}</Divider>
-          <Button component={NextLink} href={getDemoHref(searchParams)} variant="outlined">
+          <Button component={NextLink} href={getDemoHref(searchParams, WorkspaceView.STATS)} variant="outlined">
             {t('MISC.VIEW_DEMO')}
           </Button>
         </>

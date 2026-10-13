@@ -27,119 +27,163 @@ export const ctaButton = {
 
 export const ui = (theme: Theme, isMobile: boolean) => {
   return {
-    trustSection: {
-      mt: isMobile ? 4 : 6,
-    },
-
-    trustCard: {
-      p: isMobile ? 2.5 : 3,
-      borderRadius: 2,
-      border: '1px solid rgba(0,96,100,0.15)',
-      backgroundColor: 'rgba(0,96,100,0.04)',
-      textAlign: 'center',
-      height: '100%',
+    badges: {
       display: 'flex',
-      flexDirection: 'column',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      columnGap: 3,
+      rowGap: 1,
+      listStyle: 'none',
+      p: 0,
+      m: 0,
+      mt: isMobile ? 3 : 4,
+    },
+
+    badge: {
+      display: 'inline-flex',
       alignItems: 'center',
-      ...darkStyles(theme, {
-        borderColor: 'rgba(0,188,212,0.18)',
-        backgroundColor: 'rgba(255,255,255,0.04)',
-      }),
-    },
-
-    trustIcon: {
-      fontSize: 34,
-      ...accentColor(theme),
-      mb: 1.5,
-    },
-
-    trustTitle: {
-      fontWeight: 700,
-      mb: 0.75,
-    },
-
-    trustDescription: {
+      gap: 0.75,
+      fontSize: 13,
       color: 'text.secondary',
-      fontSize: 14,
-      lineHeight: 1.6,
-      mb: 0,
+    },
+
+    badgeIcon: {
+      fontSize: 16,
     },
 
     section: {
-      mt: isMobile ? 5 : 7,
-      textAlign: 'center',
+      mt: isMobile ? 7 : 11,
     },
 
     sectionTitle: {
       textAlign: 'center',
       fontWeight: 700,
-      mt: 12,
-      mb: isMobile ? 3 : 5,
+      mb: isMobile ? 3 : 4,
     },
 
-    stepCard: {
+    sectionSubtitle: {
       textAlign: 'center',
+      color: 'text.secondary',
+      maxWidth: 560,
+      mx: 'auto',
+      mt: isMobile ? -1.5 : -2,
+      mb: isMobile ? 3 : 4,
     },
 
-    stepBadge: {
-      width: 44,
-      height: 44,
-      borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      mx: 'auto',
-      mb: 4,
-      background: 'linear-gradient(135deg, rgba(0,188,212,0.18), rgba(0,96,100,0.12))',
-      color: Color.cyanDark,
+    cardTitle: {
       fontWeight: 700,
       fontSize: 18,
-      ...darkStyles(theme, {
-        background: 'linear-gradient(135deg, rgba(0,188,212,0.25), rgba(0,96,100,0.2))',
-        color: Color.cyan,
-      }),
-    },
-
-    stepTitle: {
-      fontWeight: 600,
       mb: 0.75,
     },
 
-    stepDescription: {
+    cardDescription: {
       color: 'text.secondary',
       fontSize: 14,
       lineHeight: 1.6,
       mb: 0,
     },
 
-    banksSection: {
-      mt: isMobile ? 5 : 7,
-    },
-
-    countryGrid: {
+    centered: {
+      display: 'flex',
       justifyContent: 'center',
     },
 
-    countryFlag: {
-      fontSize: 30,
-      lineHeight: 1,
-      mb: 1.5,
+    link: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 1,
+      fontSize: 15,
+      fontWeight: 600,
+      textDecoration: 'none',
+      ...accentColor(theme),
+      '&:hover': { textDecoration: 'underline' },
+    },
+
+    linkIcon: {
+      fontSize: 20,
+    },
+
+    steps: {
+      listStyle: 'none',
+      m: 0,
+      p: 0,
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+      gap: isMobile ? 3 : 4,
+      // 3 of 12 columns per step, centred
+      maxWidth: isMobile ? 'none' : '75%',
+      mx: 'auto',
+    },
+
+    step: {
+      position: 'relative',
+      display: 'flex',
+      flexDirection: isMobile ? 'row' : 'column',
+      alignItems: isMobile ? 'flex-start' : 'center',
+      gap: 2,
+      textAlign: isMobile ? 'left' : 'center',
+      // Line connecting each step to the next one
+      '&:not(:last-of-type)::after': {
+        content: '""',
+        position: 'absolute',
+        backgroundColor: 'divider',
+        ...(isMobile
+          ? { left: 15, top: 40, bottom: -16, width: 2 }
+          : { top: 15, left: 'calc(50% + 28px)', width: 'calc(100% - 56px + 32px)', height: 2 }),
+      },
+    },
+
+    stepNumber: {
+      flexShrink: 0,
+      width: 32,
+      height: 32,
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 700,
+      fontSize: 14,
+      backgroundColor: 'rgba(0,96,100,0.1)',
+      color: Color.cyanDark,
+      ...darkStyles(theme, {
+        backgroundColor: 'rgba(0,188,212,0.15)',
+        color: Color.cyan,
+      }),
     },
 
     bankList: {
+      listStyle: 'none',
       m: 0,
       p: 0,
-      listStyle: 'none',
       display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 0.75,
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      columnGap: 3,
+      rowGap: 1.5,
+      maxWidth: 640,
+      mx: 'auto',
     },
 
     bankItem: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 1,
       fontSize: 15,
+      fontWeight: 500,
+    },
+
+    missingBank: {
+      textAlign: 'center',
+      color: 'text.secondary',
+      fontSize: 13,
+      mt: 3,
+    },
+
+    inlineLink: {
       fontWeight: 600,
+      textDecoration: 'none',
       ...accentColor(theme),
+      '&:hover': { textDecoration: 'underline' },
     },
   }
 }

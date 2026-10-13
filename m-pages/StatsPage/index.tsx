@@ -16,10 +16,11 @@ import { DataView, DemoBanner, DropOverlay, FileExplorer, FileSidebar, StatsView
 import { WorkspaceContext } from './context'
 import { getEndDemoHref, getView, isDemo, WorkspaceView } from './params'
 import { ui } from './styled'
+import { useDayFilter } from './useDayFilter'
 import { useFileDropzone } from './useFileDropzone'
 
 /**
- * Workspace of the stats page: file explorer, the data or stats view (`view` param) in the middle column, and the file
+ * Workspace of the stats page: file explorer, the transactions, stats or CSV view (`view` param) in the middle column, and the file
  * summary.
  */
 const Component = () => {
@@ -27,12 +28,13 @@ const Component = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const isStats = getView(searchParams) === WorkspaceView.STATS
+  const view = getView(searchParams)
   const isDemoMode = isDemo(searchParams)
   const { isLoadingFiles } = useFileHelper()
   const [includeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
     initializeWithValue: false,
   })
+  const dayFilter = useDayFilter({ isDemoMode, isDisabled: view === WorkspaceView.CSV })
   const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
   // Leave demo mode once real files are added, so they are shown
   const { dropzone, addFolder } = useFileDropzone({
@@ -57,18 +59,18 @@ const Component = () => {
     {
       id: 'middle',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn },
-      content: isStats ? <StatsView /> : <DataView />,
+      content: view === WorkspaceView.STATS ? <StatsView /> : <DataView />,
     },
     {
       id: 'right',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn, ...sx.rightColumn },
-      // Duplicates are always excluded from the stats
-      content: <FileSidebar includeDuplicates={!isStats && includeDuplicates} />,
+      // Duplicates are always excluded from the stats, the date explorer is hidden in the CSV view
+      content: <FileSidebar includeDuplicates={view === WorkspaceView.TRANSACTIONS && includeDuplicates} />,
     },
   ]
 
   return (
-    <WorkspaceContext.Provider value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder }}>
+    <WorkspaceContext.Provider value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder, dayFilter }}>
       <Box {...dropzone.getRootProps()} sx={sx.dropzone}>
         <input {...dropzone.getInputProps()} />
         {/* Across all columns, only the middle column's content changes in demo mode */}

@@ -15,7 +15,10 @@ type PreviewSectionProps = {
    * The file shown, its status is indicated by the title color.
    */
   file?: StatsFile
-  rowCount?: number
+  /**
+   * Next to the title, e.g. the row count.
+   */
+  caption?: string
   isLoading?: boolean
   error?: string | null
   /**
@@ -28,7 +31,7 @@ type PreviewSectionProps = {
 const Component = ({
   title,
   file,
-  rowCount,
+  caption,
   isLoading = false,
   error = null,
   isSticky = false,
@@ -42,9 +45,9 @@ const Component = ({
       <Box sx={isSticky ? { ...sx.header, ...sx.stickyHeader } : sx.header}>
         <Typography variant="body2" sx={file ? { ...sx.title, color: getFileNameColor(file) } : sx.title}>
           {title}
-          {rowCount !== undefined ? (
+          {caption ? (
             <Box component="span" sx={sx.rowCount}>
-              {t('STATS_PAGE.DATA_VIEW.ROW_COUNT', { count: rowCount })}
+              {caption}
             </Box>
           ) : null}
         </Typography>
