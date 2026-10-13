@@ -6,13 +6,16 @@ import { ParsedStatsFile, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { splitDuplicates } from '@/m-stats-file/service'
 
-import { getTransactionsGroupedByDay } from './helper'
+import { getTransactionRangeItems } from './helper'
+
+export { getTransactionRangeItems, RangeGranularity } from './helper'
 
 export const useTransactionHelper = ({
   files,
   locale,
   dateFormat,
   filterTransactions = (transactions) => transactions,
+  excludedDays,
 }: {
   files: ParsedStatsFile[]
   locale: UserLocale
@@ -21,6 +24,10 @@ export const useTransactionHelper = ({
    * Applied to the unique transactions, before the range items are grouped.
    */
   filterTransactions?: (transactions: Transaction[]) => Transaction[]
+  /**
+   * Days (`yyyy-MM-dd`) removed by `filterTransactions`, shown as gaps.
+   */
+  excludedDays?: Set<string>
 }): {
   transactions: Transaction[]
   transactionRangeItems: TransactionRangeItem[]
@@ -36,7 +43,7 @@ export const useTransactionHelper = ({
   }
 
   transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
-  const transactionRangeItems = getTransactionsGroupedByDay({
+  const transactionRangeItems = getTransactionRangeItems({
     dateRange: {
       start: parseISO(transactions[0].date),
       end: parseISO(transactions[transactions.length - 1].date),
@@ -44,6 +51,7 @@ export const useTransactionHelper = ({
     transactions,
     locale,
     dateFormat,
+    excludedDays,
   })
 
   return {

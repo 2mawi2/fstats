@@ -1,12 +1,16 @@
 'use client'
 
-import { Box, List, Skeleton, Typography } from '@mui/material'
+import { Box, List, Typography } from '@mui/material'
+import { useSearchParams } from 'next/navigation'
 import { useRef } from 'react'
 
 import { useDataLayout, useResizeHandle } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace, useWorkspaceFiles } from '../../context'
+import { getView, WorkspaceView } from '../../params'
+import DateExplorer from '../DateExplorer'
+import DateSkeleton from '../DateSkeleton'
 import FileRow from '../FileRow'
 import FileToolbar from '../FileToolbar'
 import { clampSplit } from './actions'
@@ -16,6 +20,8 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { isDemoMode } = useWorkspace()
+  // The date filter doesn't apply to the CSV view, a placeholder is shown instead
+  const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const { files, isChecked, toggleFile } = useWorkspaceFiles()
   const panesRef = useRef<HTMLDivElement>(null)
   const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
@@ -46,13 +52,8 @@ const Component = () => {
 
         <Box sx={sx.splitDivider} onPointerDown={startResize((delta) => setSplit(clampSplit(split + delta)))} />
 
-        <Box sx={{ ...sx.pane, flexBasis: `${100 - split}%` }}>
-          {files.length ? (
-            <>
-              <Skeleton variant="text" width="40%" />
-              <Skeleton variant="rectangular" height={120} sx={{ mt: 1 }} />
-            </>
-          ) : null}
+        <Box sx={{ ...sx.pane, ...sx.datesPane, flexBasis: `${100 - split}%` }}>
+          {isCsv ? <DateSkeleton title={t('STATS_PAGE.DATE_EXPLORER.CSV_DISABLED')} /> : <DateExplorer />}
         </Box>
       </Box>
     </Box>

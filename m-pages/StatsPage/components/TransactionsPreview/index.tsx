@@ -11,7 +11,7 @@ import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { AmountFilter, filterTransactions } from '../../actions'
+import { AmountFilter, filterDays, filterTransactions } from '../../actions'
 import FileMessage from '../FileMessage'
 import PreviewSection from '../PreviewSection'
 import { STICKY_HEADER_OFFSET } from '../PreviewSection/actions'
@@ -23,6 +23,7 @@ const DUPLICATE_ROW_STYLE = { opacity: 0.4 }
 type TransactionsPreviewProps = {
   files: StatsFile[]
   amountFilter: AmountFilter
+  deselectedDays: Set<string>
   includeDuplicates: boolean
   scrollElement: HTMLElement | null
 }
@@ -30,7 +31,13 @@ type TransactionsPreviewProps = {
 /**
  * Transactions of all files in a single table, with their source file when there is more than one.
  */
-const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: TransactionsPreviewProps) => {
+const Component = ({
+  files,
+  amountFilter,
+  deselectedDays,
+  includeDuplicates,
+  scrollElement,
+}: TransactionsPreviewProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const parsedFiles = useMemo(() => files.filter(isParsed), [files])
@@ -39,8 +46,8 @@ const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: Tr
   const singleFile = isCombined ? undefined : (parsedFiles[0] ?? files[0])
   const currency = useMemo(() => getSharedCurrency(parsedFiles), [parsedFiles])
   const allTransactions = useMemo(
-    () => filterTransactions(getSourcedTransactions(parsedFiles), amountFilter),
-    [parsedFiles, amountFilter],
+    () => filterDays(filterTransactions(getSourcedTransactions(parsedFiles), amountFilter), deselectedDays),
+    [parsedFiles, amountFilter, deselectedDays],
   )
   const transactions = useMemo(
     () => (includeDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),

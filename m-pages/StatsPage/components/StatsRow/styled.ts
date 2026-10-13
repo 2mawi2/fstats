@@ -35,6 +35,11 @@ export const ui = () => {
       lineHeight: '18px',
       color: 'text.secondary',
     },
+    dateFiltered: {
+      flexShrink: 0,
+      fontSize: 15,
+      color: 'text.secondary',
+    },
     balance: {
       flexShrink: 0,
       fontSize: 13,

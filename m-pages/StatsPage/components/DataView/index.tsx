@@ -11,15 +11,17 @@ import { useTranslation } from '@/lib/i18n'
 import {
   getAmountFilterOptions,
   getDuplicateCount,
+  getEmptyReason,
   getTransactionsLayoutOptions,
   TransactionsLayout,
 } from '../../actions'
-import { useWorkspaceFiles } from '../../context'
+import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
 import { useAmountFilter } from '../../useAmountFilter'
 import CsvPreview from '../CsvPreview'
 import DropZoneDisplay from '../DropZoneDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
+import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import SegmentedToggle from '../SegmentedToggle'
 import TransactionsPreview from '../TransactionsPreview'
 import ViewToolbar from '../ViewToolbar'
@@ -43,15 +45,19 @@ const Component = () => {
     initializeWithValue: false,
   })
   const [amountFilter, setAmountFilter] = useAmountFilter()
+  const { deselectedDays } = useWorkspaceDayFilter()
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
-  const isEmpty = !files.length || !checkedFiles.length
+  // The filters don't apply to the CSV view
+  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, amountFilter, deselectedDays) : null
+  const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && isTransactions
   // Multiple parsed files are shown as one, with combined stats above the stats per file
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // Only the combined table has duplicates
-  const duplicateCount = isCombined && !isTransactionsSplit ? getDuplicateCount(checkedParsedFiles, amountFilter) : 0
+  const duplicateCount =
+    isCombined && !isTransactionsSplit ? getDuplicateCount(checkedParsedFiles, amountFilter, deselectedDays) : 0
 
   return (
     <>
@@ -63,7 +69,13 @@ const Component = () => {
           options={getAmountFilterOptions()}
           onChange={setAmountFilter}
           disabled={!isTransactionsView}
-          disabledTooltip={isTransactions ? undefined : t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.CSV_DISABLED')}
+          disabledTooltip={
+            !isTransactions
+              ? t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.CSV_DISABLED')
+              : !checkedFiles.length
+                ? t('STATS_PAGE.NO_SELECTION.TITLE')
+                : undefined
+          }
         />
         {isTransactionsView && isCombined ? (
           <SegmentedToggle
@@ -94,6 +106,8 @@ const Component = () => {
             <DropZoneDisplay />
           ) : !checkedFiles.length ? (
             <NoSelectionDisplay />
+          ) : emptyReason ? (
+            <NoTransactionsDisplay reason={emptyReason} />
           ) : isTransactions ? (
             isTransactionsSplit ? (
               checkedFiles.map((file) => (
@@ -101,6 +115,7 @@ const Component = () => {
                   key={file.id}
                   files={[file]}
                   amountFilter={amountFilter}
+                  deselectedDays={deselectedDays}
                   includeDuplicates={includeDuplicates}
                   scrollElement={middleColumn}
                 />
@@ -109,6 +124,7 @@ const Component = () => {
               <TransactionsPreview
                 files={checkedFiles}
                 amountFilter={amountFilter}
+                deselectedDays={deselectedDays}
                 includeDuplicates={includeDuplicates}
                 scrollElement={middleColumn}
               />

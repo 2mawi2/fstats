@@ -181,10 +181,66 @@ export const filterTransactions = <T extends Transaction>(transactions: T[], fil
 }
 
 /**
- * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount filter.
+ * Day of a transaction as `yyyy-MM-dd`, as it was parsed (ignoring time zones).
  */
-export const getDuplicateCount = (files: ParsedStatsFile[], amountFilter: AmountFilter) => {
-  return splitDuplicates(filterTransactions(files.flatMap(getFileTransactions), amountFilter)).duplicates.length
+export const getTransactionDay = (transaction: Transaction) => {
+  return transaction.date.split('T')[0]
+}
+
+/**
+ * Transactions without those on the deselected days of the date explorer.
+ */
+export const filterDays = <T extends Transaction>(transactions: T[], deselectedDays: Set<string>) => {
+  return deselectedDays.size
+    ? transactions.filter((transaction) => !deselectedDays.has(getTransactionDay(transaction)))
+    : transactions
+}
+
+export const EmptyReason = {
+  NO_DATES: 'noDates',
+  NO_MATCHES: 'noMatches',
+} as const
+
+export type EmptyReason = (typeof EmptyReason)[keyof typeof EmptyReason]
+
+/**
+ * Why the amount and day filters leave no transactions of the files, `null` if some are left (or the files have none).
+ */
+export const getEmptyReason = (files: ParsedStatsFile[], amountFilter: AmountFilter, deselectedDays: Set<string>) => {
+  const allTransactions = files.flatMap(getFileTransactions)
+  const dayTransactions = filterDays(allTransactions, deselectedDays)
+
+  if (!allTransactions.length) {
+    return null
+  }
+
+  if (!dayTransactions.length) {
+    return EmptyReason.NO_DATES
+  }
+
+  return filterTransactions(dayTransactions, amountFilter).length ? null : EmptyReason.NO_MATCHES
+}
+
+/**
+ * Days with transactions of the files that are deselected in the date explorer.
+ */
+export const getExcludedDayCount = (files: ParsedStatsFile[], deselectedDays: Set<string>) => {
+  const days = new Set(files.flatMap(getFileTransactions).map(getTransactionDay))
+  return [...days].filter((day) => deselectedDays.has(day)).length
+}
+
+/**
+ * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount and day
+ * filters.
+ */
+export const getDuplicateCount = (
+  files: ParsedStatsFile[],
+  amountFilter: AmountFilter,
+  deselectedDays: Set<string>,
+) => {
+  return splitDuplicates(
+    filterDays(filterTransactions(files.flatMap(getFileTransactions), amountFilter), deselectedDays),
+  ).duplicates.length
 }
 
 // TODO: Once we have currency conversion logic, convert files with different currencies

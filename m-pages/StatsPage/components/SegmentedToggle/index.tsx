@@ -4,6 +4,9 @@ import { Box, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
 
 import { ui } from './styled'
 
+// The labels mostly speak for themselves, so their titles only show when hovering a while
+const TITLE_DELAY = 750 // ms
+
 type SegmentedToggleProps<T extends string> = {
   value: T
   options: { value: T; label: string; title?: string }[]
@@ -34,9 +37,17 @@ const Component = <T extends string>({
       sx={sx.group(disabled)}
     >
       {options.map((option) => (
-        <ToggleButton key={option.value} value={option.value} title={option.title} sx={sx.button}>
-          {option.label}
-        </ToggleButton>
+        // Disabled buttons don't fire hover events, the group's `disabledTooltip` explains them instead
+        <Tooltip
+          key={option.value}
+          title={disabled ? '' : option.title}
+          enterDelay={TITLE_DELAY}
+          enterNextDelay={TITLE_DELAY}
+        >
+          <ToggleButton value={option.value} sx={sx.button}>
+            {option.label}
+          </ToggleButton>
+        </Tooltip>
       ))}
     </ToggleButtonGroup>
   )

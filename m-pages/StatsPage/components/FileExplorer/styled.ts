@@ -22,6 +22,11 @@ export const ui = () => {
     filesPane: {
       p: 0,
     },
+    // The date explorer scrolls its rows only, below its toolbar
+    datesPane: {
+      p: 0,
+      overflowY: 'hidden',
+    },
     dropTip: {
       display: 'block',
       fontSize: 12,

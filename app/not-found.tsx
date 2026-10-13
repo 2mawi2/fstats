@@ -10,12 +10,12 @@ const Page = () => {
 
   return (
     <PageWrapper>
-      <Grid container spacing={4}>
-        <Grid size={12}>
-          <Typography color="primary" variant="body2" sx={{ fontWeight: 'bold', fontSize: 40 }}>
+      <Grid container spacing={4} sx={{ px: { xs: 3, md: 6 }, pt: { xs: 2, md: 6 } }}>
+        <Grid size={12} sx={{ maxWidth: 600 }}>
+          <Typography color="primary" variant="body2" sx={{ fontWeight: 'bold', fontSize: 40, mb: 3 }}>
             404
           </Typography>
-          <Typography color="primary" variant="body2" sx={{ fontWeight: 'bold', fontSize: 20 }}>
+          <Typography color="primary" variant="body2" sx={{ fontWeight: 'bold', fontSize: 20, mb: 1 }}>
             {t('PAGE_404.TITLE')}
           </Typography>
           <Typography color="secondary" variant="body2" sx={{ mb: 4 }}>

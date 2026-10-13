@@ -9,16 +9,17 @@ import { getTransactionsByCurrency } from './actions'
 type TransactionsSummaryProps = {
   files: ParsedStatsFile[]
   includeDuplicates: boolean
+  deselectedDays: Set<string>
 }
 
 /**
  * Combined stats of all files, one row per currency.
  */
-const Component = ({ files, includeDuplicates }: TransactionsSummaryProps) => {
+const Component = ({ files, includeDuplicates, deselectedDays }: TransactionsSummaryProps) => {
   const { t } = useTranslation()
-  const groups = getTransactionsByCurrency(files, includeDuplicates)
+  const groups = getTransactionsByCurrency(files, includeDuplicates, deselectedDays)
 
-  return groups.map(({ currency, transactions, duplicateCount }) => (
+  return groups.map(({ currency, transactions, duplicateCount, dateExcludedCount }) => (
     <StatsRow
       key={currency}
       title={t('MISC.ALL_TRANSACTIONS')}
@@ -26,8 +27,10 @@ const Component = ({ files, includeDuplicates }: TransactionsSummaryProps) => {
       isTotal
       defaultExpanded
       stats={{ transactions, currency }}
-      notes={
-        duplicateCount
+      isDateFiltered={dateExcludedCount > 0}
+      notes={[
+        ...(dateExcludedCount ? [t('STATS_PAGE.SIDEBAR.DATE_EXCLUDED', { count: dateExcludedCount })] : []),
+        ...(duplicateCount
           ? [
               t(
                 includeDuplicates ? 'STATS_PAGE.SIDEBAR.DUPLICATES_INCLUDED' : 'STATS_PAGE.SIDEBAR.DUPLICATES_EXCLUDED',
@@ -36,8 +39,8 @@ const Component = ({ files, includeDuplicates }: TransactionsSummaryProps) => {
                 },
               ),
             ]
-          : []
-      }
+          : []),
+      ]}
     />
   ))
 }

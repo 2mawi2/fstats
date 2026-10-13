@@ -4,6 +4,8 @@ import { createContext, useContext } from 'react'
 
 import { useFileHelper } from '@/hooks'
 
+import type { DayFilter } from './useDayFilter'
+
 type WorkspaceContextValue = {
   /**
    * Only the read-only demo file is shown, see `getDemoFile`.
@@ -11,6 +13,7 @@ type WorkspaceContextValue = {
   isDemoMode: boolean
   onAddFiles: () => void
   onAddFolder: () => void
+  dayFilter: DayFilter
 }
 
 /**
@@ -20,6 +23,7 @@ export const WorkspaceContext = createContext<WorkspaceContextValue>({
   isDemoMode: false,
   onAddFiles: () => {},
   onAddFolder: () => {},
+  dayFilter: { deselectedDays: new Set(), setDeselectedDays: () => {} },
 })
 
 export const useWorkspace = () => {
@@ -32,4 +36,11 @@ export const useWorkspace = () => {
 export const useWorkspaceFiles = () => {
   const { isDemoMode } = useWorkspace()
   return useFileHelper({ isDemoMode })
+}
+
+/**
+ * Days deselected in the date explorer, see `useDayFilter`.
+ */
+export const useWorkspaceDayFilter = () => {
+  return useWorkspace().dayFilter
 }

@@ -8,7 +8,6 @@
     "TRANSACTIONS": "Transactions",
     "INCOME": "Income",
     "EXPENSES": "Expenses",
-    "BALANCE": "Balance",
     "TOTAL": "Total",
     "DATE": "Date",
     "DESCRIPTION": "Description",
@@ -73,6 +72,9 @@
       "TRANSACTIONS": "Transactions",
       "STATS": "Stats"
     },
+    "DATE_EXPLORER": {
+      "CSV_DISABLED": "Switch to Transactions or Stats"
+    },
     "FILE_TOOLBAR": {
       "SELECT_ALL": "All",
       "SELECT_NONE": "None",
@@ -107,7 +109,16 @@
       "TITLE": "No file selected",
       "SUBTITLE": "Pick a file on the left to see its transactions."
     },
+    "NO_TRANSACTIONS": {
+      "NO_DATES_TITLE": "No dates selected",
+      "NO_DATES_SUBTITLE": "Select dates on the left to see their transactions.",
+      "NO_MATCHES_TITLE": "No transactions",
+      "NO_MATCHES_SUBTITLE": "None of the selected dates have transactions matching this filter."
+    },
     "SIDEBAR": {
+      "DATE_FILTERED": "Filtered by date",
+      "DATE_EXCLUDED_one": "{{count}} excluded by date",
+      "DATE_EXCLUDED_other": "{{count}} excluded by date",
       "FILE_DETAILS": "File details",
       "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
       "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
@@ -137,19 +148,23 @@
       },
       "AMOUNT_FILTER": {
         "ALL": "All",
-        "ALL_TITLE": "All amounts",
+        "ALL_TITLE": "All transactions",
         "IN": "In",
-        "IN_TITLE": "Money in only",
+        "IN_TITLE": "Money in",
         "OUT": "Out",
-        "OUT_TITLE": "Money out only",
-        "CSV_DISABLED": "Only available in Transactions and Stats"
+        "OUT_TITLE": "Money out",
+        "CSV_DISABLED": "Switch to Transactions or Stats"
       }
     },
     "STATS_VIEW": {
       "NO_DATA": "No data to analyse",
       "NO_DATA_SELECT": "Drop or <files>select files</files> {{dot}} <link>select a folder</link>",
-      "AT_A_GLANCE": "At a glance",
+      "BALANCE": "Balance",
       "DATE_RANGE": "{{start}} to {{end}}",
+      "DAYS_EXCLUDED_one": "{{count}} day excluded",
+      "DAYS_EXCLUDED_other": "{{count}} days excluded",
+      "TRANSACTIONS_PER_MONTH": "Transactions per month",
+      "AVERAGE_PER_MONTH": "Average {{average}}",
       "CASHFLOW": "Cashflow",
       "BREAKDOWN_BY_CATEGORY": "Breakdown by category",
       "SHOW_ALL_CATEGORIES": "Show all categories",

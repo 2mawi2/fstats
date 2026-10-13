@@ -1,7 +1,7 @@
 'use client'
 
-import { ExpandMore } from '@mui/icons-material'
-import { Box, Collapse, ListItem, ListItemButton, Typography } from '@mui/material'
+import { EventNoteOutlined, ExpandMore } from '@mui/icons-material'
+import { Box, Collapse, ListItem, ListItemButton, Tooltip, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 
@@ -10,6 +10,7 @@ import type { Currency } from '@/types-enums'
 import { useUserPreferences } from '@/hooks'
 import { toFixedLocaleCurrency } from '@/utils/Number'
 import { getStats } from '@/utils/Stats'
+import { useTranslation } from '@/lib/i18n'
 
 import { getAmountColor } from '../../actions'
 import StatsList from '../StatsList'
@@ -34,6 +35,10 @@ type StatsRowProps = {
    * Shown after the transaction count, e.g. "5 duplicates excluded".
    */
   notes?: string[]
+  /**
+   * Some transactions are on days deselected in the date explorer, indicated next to the balance.
+   */
+  isDateFiltered?: boolean
   defaultExpanded?: boolean
   /**
    * Shown above the stats when expanded.
@@ -51,10 +56,12 @@ const Component = ({
   stats,
   chip,
   notes,
+  isDateFiltered = false,
   defaultExpanded = false,
   children,
 }: StatsRowProps) => {
   const sx = ui()
+  const { t } = useTranslation()
   const { locale } = useUserPreferences()
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
   const profit = stats ? getStats(stats.transactions).profit : null
@@ -72,6 +79,11 @@ const Component = ({
           <Box component="span" sx={sx.chip}>
             {chip}
           </Box>
+        ) : null}
+        {isDateFiltered ? (
+          <Tooltip title={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')}>
+            <EventNoteOutlined sx={sx.dateFiltered} aria-label={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')} />
+          </Tooltip>
         ) : null}
         {/* The expanded details show it as their total */}
         {stats && profit !== null && !isExpanded ? (

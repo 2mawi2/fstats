@@ -9,16 +9,22 @@ import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/s
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
+import { useTranslation } from '@/lib/i18n'
 
-import { getFileAccount, getFileFormat, getFileNameColor } from '../../actions'
+import { filterDays, getFileAccount, getFileFormat, getFileNameColor } from '../../actions'
 import StatsRow from '../StatsRow'
 import { ui } from './styled'
 
 type FileDetailsProps = {
   file: StatsFile
+  /**
+   * Days deselected in the date explorer.
+   */
+  deselectedDays: Set<string>
 }
 
-const Component = ({ file }: FileDetailsProps) => {
+const Component = ({ file, deselectedDays }: FileDetailsProps) => {
+  const { t } = useTranslation()
   const sx = ui()
   const { locale } = useUserPreferences()
 
@@ -52,11 +58,17 @@ const Component = ({ file }: FileDetailsProps) => {
     )
   }
 
+  const fileTransactions = isParsed(file) ? getFileTransactions(file) : []
+  const transactions = filterDays(fileTransactions, deselectedDays)
+  const dateExcludedCount = fileTransactions.length - transactions.length
+
   return (
     <StatsRow
       title={file.file.name}
       titleColor={getFileNameColor(file)}
-      stats={isParsed(file) ? { transactions: getFileTransactions(file), currency: getFileCurrency(file) } : null}
+      stats={isParsed(file) ? { transactions, currency: getFileCurrency(file) } : null}
+      isDateFiltered={dateExcludedCount > 0}
+      notes={dateExcludedCount ? [t('STATS_PAGE.SIDEBAR.DATE_EXCLUDED', { count: dateExcludedCount })] : []}
     >
       <Box sx={sx.info}>
         {renderAccount()}

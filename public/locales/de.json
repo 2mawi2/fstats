@@ -8,7 +8,6 @@
     "TRANSACTIONS": "Umsätze",
     "INCOME": "Einnahmen",
     "EXPENSES": "Ausgaben",
-    "BALANCE": "Saldo",
     "TOTAL": "Summe",
     "DATE": "Datum",
     "DESCRIPTION": "Beschreibung",
@@ -73,6 +72,9 @@
       "TRANSACTIONS": "Umsätze",
       "STATS": "Statistiken"
     },
+    "DATE_EXPLORER": {
+      "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln"
+    },
     "FILE_TOOLBAR": {
       "SELECT_ALL": "Alle",
       "SELECT_NONE": "Keine",
@@ -107,7 +109,16 @@
       "TITLE": "Keine Datei ausgewählt",
       "SUBTITLE": "Wähle links eine Datei aus, um ihre Umsätze zu sehen."
     },
+    "NO_TRANSACTIONS": {
+      "NO_DATES_TITLE": "Kein Datum ausgewählt",
+      "NO_DATES_SUBTITLE": "Wähle links Daten aus, um ihre Umsätze zu sehen.",
+      "NO_MATCHES_TITLE": "Keine Umsätze",
+      "NO_MATCHES_SUBTITLE": "An den ausgewählten Daten gibt es keine Umsätze für diesen Filter."
+    },
     "SIDEBAR": {
+      "DATE_FILTERED": "Nach Datum gefiltert",
+      "DATE_EXCLUDED_one": "{{count}} durch Datum ausgeschlossen",
+      "DATE_EXCLUDED_other": "{{count}} durch Datum ausgeschlossen",
       "FILE_DETAILS": "Dateidetails",
       "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
       "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen",
@@ -137,19 +148,23 @@
       },
       "AMOUNT_FILTER": {
         "ALL": "Alle",
-        "ALL_TITLE": "Alle Beträge",
+        "ALL_TITLE": "Alle Umsätze",
         "IN": "Ein",
-        "IN_TITLE": "Nur Geldeingänge",
+        "IN_TITLE": "Geldeingänge",
         "OUT": "Aus",
-        "OUT_TITLE": "Nur Geldausgänge",
-        "CSV_DISABLED": "Nur in Umsätze und Statistiken verfügbar"
+        "OUT_TITLE": "Geldausgänge",
+        "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln"
       }
     },
     "STATS_VIEW": {
       "NO_DATA": "Keine Daten zum Analysieren",
       "NO_DATA_SELECT": "Ablegen oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
-      "AT_A_GLANCE": "Auf einen Blick",
+      "BALANCE": "Saldo",
       "DATE_RANGE": "{{start}} bis {{end}}",
+      "DAYS_EXCLUDED_one": "{{count}} Tag ausgeschlossen",
+      "DAYS_EXCLUDED_other": "{{count}} Tage ausgeschlossen",
+      "TRANSACTIONS_PER_MONTH": "Umsätze pro Monat",
+      "AVERAGE_PER_MONTH": "Durchschnitt {{average}}",
       "CASHFLOW": "Cashflow",
       "BREAKDOWN_BY_CATEGORY": "Aufschlüsselung nach Kategorie",
       "SHOW_ALL_CATEGORIES": "Alle Kategorien anzeigen",
