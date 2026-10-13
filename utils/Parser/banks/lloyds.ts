@@ -28,7 +28,11 @@ export const lloyds = defineBank({
       columns: {
         date: 'Transaction Date',
         description: 'Transaction Description',
-        amount: { type: 'inOut', in: 'Credit Amount', out: 'Debit Amount' },
+        amount: {
+          type: 'inOut',
+          in: 'Credit Amount',
+          out: 'Debit Amount',
+        },
       },
       extraColumns: {
         balance: 'Balance',

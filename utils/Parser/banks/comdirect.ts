@@ -19,7 +19,10 @@ export const comdirect = defineBank({
       columns: {
         date: 'Wertstellung (Valuta)',
         description: 'Buchungstext',
-        amount: { type: 'signed', header: 'Umsatz in EUR' },
+        amount: {
+          type: 'signed',
+          header: 'Umsatz in EUR',
+        },
       },
       extraColumns: {
         balance: null,
@@ -39,7 +42,10 @@ export const comdirect = defineBank({
       columns: {
         date: 'Umsatztag',
         description: 'Buchungstext',
-        amount: { type: 'signed', header: 'Umsatz in EUR' },
+        amount: {
+          type: 'signed',
+          header: 'Umsatz in EUR',
+        },
       },
       extraColumns: {
         balance: null,

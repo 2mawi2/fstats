@@ -28,7 +28,10 @@ export const ing = defineBank({
       columns: {
         date: 'Wertstellungsdatum',
         description: 'Auftraggeber/Empfänger',
-        amount: { type: 'signed', header: 'Betrag' },
+        amount: {
+          type: 'signed',
+          header: 'Betrag',
+        },
       },
       extraColumns: {
         balance: 'Saldo',

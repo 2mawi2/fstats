@@ -23,7 +23,8 @@ export const ui = () => {
       '& > * + *': {
         borderLeft: { xs: 0, sm: 1 },
         borderTop: { xs: 1, sm: 0 },
-        borderColor: 'divider',
+        // Responsive, so it's set after the responsive `border*` shorthands, which reset the color to `currentColor`
+        borderColor: { xs: 'divider', sm: 'divider' },
       },
     }),
     column: {

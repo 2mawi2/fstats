@@ -19,7 +19,10 @@ export const fnb = defineBank({
       columns: {
         date: 'Date',
         description: 'Description',
-        amount: { type: 'signed', header: 'Amount' },
+        amount: {
+          type: 'signed',
+          header: 'Amount',
+        },
       },
       extraColumns: {
         balance: 'Balance',
