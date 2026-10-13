@@ -144,6 +144,8 @@
       "SHOW_DUPLICATES": "Duplikate anzeigen",
       "DUPLICATE_OF": "Duplikat, auch in {{file}}",
       "DUPLICATE_TAG": "Duplikat",
+      "DATE_EXCLUDED_TAG": "Ausgeschlossen",
+      "EXCLUDED_BY_DATE": "Durch Datum ausgeschlossen",
       "ALSO_IN": "Auch in {{files}}",
       "ROW_COUNT_one": "{{count}} Zeile",
       "ROW_COUNT_other": "{{count}} Zeilen",

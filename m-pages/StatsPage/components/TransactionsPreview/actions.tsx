@@ -20,7 +20,7 @@ const TABULAR_NUMS = { fontVariantNumeric: 'tabular-nums' } as const
 
 // Same as the bank chip of the file rows, with the info icon. Inline flex, so the strikethrough of the row doesn't
 // reach it
-const DUPLICATE_TAG_SX = {
+const TAG_SX = {
   display: 'inline-flex',
   alignItems: 'center',
   gap: 0.5,
@@ -38,6 +38,24 @@ const DUPLICATE_TAG_SX = {
 } as const
 
 const INFO_ICON_SX = { display: 'block', fontSize: 14, color: 'text.secondary' } as const
+
+export const TransactionTag = {
+  DUPLICATE: 'duplicate',
+  DATE_EXCLUDED: 'dateExcluded',
+} as const
+
+export type TransactionTag = (typeof TransactionTag)[keyof typeof TransactionTag]
+
+const TAG_LABEL_KEYS: Record<TransactionTag, string> = {
+  [TransactionTag.DUPLICATE]: 'STATS_PAGE.DATA_VIEW.DUPLICATE_TAG',
+  [TransactionTag.DATE_EXCLUDED]: 'STATS_PAGE.DATA_VIEW.DATE_EXCLUDED_TAG',
+}
+
+// Wide enough for the longest label, e.g. "Ausgeschlossen"
+const TAG_COLUMN_WIDTHS: Record<TransactionTag, number> = {
+  [TransactionTag.DUPLICATE]: 96,
+  [TransactionTag.DATE_EXCLUDED]: 128,
+}
 
 type SourcedTransaction = Transaction & {
   /**
@@ -76,17 +94,36 @@ export const getSourcedTransactions = (files: ParsedStatsFile[]): SourcedTransac
 }
 
 /**
- * Tooltip of the source column: the file, and where else the transaction is.
+ * Duplicates are tagged as such even if also excluded by date, they're excluded either way.
  */
-export const getSourceLabel = ({ source, sources, isDuplicate }: SourcedTransaction, t: TFunction) => {
-  if (isDuplicate) {
-    return `${source}\n${t('STATS_PAGE.DATA_VIEW.DUPLICATE_OF', { file: sources[0] })}`
+export const getTransactionTag = (transaction: SourcedTransaction, isDateExcluded: boolean): TransactionTag | null => {
+  if (transaction.isDuplicate) {
+    return TransactionTag.DUPLICATE
   }
 
+  return isDateExcluded ? TransactionTag.DATE_EXCLUDED : null
+}
+
+/**
+ * Tooltip of the source column: the file and where else the transaction is (only with multiple files), and why it's
+ * excluded. Empty when there is nothing to show.
+ */
+export const getSourceLabel = (
+  { source, sources, isDuplicate }: SourcedTransaction,
+  { showSource, tag }: { showSource: boolean; tag: TransactionTag | null },
+  t: TFunction,
+) => {
   const otherSources = sources.filter((name) => name !== source)
-  return otherSources.length
-    ? `${source}\n${t('STATS_PAGE.DATA_VIEW.ALSO_IN', { files: otherSources.join(', ') })}`
-    : source
+  const sourceLines = !showSource
+    ? []
+    : isDuplicate
+      ? [source, t('STATS_PAGE.DATA_VIEW.DUPLICATE_OF', { file: sources[0] })]
+      : otherSources.length
+        ? [source, t('STATS_PAGE.DATA_VIEW.ALSO_IN', { files: otherSources.join(', ') })]
+        : [source]
+  const tagLines = tag === TransactionTag.DATE_EXCLUDED ? [t('STATS_PAGE.DATA_VIEW.EXCLUDED_BY_DATE')] : []
+
+  return [...sourceLines, ...tagLines].join('\n')
 }
 
 /**
@@ -103,9 +140,9 @@ export const getTransactionColumns = (
   amountFilter: AmountFilter,
   t: TFunction,
   /**
-   * Shows a "Duplicate" tag next to the source of duplicates, only when some are shown.
+   * Tags shown next to the source (e.g. "Duplicate"), only when some are shown. Shows the column without sources.
    */
-  isDuplicate?: (rowIndex: number) => boolean,
+  tags?: { shown: TransactionTag[]; getTag: (rowIndex: number) => TransactionTag | null },
 ): VirtualTableColumn[] => [
   { label: t('MISC.DATE'), width: 100, getStyle: () => TABULAR_NUMS },
   { label: t('MISC.DESCRIPTION'), width: 320 },
@@ -119,26 +156,34 @@ export const getTransactionColumns = (
       amountFilter === AmountFilter.ALL && value.startsWith('+') ? { ...TABULAR_NUMS, fontWeight: 600 } : TABULAR_NUMS,
   },
   { label: t('MISC.CATEGORY'), width: 160 },
-  ...(showSource
+  ...(showSource || tags
     ? [
         {
           label: t('MISC.SOURCE'),
-          fixedWidth: isDuplicate ? 96 : 32,
+          fixedWidth: Math.max(32, ...(tags?.shown ?? []).map((tag) => TAG_COLUMN_WIDTHS[tag])),
           hideLabel: true,
           align: 'right' as const,
-          renderCell: (source: string, rowIndex: number) => (
-            // Duplicates show a tag with the icon
-            <Tooltip title={<Box sx={{ whiteSpace: 'pre-line' }}>{source}</Box>} placement="left">
-              {isDuplicate?.(rowIndex) ? (
-                <Box component="span" sx={DUPLICATE_TAG_SX}>
-                  {t('STATS_PAGE.DATA_VIEW.DUPLICATE_TAG')}
-                  <InfoOutlined sx={INFO_ICON_SX} />
-                </Box>
-              ) : (
-                <InfoOutlined sx={{ ...INFO_ICON_SX, ml: 'auto' }} />
-              )}
-            </Tooltip>
-          ),
+          renderCell: (label: string, rowIndex: number) => {
+            const tag = tags?.getTag(rowIndex) ?? null
+
+            if (!label) {
+              return null
+            }
+
+            // Tagged rows show the tag with the icon
+            return (
+              <Tooltip title={<Box sx={{ whiteSpace: 'pre-line' }}>{label}</Box>} placement="left">
+                {tag ? (
+                  <Box component="span" sx={TAG_SX}>
+                    {t(TAG_LABEL_KEYS[tag])}
+                    <InfoOutlined sx={INFO_ICON_SX} />
+                  </Box>
+                ) : (
+                  <InfoOutlined sx={{ ...INFO_ICON_SX, ml: 'auto' }} />
+                )}
+              </Tooltip>
+            )
+          },
         },
       ]
     : []),

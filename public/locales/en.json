@@ -144,6 +144,8 @@
       "SHOW_DUPLICATES": "Show duplicates",
       "DUPLICATE_OF": "Duplicate, also in {{file}}",
       "DUPLICATE_TAG": "Duplicate",
+      "DATE_EXCLUDED_TAG": "Excluded",
+      "EXCLUDED_BY_DATE": "Excluded by date",
       "ALSO_IN": "Also in {{files}}",
       "ROW_COUNT_one": "{{count}} row",
       "ROW_COUNT_other": "{{count}} rows",
