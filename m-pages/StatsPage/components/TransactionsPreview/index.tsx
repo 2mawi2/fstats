@@ -105,8 +105,8 @@ const Component = ({
     [shownTransactions, includeDateExcluded, deselectedDays],
   )
   const cellOptions = useMemo(
-    () => ({ currency, amountFilter, locale, dateFormat }),
-    [currency, amountFilter, locale, dateFormat],
+    () => ({ currency, amountFilter, locale, dateFormat, t }),
+    [currency, amountFilter, locale, dateFormat, t],
   )
   // Computed once a search starts, so typing only compares strings
   const isSearching = !!search

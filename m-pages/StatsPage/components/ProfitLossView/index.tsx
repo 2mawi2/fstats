@@ -59,8 +59,8 @@ const Component = () => {
     [allParsedFiles, filter, deselectedDays],
   )
   const profitLosses = useMemo(
-    () => getProfitLoss(filterFiles(selectedFiles, filter), period),
-    [selectedFiles, filter, period],
+    () => getProfitLoss(filterFiles(selectedFiles, filter), period, t),
+    [selectedFiles, filter, period, t],
   )
   const currencies = profitLosses.map((profitLoss) => profitLoss.currency)
   const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)

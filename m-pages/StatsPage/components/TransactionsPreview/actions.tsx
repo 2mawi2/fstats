@@ -9,7 +9,7 @@ import { getFileCurrency, getFileTransactions, splitDuplicates } from '@/m-stats
 import { getCurrencySymbol } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
 import { toFixedLocaleAmount, toFixedLocaleCurrency } from '@/utils/Number'
-import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { getCategoryLabel } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
 
 import { AmountFilter } from '../../actions'
@@ -154,7 +154,8 @@ export const getTransactionCells = (
     amountFilter,
     locale,
     dateFormat,
-  }: { currency: Currency | null; amountFilter: AmountFilter; locale: UserLocale; dateFormat: DateFormat },
+    t,
+  }: { currency: Currency | null; amountFilter: AmountFilter; locale: UserLocale; dateFormat: DateFormat; t: TFunction },
 ) => {
   // Signs are redundant when only one direction is shown
   const isSigned = amountFilter === AmountFilter.ALL
@@ -166,6 +167,6 @@ export const getTransactionCells = (
     toDisplayDate(transaction.date, locale, { formatTo: dateFormat }),
     transaction.description,
     formatAmount(displayValue, transaction.currency, locale, { showPlusSign: isSigned }),
-    getSubcategoryLabel(transaction.category),
+    getCategoryLabel(transaction.category, t),
   ]
 }

@@ -4,7 +4,7 @@ import { countBy, sumBy } from 'lodash'
 import type { ParentCategory, ParentCategoryCode, ParsedStatsFile, Transaction } from '@/types'
 import { ALL_CATEGORIES, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
 import { getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
-import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { getCategoryLabel } from '@/utils/TransactionParser'
 
 import type { AmountFilter } from '../../actions'
 import { filterAmount, getCategoryKey, NO_CATEGORY } from '../../actions'
@@ -42,17 +42,18 @@ export const getCategoryFilterTransactions = (shownFiles: ParsedStatsFile[], amo
 const toParentOptions = (
   categories: Record<ParentCategoryCode, ParentCategory>,
   counts: Record<string, number>,
+  t: TFunction,
 ): ParentCategoryOption[] => {
   return Object.values(categories).map((parent) => {
     const children = Object.values(parent.subcategories).map((category) => ({
       key: category.code,
-      label: category.label,
+      label: getCategoryLabel(category.code, t),
       count: counts[category.code] ?? 0,
     }))
 
     return {
       key: parent.code,
-      label: parent.label,
+      label: getCategoryLabel(parent.code, t),
       count: sumBy(children, 'count'),
       keys: children.filter((child) => child.count).map((child) => child.key),
       children,
@@ -70,7 +71,7 @@ export const getCategoryGroups = (transactions: Transaction[], t: TFunction): Ca
     .filter((key) => !KNOWN_KEYS.has(key))
     .map((key) => ({
       key,
-      label: getSubcategoryLabel(key === NO_CATEGORY ? null : key),
+      label: getCategoryLabel(key === NO_CATEGORY ? null : key, t),
       count: counts[key],
       keys: [key],
       children: [],
@@ -80,12 +81,12 @@ export const getCategoryGroups = (transactions: Transaction[], t: TFunction): Ca
     {
       key: 'in',
       label: t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.IN_TITLE'),
-      parents: toParentOptions(INCOME_CATEGORIES, counts),
+      parents: toParentOptions(INCOME_CATEGORIES, counts, t),
     },
     {
       key: 'out',
       label: t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.OUT_TITLE'),
-      parents: [...toParentOptions(EXPENSE_CATEGORIES, counts), ...otherOptions],
+      parents: [...toParentOptions(EXPENSE_CATEGORIES, counts, t), ...otherOptions],
     },
   ]
 }
