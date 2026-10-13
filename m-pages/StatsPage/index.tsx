@@ -15,6 +15,7 @@ import { WorkspaceContext } from './context'
 import { ui } from './styled'
 import { useDayFilter } from './useDayFilter'
 import { useFileDropzone } from './useFileDropzone'
+import { useDemoState } from './useViewStorage'
 
 /**
  * Workspace of the stats page: file explorer, the transactions, stats, breakdown or CSV view (`view` param) in the middle column, and the file
@@ -29,6 +30,7 @@ const Component = () => {
   const isDemoMode = isDemo(searchParams)
   const { isLoadingFiles } = useFileHelper()
   const dayFilter = useDayFilter({ isDemoMode, isDisabled: view === WorkspaceView.CSV })
+  const demoState = useDemoState(isDemoMode)
   const { columnWidths: widths, setColumnWidths: setWidths } = useStatsLayout()
   // Leave demo mode once real files are added, so they are shown
   const { dropzone, addFolder } = useFileDropzone({
@@ -66,7 +68,9 @@ const Component = () => {
   ]
 
   return (
-    <WorkspaceContext.Provider value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder, dayFilter }}>
+    <WorkspaceContext.Provider
+      value={{ isDemoMode, onAddFiles: dropzone.open, onAddFolder: addFolder, dayFilter, demoState }}
+    >
       <Box {...dropzone.getRootProps()} sx={sx.dropzone}>
         <input {...dropzone.getInputProps()} />
         {/* Above all columns, all of them show demo data in demo mode */}

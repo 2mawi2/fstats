@@ -8,6 +8,7 @@ import { useFileHelper } from '@/hooks'
 import type { CheckedTransactions, StatsTransactions } from './actions'
 import { getCheckedTransactions, getStatsTransactions } from './actions'
 import type { DayFilter } from './useDayFilter'
+import type { DemoState } from './useViewStorage'
 
 type WorkspaceContextValue = {
   /**
@@ -17,6 +18,7 @@ type WorkspaceContextValue = {
   onAddFiles: () => void
   onAddFolder: () => void
   dayFilter: DayFilter
+  demoState: DemoState
 }
 
 /**
@@ -27,6 +29,7 @@ export const WorkspaceContext = createContext<WorkspaceContextValue>({
   onAddFiles: () => {},
   onAddFolder: () => {},
   dayFilter: { deselectedDays: new Set(), setDeselectedDays: () => {} },
+  demoState: { values: {}, setValues: () => {} },
 })
 
 export const useWorkspace = () => {
