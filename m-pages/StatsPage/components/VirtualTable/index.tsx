@@ -5,7 +5,7 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import type { CSSProperties, ReactNode } from 'react'
 import { useLayoutEffect, useRef, useState } from 'react'
 
-import { getColWidths, OVERSCAN, ROW_HEIGHT } from './actions'
+import { getColWidths, OVERSCAN, ROW_HEIGHT, splitMatches } from './actions'
 import { ui } from './styled'
 
 export type VirtualTableColumn = {
@@ -58,6 +58,15 @@ type VirtualTableProps = {
    * The scrolling ancestor, can be shared by multiple tables.
    */
   scrollElement: HTMLElement | null
+  /**
+   * Search query, highlighted in the cells (case-insensitive). Not in cells with `renderCell`.
+   */
+  highlight?: string
+}
+
+const highlightMatches = (text: string, query: string) => {
+  // eslint-disable-next-line react/no-array-index-key
+  return splitMatches(text, query).map((part, index) => (index % 2 ? <mark key={index}>{part}</mark> : part))
 }
 
 const Component = ({
@@ -69,6 +78,7 @@ const Component = ({
   stickyHeaderTop,
   minColumnWidth,
   scrollElement,
+  highlight = '',
 }: VirtualTableProps) => {
   const sx = ui()
   const tbodyRef = useRef<HTMLTableSectionElement>(null)
@@ -169,7 +179,7 @@ const Component = ({
                     title={column?.renderCell ? undefined : cell}
                     style={{ textAlign: column?.align, ...column?.getStyle?.(cell) }}
                   >
-                    {column?.renderCell ? column.renderCell(cell, item.index) : cell}
+                    {column?.renderCell ? column.renderCell(cell, item.index) : highlightMatches(cell, highlight)}
                   </td>
                 )
               })}

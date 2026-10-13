@@ -2,7 +2,7 @@
 
 import { Box } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
@@ -23,11 +23,14 @@ import { useAmountFilter } from '../../useAmountFilter'
 import { useTableOptions } from '../../useTableOptions'
 import CsvPreview from '../CsvPreview'
 import DropZoneDisplay from '../DropZoneDisplay'
+import NoSearchResultsDisplay from '../NoSearchResultsDisplay'
 import NoSelectionDisplay from '../NoSelectionDisplay'
 import NoTransactionsDisplay from '../NoTransactionsDisplay'
+import SearchField from '../SearchField'
 import SegmentedToggle from '../SegmentedToggle'
 import TransactionsPreview from '../TransactionsPreview'
 import ViewToolbar from '../ViewToolbar'
+import { toSearchQuery } from '../VirtualTable/actions'
 import { ui } from './styled'
 
 /**
@@ -44,6 +47,9 @@ const Component = () => {
     TransactionsLayout.COMBINED,
     { initializeWithValue: false },
   )
+  // Kept when switching between the CSV and transactions views. Deferred, so typing stays responsive with many rows.
+  const [search, setSearch] = useState('')
+  const searchQuery = toSearchQuery(useDeferredValue(search))
   const { includeDuplicates, setIncludeDuplicates, includeDateExcluded, setIncludeDateExcluded } = useTableOptions()
   const [amountFilter, setAmountFilter] = useAmountFilter()
   const { deselectedDays } = useWorkspaceDayFilter()
@@ -70,6 +76,8 @@ const Component = () => {
     <>
       {/* Outside the scroll container, so it stays in place */}
       <ViewToolbar
+        end={<SearchField value={search} onChange={setSearch} disabled={isEmpty} />}
+        tableOptionsDisabledTooltip={!checkedFiles.length ? t('STATS_PAGE.NO_SELECTION.TITLE') : undefined}
         tableOptions={
           isTransactionsView
             ? [
@@ -98,10 +106,10 @@ const Component = () => {
           onChange={setAmountFilter}
           disabled={!isTransactionsView}
           disabledTooltip={
-            !isTransactions
-              ? t('STATS_PAGE.CSV_DISABLED')
-              : !checkedFiles.length
-                ? t('STATS_PAGE.NO_SELECTION.TITLE')
+            !checkedFiles.length
+              ? t('STATS_PAGE.NO_SELECTION.TITLE')
+              : !isTransactions
+                ? t('STATS_PAGE.CSV_DISABLED')
                 : undefined
           }
         />
@@ -132,6 +140,7 @@ const Component = () => {
                   includeDuplicates={includeDuplicates}
                   includeDateExcluded={includeDateExcluded}
                   scrollElement={middleColumn}
+                  search={searchQuery}
                 />
               ))
             ) : (
@@ -141,12 +150,21 @@ const Component = () => {
                 includeDuplicates={includeDuplicates}
                 includeDateExcluded={includeDateExcluded}
                 scrollElement={middleColumn}
+                search={searchQuery}
               />
             )
           ) : (
-            checkedFiles.map((file) => <CsvPreview key={file.id} file={file} scrollElement={middleColumn} />)
+            checkedFiles.map((file) => (
+              <CsvPreview key={file.id} file={file} scrollElement={middleColumn} search={searchQuery} />
+            ))
           )}
         </div>
+        {/* Shown by CSS once the tables leave the content empty, so they don't need to report their matches */}
+        {searchQuery ? (
+          <Box sx={sx.noSearchResults}>
+            <NoSearchResultsDisplay search={search.trim()} onClear={() => setSearch('')} />
+          </Box>
+        ) : null}
       </Box>
     </>
   )

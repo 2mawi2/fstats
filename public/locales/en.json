@@ -137,6 +137,14 @@
       "ALSO_IN": "Also in {{files}}",
       "ROW_COUNT_one": "{{count}} row",
       "ROW_COUNT_other": "{{count}} rows",
+      "SEARCH": "Search",
+      "CLEAR_SEARCH": "Clear search",
+      "SEARCH_MATCHES_one": "{{count}} match",
+      "SEARCH_MATCHES_other": "{{count}} matches",
+      "NO_SEARCH_RESULTS": {
+        "TITLE": "No results",
+        "SUBTITLE": "Nothing matches “{{search}}”. Try a different search."
+      },
       "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
       "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
       "FILE_NOT_READ": "No preview, this file was not added: {{message}}",

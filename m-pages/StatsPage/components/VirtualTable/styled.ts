@@ -54,6 +54,13 @@ export const ui = () => {
       '& tbody tr:not(.spacer):hover': {
         bgcolor: 'action.hover',
       },
+      // Search matches
+      '& mark': (theme: Theme) => ({
+        color: 'inherit',
+        backgroundColor: '#fde68a',
+        borderRadius: '2px',
+        ...theme.applyStyles('dark', { backgroundColor: 'rgba(250, 204, 21, 0.4)' }),
+      }),
     },
   }
 }

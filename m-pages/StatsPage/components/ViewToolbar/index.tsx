@@ -16,6 +16,14 @@ import { ui } from './styled'
 type ViewToolbarProps = {
   children?: ReactNode
   /**
+   * On the right, next to the table options, e.g. a search field.
+   */
+  end?: ReactNode
+  /**
+   * Overrides why the table options are disabled.
+   */
+  tableOptionsDisabledTooltip?: string
+  /**
    * Options of the transactions table, the button is disabled without them.
    */
   tableOptions?: TableOption[]
@@ -25,7 +33,7 @@ type ViewToolbarProps = {
  * Toolbar of the middle column: switches between the CSV, transactions, breakdown and stats views (raw to most summarised), followed by the view's own controls
  * and the options of the transactions table.
  */
-const Component = ({ children, tableOptions }: ViewToolbarProps) => {
+const Component = ({ children, end, tableOptions, tableOptionsDisabledTooltip }: ViewToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -63,14 +71,17 @@ const Component = ({ children, tableOptions }: ViewToolbarProps) => {
       </Box>
       {children ? <Divider orientation="vertical" flexItem sx={sx.divider} /> : null}
       {children}
+      <Box sx={sx.spacer} />
+      {end}
       {/* On every view, so the toolbar doesn't change when switching */}
       <TableOptions
         options={tableOptions ?? []}
         disabled={!tableOptions}
         disabledTooltip={
-          activeView === WorkspaceView.TRANSACTIONS
+          tableOptionsDisabledTooltip ??
+          (activeView === WorkspaceView.TRANSACTIONS
             ? t('STATS_PAGE.NO_SELECTION.TITLE')
-            : t('STATS_PAGE.DATA_VIEW.TABLE_OPTIONS_DISABLED')
+            : t('STATS_PAGE.DATA_VIEW.TABLE_OPTIONS_DISABLED'))
         }
       />
     </Box>

@@ -27,7 +27,7 @@ const Component = () => {
   const csvTitle = t('STATS_PAGE.CSV_DISABLED')
 
   if (!checkedFiles.length) {
-    return <StatsSkeleton title={isCsv ? csvTitle : t('STATS_PAGE.NO_SELECTION.TITLE')} />
+    return <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
   }
 
   return (

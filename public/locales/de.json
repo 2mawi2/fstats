@@ -137,6 +137,14 @@
       "ALSO_IN": "Auch in {{files}}",
       "ROW_COUNT_one": "{{count}} Zeile",
       "ROW_COUNT_other": "{{count}} Zeilen",
+      "SEARCH": "Suchen",
+      "CLEAR_SEARCH": "Suche löschen",
+      "SEARCH_MATCHES_one": "{{count}} Treffer",
+      "SEARCH_MATCHES_other": "{{count}} Treffer",
+      "NO_SEARCH_RESULTS": {
+        "TITLE": "Keine Ergebnisse",
+        "SUBTITLE": "Nichts passt zu „{{search}}“. Versuche eine andere Suche."
+      },
       "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
       "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
       "FILE_NOT_READ": "Keine Vorschau, diese Datei wurde nicht hinzugefügt: {{message}}",

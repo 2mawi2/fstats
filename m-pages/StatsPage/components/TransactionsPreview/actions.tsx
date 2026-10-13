@@ -4,9 +4,13 @@ import type { TFunction } from 'i18next'
 import { groupBy, uniq } from 'lodash'
 
 import type { ParsedStatsFile, Transaction } from '@/types'
-import type { Currency } from '@/types-enums'
+import type { Currency, DateFormat, UserLocale } from '@/types-enums'
 import { getFileCurrency, getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 import { getCurrencySymbol } from '@/utils/Currency'
+import { toDisplayDate } from '@/utils/Date'
+import { toFixedLocaleAmount, toFixedLocaleCurrency } from '@/utils/Number'
+import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { Big } from '@/lib/w-big'
 
 import { AmountFilter } from '../../actions'
 import type { VirtualTableColumn } from '../VirtualTable'
@@ -139,3 +143,29 @@ export const getTransactionColumns = (
       ]
     : []),
 ]
+
+/**
+ * Shown values of the transaction, without the source (only a tooltip).
+ */
+export const getTransactionCells = (
+  transaction: SourcedTransaction,
+  {
+    currency,
+    amountFilter,
+    locale,
+    dateFormat,
+  }: { currency: Currency | null; amountFilter: AmountFilter; locale: UserLocale; dateFormat: DateFormat },
+) => {
+  // Signs are redundant when only one direction is shown
+  const isSigned = amountFilter === AmountFilter.ALL
+  const displayValue = isSigned ? transaction.value : Big(transaction.value).abs().toString()
+  // Mixed currencies show the symbol per amount
+  const formatAmount = currency ? toFixedLocaleAmount : toFixedLocaleCurrency
+
+  return [
+    toDisplayDate(transaction.date, locale, { formatTo: dateFormat }),
+    transaction.description,
+    formatAmount(displayValue, transaction.currency, locale, { showPlusSign: isSigned }),
+    getSubcategoryLabel(transaction.category),
+  ]
+}

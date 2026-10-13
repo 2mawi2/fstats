@@ -5,11 +5,8 @@ import { useMemo } from 'react'
 import type { StatsFile } from '@/types'
 import { isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
-import { getTransactionDay, toDisplayDate } from '@/utils/Date'
-import { toFixedLocaleAmount, toFixedLocaleCurrency } from '@/utils/Number'
-import { getSubcategoryLabel } from '@/utils/TransactionParser'
+import { getTransactionDay } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
-import { Big } from '@/lib/w-big'
 
 import { AmountFilter, filterTransactions, getTransactionCounts, getTransactionCountText } from '../../actions'
 import { useWorkspaceDayFilter } from '../../context'
@@ -17,7 +14,14 @@ import FileMessage from '../FileMessage'
 import PreviewSection from '../PreviewSection'
 import { STICKY_HEADER_OFFSET } from '../PreviewSection/actions'
 import VirtualTable from '../VirtualTable'
-import { getSharedCurrency, getSourcedTransactions, getSourceLabel, getTransactionColumns } from './actions'
+import { filterBySearch, toSearchText } from '../VirtualTable/actions'
+import {
+  getSharedCurrency,
+  getSourcedTransactions,
+  getSourceLabel,
+  getTransactionCells,
+  getTransactionColumns,
+} from './actions'
 
 // On days deselected in the date explorer
 const DESELECTED_ROW_STYLE = { opacity: 0.4 }
@@ -33,6 +37,10 @@ type TransactionsPreviewProps = {
    */
   includeDateExcluded: boolean
   scrollElement: HTMLElement | null
+  /**
+   * Only transactions containing the query in their shown values are shown, see `toSearchQuery`.
+   */
+  search: string
 }
 
 /**
@@ -44,6 +52,7 @@ const Component = ({
   includeDuplicates,
   includeDateExcluded,
   scrollElement,
+  search,
 }: TransactionsPreviewProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
@@ -62,12 +71,29 @@ const Component = ({
     [allTransactions, includeDuplicates],
   )
   const counts = useMemo(() => getTransactionCounts(allTransactions, deselectedDays), [allTransactions, deselectedDays])
-  const transactions = useMemo(
+  const dayTransactions = useMemo(
     () =>
       includeDateExcluded
         ? shownTransactions
         : shownTransactions.filter((transaction) => !deselectedDays.has(getTransactionDay(transaction))),
     [shownTransactions, includeDateExcluded, deselectedDays],
+  )
+  const cellOptions = useMemo(
+    () => ({ currency, amountFilter, locale, dateFormat }),
+    [currency, amountFilter, locale, dateFormat],
+  )
+  // Computed once a search starts, so typing only compares strings
+  const isSearching = !!search
+  const searchTexts = useMemo(
+    () =>
+      isSearching
+        ? dayTransactions.map((transaction) => toSearchText(getTransactionCells(transaction, cellOptions)))
+        : [],
+    [isSearching, dayTransactions, cellOptions],
+  )
+  const transactions = useMemo(
+    () => filterBySearch(dayTransactions, searchTexts, search),
+    [dayTransactions, searchTexts, search],
   )
   const columns = useMemo(
     () =>
@@ -83,21 +109,9 @@ const Component = ({
     [currency, isCombined, amountFilter, t, transactions],
   )
 
-  const getCells = (index: number) => {
-    const transaction = transactions[index]
-    // Signs are redundant when only one direction is shown
-    const isSigned = amountFilter === AmountFilter.ALL
-    const displayValue = isSigned ? transaction.value : Big(transaction.value).abs().toString()
-    const formatAmount = currency ? toFixedLocaleAmount : toFixedLocaleCurrency
-    const amount = formatAmount(displayValue, transaction.currency, locale, { showPlusSign: isSigned })
-
-    return [
-      toDisplayDate(transaction.date, locale, { formatTo: dateFormat }),
-      transaction.description,
-      amount,
-      getSubcategoryLabel(transaction.category),
-      ...(isCombined ? [getSourceLabel(transaction, t)] : []),
-    ]
+  // Only tables with matches are shown, see `NoSearchResultsDisplay`
+  if (parsedFiles.length && search && !transactions.length) {
+    return null
   }
 
   return (
@@ -105,7 +119,13 @@ const Component = ({
       title={singleFile ? singleFile.file.name : t('MISC.ALL_TRANSACTIONS')}
       file={singleFile}
       // Like everywhere else, those greyed out or struck through aren't counted
-      caption={parsedFiles.length ? getTransactionCountText(counts) : undefined}
+      caption={
+        !parsedFiles.length
+          ? undefined
+          : search
+            ? t('STATS_PAGE.DATA_VIEW.SEARCH_MATCHES', { count: transactions.length })
+            : getTransactionCountText(counts)
+      }
       // A single table, so its title and header row can stay in view
       isSticky={isCombined}
     >
@@ -114,7 +134,11 @@ const Component = ({
           columns={columns}
           columnCount={columns.length}
           rowCount={transactions.length}
-          getCells={getCells}
+          getCells={(index) => [
+            ...getTransactionCells(transactions[index], cellOptions),
+            ...(isCombined ? [getSourceLabel(transactions[index], t)] : []),
+          ]}
+          highlight={search}
           stickyHeaderTop={isCombined ? STICKY_HEADER_OFFSET : undefined}
           getRowStyle={(index) =>
             transactions[index].isDuplicate

@@ -1,3 +1,5 @@
+import { escapeRegExp } from 'lodash'
+
 import type { VirtualTableColumn } from '.'
 
 // Estimate only, rows are measured once rendered
@@ -29,4 +31,32 @@ export const getColWidths = (columns: VirtualTableColumn[] | null, columnCount: 
 
     return index === autoIndex ? 'auto' : `${(width / totalWidth) * 100}%`
   })
+}
+
+/**
+ * Lowercase query of the search field, empty when there is nothing to search for.
+ */
+export const toSearchQuery = (search: string) => {
+  return search.trim().toLowerCase()
+}
+
+/**
+ * Lowercase text of the cells to search in, separated so matches don't span cells.
+ */
+export const toSearchText = (cells: string[]) => {
+  return cells.join('\n').toLowerCase()
+}
+
+/**
+ * The rows whose search text (see `toSearchText`, by row index) contains the query, all rows without a query.
+ */
+export const filterBySearch = <T>(rows: T[], searchTexts: string[], query: string) => {
+  return query ? rows.filter((_, index) => searchTexts[index].includes(query)) : rows
+}
+
+/**
+ * Splits the text into parts, the odd ones match the query (case-insensitive).
+ */
+export const splitMatches = (text: string, query: string) => {
+  return query ? text.split(new RegExp(`(${escapeRegExp(query)})`, 'gi')) : [text]
 }

@@ -22,7 +22,7 @@ const Component = () => {
   const { isDemoMode } = useWorkspace()
   // The date filter doesn't apply to the CSV view, a placeholder is shown instead
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
-  const { files, isChecked, toggleFile } = useWorkspaceFiles()
+  const { files, checkedFiles, isChecked, toggleFile } = useWorkspaceFiles()
   const panesRef = useRef<HTMLDivElement>(null)
   const { explorerSplit: split, setExplorerSplit: setSplit } = useDataLayout()
   const startResize = useResizeHandle(panesRef, 'y')
@@ -53,7 +53,8 @@ const Component = () => {
         <Box sx={sx.splitDivider} onPointerDown={startResize((delta) => setSplit(clampSplit(split + delta)))} />
 
         <Box sx={{ ...sx.pane, ...sx.datesPane, flexBasis: `${100 - split}%` }}>
-          {isCsv ? <DateSkeleton title={t('STATS_PAGE.CSV_DISABLED')} /> : <DateExplorer />}
+          {/* Without checked files, the date explorer says so */}
+          {isCsv && checkedFiles.length ? <DateSkeleton title={t('STATS_PAGE.CSV_DISABLED')} /> : <DateExplorer />}
         </Box>
       </Box>
     </Box>

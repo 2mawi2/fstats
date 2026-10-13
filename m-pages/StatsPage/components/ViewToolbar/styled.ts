@@ -47,6 +47,10 @@ export const ui = () => {
     radio: {
       fontSize: 16,
     },
+    // Pushes the end controls and table options to the right
+    spacer: {
+      flexGrow: 1,
+    },
     divider: {
       mx: 0.5,
       my: 0.5,

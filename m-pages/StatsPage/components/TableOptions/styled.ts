@@ -2,7 +2,6 @@ export const ui = () => {
   return {
     // On the right of the toolbar
     button: {
-      ml: 'auto',
       mr: -0.75,
     },
     icon: {
