@@ -76,7 +76,7 @@ const Component = ({ options, currency }: FiltersProps) => {
   // The breakdown shows income and expenses, so the amount filter doesn't apply
   const amount = view === WorkspaceView.BREAKDOWN ? AmountFilter.ALL : amountFilter
   const transactions = useMemo(() => getCategoryFilterTransactions(parsedFiles, amount), [parsedFiles, amount])
-  const groups = useMemo(() => getCategoryGroups(transactions), [transactions])
+  const groups = useMemo(() => getCategoryGroups(transactions, t), [transactions, t])
   const currencyCounts = useMemo(() => countBy(transactions, (transaction) => transaction.currency), [transactions])
   const disabled = !checkedFiles.length || view === WorkspaceView.CSV
   const currencies = currency?.currencies ?? []

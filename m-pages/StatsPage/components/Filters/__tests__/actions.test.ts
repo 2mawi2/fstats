@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Transaction } from '@/types'
+import { i18n } from '@/lib/i18n'
 
 import { NO_CATEGORY } from '../../../actions'
 import { getCategoryGroups, getCheckState, toggleCategories } from '../actions'
@@ -9,7 +10,7 @@ const toTransaction = (category: string | null) => ({ category }) as Transaction
 
 describe('getCategoryGroups', () => {
   it('should count the categories of the transactions, money in and out', () => {
-    const groups = getCategoryGroups(['INC_01', 'HOU_01', 'HOU_01', 'HOU_02', null].map(toTransaction))
+    const groups = getCategoryGroups(['INC_01', 'HOU_01', 'HOU_01', 'HOU_02', null].map(toTransaction), i18n.t)
     const findParent = (groupIndex: number, key: string) =>
       groups[groupIndex].parents.find((parent) => parent.key === key)
 

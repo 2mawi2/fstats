@@ -1,10 +1,10 @@
+import type { TFunction } from 'i18next'
 import { countBy, sumBy } from 'lodash'
 
 import type { ParentCategory, ParentCategoryCode, ParsedStatsFile, Transaction } from '@/types'
 import { ALL_CATEGORIES, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
 import { getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 import { getSubcategoryLabel } from '@/utils/TransactionParser'
-import { i18n } from '@/lib/i18n'
 
 import type { AmountFilter } from '../../actions'
 import { filterAmount, getCategoryKey, NO_CATEGORY } from '../../actions'
@@ -64,7 +64,7 @@ const toParentOptions = (
  * All categories with their number of transactions, money in and out, those without transactions are disabled.
  * Transactions without a (known) category are last in money out.
  */
-export const getCategoryGroups = (transactions: Transaction[]): CategoryGroup[] => {
+export const getCategoryGroups = (transactions: Transaction[], t: TFunction): CategoryGroup[] => {
   const counts = countBy(transactions, getCategoryKey)
   const otherOptions = Object.keys(counts)
     .filter((key) => !KNOWN_KEYS.has(key))
@@ -79,12 +79,12 @@ export const getCategoryGroups = (transactions: Transaction[]): CategoryGroup[] 
   return [
     {
       key: 'in',
-      label: i18n.t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.IN_TITLE'),
+      label: t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.IN_TITLE'),
       parents: toParentOptions(INCOME_CATEGORIES, counts),
     },
     {
       key: 'out',
-      label: i18n.t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.OUT_TITLE'),
+      label: t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.OUT_TITLE'),
       parents: [...toParentOptions(EXPENSE_CATEGORIES, counts), ...otherOptions],
     },
   ]
