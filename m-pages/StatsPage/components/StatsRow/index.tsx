@@ -36,9 +36,9 @@ type StatsRowProps = {
    */
   notes?: string[]
   /**
-   * Some transactions are on days deselected in the date explorer, indicated next to the balance.
+   * Transactions on days deselected in the date explorer, indicated next to the balance and as the first note.
    */
-  isDateFiltered?: boolean
+  dateExcludedCount?: number
   defaultExpanded?: boolean
   /**
    * Shown above the stats when expanded.
@@ -56,7 +56,7 @@ const Component = ({
   stats,
   chip,
   notes,
-  isDateFiltered = false,
+  dateExcludedCount = 0,
   defaultExpanded = false,
   children,
 }: StatsRowProps) => {
@@ -80,7 +80,7 @@ const Component = ({
             {chip}
           </Box>
         ) : null}
-        {isDateFiltered ? (
+        {dateExcludedCount ? (
           <Tooltip title={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')}>
             <EventNoteOutlined sx={sx.dateFiltered} aria-label={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')} />
           </Tooltip>
@@ -96,7 +96,16 @@ const Component = ({
       <Collapse in={isExpanded} unmountOnExit sx={sx.collapse}>
         <Box className="details" sx={sx.details}>
           {children}
-          {stats ? <StatsList transactions={stats.transactions} currency={stats.currency} notes={notes} /> : null}
+          {stats ? (
+            <StatsList
+              transactions={stats.transactions}
+              currency={stats.currency}
+              notes={[
+                ...(dateExcludedCount ? [t('STATS_PAGE.SIDEBAR.DATE_EXCLUDED', { count: dateExcludedCount })] : []),
+                ...(notes ?? []),
+              ]}
+            />
+          ) : null}
         </Box>
       </Collapse>
     </ListItem>

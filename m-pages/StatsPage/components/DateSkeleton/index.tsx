@@ -18,8 +18,6 @@ const ROWS: { type: DateRow['type']; width: number; isExpanded?: boolean }[] = [
   { type: 'month', width: 44 },
 ]
 
-const LEVEL = { year: 0, month: 1, day: 2 } as const
-
 type DateSkeletonProps = {
   /**
    * Explains why the date explorer isn't shown, shown on hover.
@@ -42,7 +40,7 @@ const Component = ({ title }: DateSkeletonProps) => {
             // eslint-disable-next-line react/no-array-index-key
             key={index}
             sx={sx.row}
-            style={{ height: getRowHeight(row), paddingLeft: ROW_INDENT[LEVEL[row.type]] }}
+            style={{ height: getRowHeight(row), paddingLeft: ROW_INDENT[row.type] }}
           >
             {row.type === 'month' ? (
               <Box sx={sx.expandIcon}>

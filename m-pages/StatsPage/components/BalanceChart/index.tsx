@@ -5,11 +5,11 @@ import { MISC } from '@/common'
 import { LineChart } from '@/components'
 import { useIsDarkMode } from '@/hooks'
 import { Color } from '@/styles/colors'
-import { getAreaFill, getLineColor, getThemeColor } from '@/utils/Chart'
+import { getAreaFill, getThemeColor } from '@/utils/Chart'
 import { useTranslation } from '@/lib/i18n'
 
 import CardTitle from '../CardTitle'
-import { accumulateValues, getChartOptions } from './actions'
+import { accumulateValues, getChartOptions, getLineColor } from './actions'
 import { ui } from './styled'
 
 type BalanceChartProps = {

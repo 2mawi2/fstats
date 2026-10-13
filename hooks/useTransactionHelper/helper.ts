@@ -1,8 +1,9 @@
-import { differenceInCalendarDays, format, startOfMonth, startOfWeek } from 'date-fns'
+import { differenceInCalendarDays, parseISO, startOfMonth, startOfWeek } from 'date-fns'
 
 import type { DateRange, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
-import { getDaysInRange, toDisplayDate } from '@/utils/Date'
+import { groupInOrder } from '@/utils/Array'
+import { getDaysInRange, getTransactionDay, toDayKey, toDisplayDate } from '@/utils/Date'
 
 export const RangeGranularity = {
   DAY: 'day',
@@ -20,8 +21,11 @@ export const getRangeGranularity = ({ start, end }: DateRange): RangeGranularity
   return dayCount <= 92 ? RangeGranularity.DAY : dayCount <= 730 ? RangeGranularity.WEEK : RangeGranularity.MONTH
 }
 
-const toDayKey = (date: Date) => {
-  return format(date, 'yyyy-MM-dd')
+/**
+ * From the first to the last of the sorted transactions.
+ */
+export const getTransactionsDateRange = (transactions: Transaction[]): DateRange => {
+  return { start: parseISO(transactions[0].date), end: parseISO(transactions[transactions.length - 1].date) }
 }
 
 const getBucketStart = (day: Date, granularity: RangeGranularity) => {
@@ -59,28 +63,8 @@ export const getTransactionRangeItems = ({
    */
   granularity?: RangeGranularity
 }): TransactionRangeItem[] => {
-  const transactionsByDay = new Map<string, Transaction[]>()
-  const daysByBucket = new Map<number, Date[]>()
-
-  transactions.forEach((transaction) => {
-    const day = transaction.date.split('T')[0]
-    const dayTransactions = transactionsByDay.get(day)
-    if (dayTransactions) {
-      dayTransactions.push(transaction)
-    } else {
-      transactionsByDay.set(day, [transaction])
-    }
-  })
-
-  getDaysInRange(dateRange).forEach((day) => {
-    const key = getBucketStart(day, granularity).getTime()
-    const days = daysByBucket.get(key)
-    if (days) {
-      days.push(day)
-    } else {
-      daysByBucket.set(key, [day])
-    }
-  })
+  const transactionsByDay = groupInOrder(transactions, getTransactionDay)
+  const daysByBucket = groupInOrder(getDaysInRange(dateRange), (day) => toDayKey(getBucketStart(day, granularity)))
 
   return [...daysByBucket.values()].map((days) => {
     const dayKeys = days.map(toDayKey)

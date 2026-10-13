@@ -8,9 +8,9 @@ import { useIsDarkMode, useUserPreferences } from '@/hooks'
 import { getAreaFill, getThemeColor } from '@/utils/Chart'
 import { useTranslation } from '@/lib/i18n'
 
+import { ui } from '../BalanceChart/styled'
 import CardTitle from '../CardTitle'
 import { getChartOptions, getLineColors, getMonthlyCounts } from './actions'
-import { ui } from './styled'
 
 type TransactionCountChartProps = {
   /**
@@ -66,7 +66,7 @@ const Component = ({ transactions, excludedDays }: TransactionCountChartProps) =
             averageLabel: t('STATS_PAGE.STATS_VIEW.AVERAGE_PER_MONTH', {
               average: (average ?? 0).toLocaleString(locale),
             }),
-            colors,
+            averageColor: colors.average,
           })}
           data={chartData}
         />

@@ -7,10 +7,9 @@ import { useMemo, useState } from 'react'
 
 import { getFileTransactions } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
-import { toDisplayDate } from '@/utils/Date'
+import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
-import { getTransactionDay } from '../../actions'
 import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import DateSkeleton from '../DateSkeleton'
 import type { DateRow } from './actions'
@@ -18,6 +17,7 @@ import {
   getCheckState,
   getDateTree,
   getDefaultExpanded,
+  getDeselectedCounts,
   getRowHeight,
   getVisibleRows,
   OVERSCAN,
@@ -45,9 +45,11 @@ const Component = () => {
     () => getDateTree(selectedFiles.flatMap(getFileTransactions).map(getTransactionDay)),
     [selectedFiles],
   )
-  const allDays = tree.flatMap((year) => year.days)
-  const expanded = expandedKeys ?? getDefaultExpanded(tree)
-  const rows = getVisibleRows(tree, expanded)
+  // Memoized by hand, the virtualizer re-renders on scroll and the compiler skips this component
+  const defaultExpanded = useMemo(() => getDefaultExpanded(tree), [tree])
+  const expanded = expandedKeys ?? defaultExpanded
+  const rows = useMemo(() => getVisibleRows(tree, expanded), [tree, expanded])
+  const deselectedCounts = useMemo(() => getDeselectedCounts(tree, deselectedDays), [tree, deselectedDays])
 
   // Not compatible with React Compiler memoization, the compiler skips this component
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -90,7 +92,7 @@ const Component = () => {
   }
 
   // No files, or none checked
-  if (!allDays.length) {
+  if (!tree.length) {
     return <DateSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
   }
 
@@ -101,7 +103,7 @@ const Component = () => {
           const row = rows[item.index]
           const isExpandable = row.type !== 'day'
           const isExpanded = expanded.has(row.key)
-          const checkState = getCheckState(row.days, deselectedDays)
+          const checkState = getCheckState(row, deselectedCounts)
           const isDeselected = !checkState.checked && !checkState.indeterminate
 
           return (
@@ -122,7 +124,7 @@ const Component = () => {
               style={{
                 transform: `translateY(${item.start}px)`,
                 height: item.size,
-                paddingLeft: ROW_INDENT[row.level],
+                paddingLeft: ROW_INDENT[row.type],
               }}
             >
               {row.type === 'month' ? renderExpandIcon(row, isExpanded) : null}

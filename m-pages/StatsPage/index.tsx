@@ -34,7 +34,7 @@ const Component = () => {
   const [includeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
     initializeWithValue: false,
   })
-  const dayFilter = useDayFilter({ isDemoMode })
+  const dayFilter = useDayFilter({ isDemoMode, isDisabled: view === WorkspaceView.CSV })
   const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
   // Leave demo mode once real files are added, so they are shown
   const { dropzone, addFolder } = useFileDropzone({
@@ -65,13 +65,7 @@ const Component = () => {
       id: 'right',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn, ...sx.rightColumn },
       // Duplicates are always excluded from the stats, the date explorer is hidden in the CSV view
-      content: (
-        <FileSidebar
-          includeDuplicates={view === WorkspaceView.TRANSACTIONS && includeDuplicates}
-          deselectedDays={dayFilter.deselectedDays}
-          isCsv={view === WorkspaceView.CSV}
-        />
-      ),
+      content: <FileSidebar includeDuplicates={view === WorkspaceView.TRANSACTIONS && includeDuplicates} />,
     },
   ]
 

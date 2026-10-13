@@ -13,12 +13,15 @@ export type DayFilter = {
   setDeselectedDays: (days: Set<string>) => void
 }
 
+const NO_DAYS = new Set<string>()
+
 /**
  * Days deselected in the date explorer, shared by the transactions and stats views via the workspace context.
  * Deselected rather than selected days are stored, so days of newly added files are shown. Not stored in demo mode,
- * so the demo starts with all days selected and doesn't filter the user's files.
+ * so the demo starts with all days selected and doesn't filter the user's files. None while `isDisabled` (the CSV
+ * view, where the date explorer doesn't apply).
  */
-export const useDayFilter = ({ isDemoMode }: { isDemoMode: boolean }): DayFilter => {
+export const useDayFilter = ({ isDemoMode, isDisabled }: { isDemoMode: boolean; isDisabled: boolean }): DayFilter => {
   const [storedDays, setStoredDays] = useLocalStorage<string[]>(MISC.LS_DATA_DESELECTED_DAYS_KEY, [], {
     initializeWithValue: false,
   })
@@ -32,9 +35,8 @@ export const useDayFilter = ({ isDemoMode }: { isDemoMode: boolean }): DayFilter
     setDemoDeselectedDays(new Set())
   }
 
-  if (isDemoMode) {
-    return { deselectedDays: demoDeselectedDays, setDeselectedDays: setDemoDeselectedDays }
-  }
+  const deselectedDays = isDemoMode ? demoDeselectedDays : storedDeselectedDays
+  const setDeselectedDays = isDemoMode ? setDemoDeselectedDays : (days: Set<string>) => setStoredDays([...days])
 
-  return { deselectedDays: storedDeselectedDays, setDeselectedDays: (days) => setStoredDays([...days]) }
+  return { deselectedDays: isDisabled ? NO_DAYS : deselectedDays, setDeselectedDays }
 }

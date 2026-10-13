@@ -1,7 +1,7 @@
 import { eachDayOfInterval, format, isValid, parse, parseISO, startOfDay } from 'date-fns'
 import { de, enGB } from 'date-fns/locale'
 
-import type { DateFnsLocale, DateRange, SelectOptionWithType } from '@/types'
+import type { DateFnsLocale, DateRange, SelectOptionWithType, Transaction } from '@/types'
 import { DateFormat, SortOrder, UserLocale } from '@/types-enums'
 
 /**
@@ -149,4 +149,18 @@ export const getDateFormatPrecision = (
     hasTime: hasHours || hasMinutes || hasSeconds,
     hasSeconds,
   }
+}
+
+/**
+ * Day (`yyyy-MM-dd`) of a transaction as it was parsed, ignoring time zones.
+ */
+export const getTransactionDay = (transaction: Pick<Transaction, 'date'>) => {
+  return transaction.date.split('T')[0]
+}
+
+/**
+ * Day (`yyyy-MM-dd`) of a date, same format as `getTransactionDay`.
+ */
+export const toDayKey = (date: Date) => {
+  return format(date, 'yyyy-MM-dd')
 }

@@ -1,8 +1,13 @@
+import { grey } from '@mui/material/colors'
 import type { ChartOptions } from 'chart.js'
 
 import type { TransactionRangeItem } from '@/types'
 import { getBaseChartOptions, getThemeColor } from '@/utils/Chart'
 import { Big } from '@/lib/w-big'
+
+export const getLineColor = (isDarkMode: boolean) => {
+  return isDarkMode ? grey[300] : grey[800]
+}
 
 export const getChartOptions = (): ChartOptions<'line'> => {
   return getBaseChartOptions<'line'>({

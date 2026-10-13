@@ -17,19 +17,17 @@ export const getTransactionsByCurrency = (
 ) => {
   return Object.entries(groupBy(files, getFileCurrency)).map(([currency, currencyFiles]) => {
     const fileTransactions = currencyFiles.flatMap(getFileTransactions)
-    const allTransactions = filterDays(fileTransactions, deselectedDays)
-    const { unique, duplicates } = splitDuplicates(allTransactions)
-    const transactions = includeDuplicates ? allTransactions : unique
-    const unfilteredCount = includeDuplicates
-      ? fileTransactions.length
-      : splitDuplicates(fileTransactions).unique.length
+    const { unique, duplicates } = splitDuplicates(fileTransactions)
+    const shownTransactions = includeDuplicates ? fileTransactions : unique
+    // Duplicates have the same ID, so the same day as the transaction they duplicate
+    const transactions = filterDays(shownTransactions, deselectedDays)
 
     return {
       currency: currency as Currency,
       transactions,
-      duplicateCount: duplicates.length,
+      duplicateCount: filterDays(duplicates, deselectedDays).length,
       // On days deselected in the date explorer
-      dateExcludedCount: unfilteredCount - transactions.length,
+      dateExcludedCount: shownTransactions.length - transactions.length,
     }
   })
 }

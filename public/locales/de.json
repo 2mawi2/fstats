@@ -72,9 +72,7 @@
       "TRANSACTIONS": "Umsätze",
       "STATS": "Statistiken"
     },
-    "DATE_EXPLORER": {
-      "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln"
-    },
+    "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln",
     "FILE_TOOLBAR": {
       "SELECT_ALL": "Alle",
       "SELECT_NONE": "Keine",
@@ -152,8 +150,7 @@
         "IN": "Ein",
         "IN_TITLE": "Geldeingänge",
         "OUT": "Aus",
-        "OUT_TITLE": "Geldausgänge",
-        "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln"
+        "OUT_TITLE": "Geldausgänge"
       }
     },
     "STATS_VIEW": {

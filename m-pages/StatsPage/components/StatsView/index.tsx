@@ -7,7 +7,6 @@ import { useTransactionHelper, useUserPreferences } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import {
-  filterDays,
   filterTransactions,
   getAmountFilterOptions,
   getCurrency,
@@ -41,7 +40,7 @@ const Component = () => {
     files: selectedFiles,
     locale,
     dateFormat,
-    filterTransactions: (unique) => filterDays(filterTransactions(unique, amountFilter), deselectedDays),
+    filterTransactions: (unique) => filterTransactions(unique, amountFilter),
     excludedDays: deselectedDays,
   })
   const currency = getCurrency(transactions)

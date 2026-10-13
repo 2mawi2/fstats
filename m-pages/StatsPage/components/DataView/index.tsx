@@ -71,7 +71,7 @@ const Component = () => {
           disabled={!isTransactionsView}
           disabledTooltip={
             !isTransactions
-              ? t('STATS_PAGE.DATA_VIEW.AMOUNT_FILTER.CSV_DISABLED')
+              ? t('STATS_PAGE.CSV_DISABLED')
               : !checkedFiles.length
                 ? t('STATS_PAGE.NO_SELECTION.TITLE')
                 : undefined

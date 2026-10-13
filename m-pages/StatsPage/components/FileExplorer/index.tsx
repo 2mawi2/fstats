@@ -53,7 +53,7 @@ const Component = () => {
         <Box sx={sx.splitDivider} onPointerDown={startResize((delta) => setSplit(clampSplit(split + delta)))} />
 
         <Box sx={{ ...sx.pane, ...sx.datesPane, flexBasis: `${100 - split}%` }}>
-          {isCsv ? <DateSkeleton title={t('STATS_PAGE.DATE_EXPLORER.CSV_DISABLED')} /> : <DateExplorer />}
+          {isCsv ? <DateSkeleton title={t('STATS_PAGE.CSV_DISABLED')} /> : <DateExplorer />}
         </Box>
       </Box>
     </Box>

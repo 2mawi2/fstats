@@ -1,11 +1,10 @@
 import { grey, indigo } from '@mui/material/colors'
 import type { ChartOptions } from 'chart.js'
-import { parseISO } from 'date-fns'
 import { mean, round } from 'lodash'
 
 import type { Transaction } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
-import { getTransactionRangeItems, RangeGranularity } from '@/hooks'
+import { getTransactionRangeItems, getTransactionsDateRange, RangeGranularity } from '@/hooks'
 import { getBaseChartOptions, getThemeColor } from '@/utils/Chart'
 
 /**
@@ -27,7 +26,7 @@ export const getMonthlyCounts = ({
   }
 
   const items = getTransactionRangeItems({
-    dateRange: { start: parseISO(transactions[0].date), end: parseISO(transactions[transactions.length - 1].date) },
+    dateRange: getTransactionsDateRange(transactions),
     transactions,
     locale,
     dateFormat,
@@ -61,11 +60,11 @@ export const getLineColors = (isDarkMode: boolean) => {
 export const getChartOptions = ({
   average,
   averageLabel,
-  colors,
+  averageColor,
 }: {
   average: number | null
   averageLabel: string
-  colors: ReturnType<typeof getLineColors>
+  averageColor: string
 }): ChartOptions<'line'> => {
   return getBaseChartOptions<'line'>({
     plugins: {
@@ -85,7 +84,7 @@ export const getChartOptions = ({
                   type: 'line',
                   yMin: average,
                   yMax: average,
-                  borderColor: colors.average,
+                  borderColor: averageColor,
                   borderWidth: 1.5,
                   borderDash: [4, 4],
                   // A chip on the middle of the line, drawn above the data so it stays readable

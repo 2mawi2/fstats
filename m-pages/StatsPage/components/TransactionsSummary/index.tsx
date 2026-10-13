@@ -27,20 +27,17 @@ const Component = ({ files, includeDuplicates, deselectedDays }: TransactionsSum
       isTotal
       defaultExpanded
       stats={{ transactions, currency }}
-      isDateFiltered={dateExcludedCount > 0}
-      notes={[
-        ...(dateExcludedCount ? [t('STATS_PAGE.SIDEBAR.DATE_EXCLUDED', { count: dateExcludedCount })] : []),
-        ...(duplicateCount
+      dateExcludedCount={dateExcludedCount}
+      notes={
+        duplicateCount
           ? [
               t(
                 includeDuplicates ? 'STATS_PAGE.SIDEBAR.DUPLICATES_INCLUDED' : 'STATS_PAGE.SIDEBAR.DUPLICATES_EXCLUDED',
-                {
-                  count: duplicateCount,
-                },
+                { count: duplicateCount },
               ),
             ]
-          : []),
-      ]}
+          : []
+      }
     />
   ))
 }

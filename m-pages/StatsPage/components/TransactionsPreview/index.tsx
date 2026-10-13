@@ -11,7 +11,7 @@ import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { AmountFilter, filterDays, filterTransactions } from '../../actions'
+import { AmountFilter, filterShown } from '../../actions'
 import FileMessage from '../FileMessage'
 import PreviewSection from '../PreviewSection'
 import { STICKY_HEADER_OFFSET } from '../PreviewSection/actions'
@@ -46,7 +46,7 @@ const Component = ({
   const singleFile = isCombined ? undefined : (parsedFiles[0] ?? files[0])
   const currency = useMemo(() => getSharedCurrency(parsedFiles), [parsedFiles])
   const allTransactions = useMemo(
-    () => filterDays(filterTransactions(getSourcedTransactions(parsedFiles), amountFilter), deselectedDays),
+    () => filterShown(getSourcedTransactions(parsedFiles), amountFilter, deselectedDays),
     [parsedFiles, amountFilter, deselectedDays],
   )
   const transactions = useMemo(

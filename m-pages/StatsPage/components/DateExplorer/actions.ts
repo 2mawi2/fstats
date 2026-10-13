@@ -1,5 +1,7 @@
 import { uniq } from 'lodash'
 
+import { groupInOrder } from '@/utils/Array'
+
 export const ROW_HEIGHT = 30 // px
 
 /**
@@ -14,10 +16,10 @@ export const getRowHeight = (row: Pick<DateRow, 'type'>) => {
 export const OVERSCAN = 10
 
 /**
- * Left padding (px) of the rows by level: the months' expand buttons are centered below the year's checkbox, the days'
+ * Left padding (px) of the rows: the months' expand buttons are centered below the year's checkbox, the days'
  * checkboxes start where the month labels start.
  */
-export const ROW_INDENT = [4, 6, 28] as const
+export const ROW_INDENT: Record<DateRow['type'], number> = { year: 4, month: 6, day: 28 }
 
 type DateMonth = {
   /**
@@ -34,10 +36,14 @@ type DateYear = DateMonth & {
   months: DateMonth[]
 }
 
-export type DateRow =
-  | { type: 'year'; key: string; days: string[]; level: 0 }
-  | { type: 'month'; key: string; days: string[]; level: 1 }
-  | { type: 'day'; key: string; days: string[]; level: 2 }
+export type DateRow = {
+  type: 'year' | 'month' | 'day'
+  /**
+   * `yyyy`, `yyyy-MM` or `yyyy-MM-dd`
+   */
+  key: string
+  days: string[]
+}
 
 /**
  * Years, months and days (`yyyy-MM-dd`) with transactions, newest first.
@@ -52,24 +58,8 @@ export const getDateTree = (days: string[]): DateYear[] => {
   }))
 }
 
-/**
- * Groups in order of the days. Not `groupBy`, its object would sort integer-like keys (years) ascending.
- */
 const groupByPrefix = (days: string[], length: number) => {
-  const groups = new Map<string, string[]>()
-
-  days.forEach((day) => {
-    const key = day.slice(0, length)
-    const group = groups.get(key)
-
-    if (group) {
-      group.push(day)
-    } else {
-      groups.set(key, [day])
-    }
-  })
-
-  return [...groups.entries()]
+  return [...groupInOrder(days, (day) => day.slice(0, length)).entries()]
 }
 
 /**
@@ -84,12 +74,12 @@ export const getDefaultExpanded = (tree: DateYear[]) => {
  */
 export const getVisibleRows = (tree: DateYear[], expanded: Set<string>): DateRow[] => {
   return tree.flatMap((year): DateRow[] => [
-    { type: 'year', key: year.key, days: year.days, level: 0 },
+    { type: 'year', key: year.key, days: year.days },
     ...(expanded.has(year.key)
       ? year.months.flatMap((month): DateRow[] => [
-          { type: 'month', key: month.key, days: month.days, level: 1 },
+          { type: 'month', key: month.key, days: month.days },
           ...(expanded.has(month.key)
-            ? month.days.map((day): DateRow => ({ type: 'day', key: day, days: [day], level: 2 }))
+            ? month.days.map((day): DateRow => ({ type: 'day', key: day, days: [day] }))
             : []),
         ])
       : []),
@@ -97,11 +87,28 @@ export const getVisibleRows = (tree: DateYear[], expanded: Set<string>): DateRow
 }
 
 /**
+ * Deselected days per year, month and day key of the tree, so the check state of a row is a lookup.
+ */
+export const getDeselectedCounts = (tree: DateYear[], deselectedDays: Set<string>) => {
+  const counts = new Map<string, number>()
+
+  tree.forEach((year) => {
+    year.days
+      .filter((day) => deselectedDays.has(day))
+      .forEach((day) => {
+        ;[year.key, day.slice(0, 7), day].forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1))
+      })
+  })
+
+  return counts
+}
+
+/**
  * Checked if none of the days are deselected, indeterminate if some are.
  */
-export const getCheckState = (days: string[], deselectedDays: Set<string>) => {
-  const deselectedCount = days.filter((day) => deselectedDays.has(day)).length
-  return { checked: deselectedCount === 0, indeterminate: deselectedCount > 0 && deselectedCount < days.length }
+export const getCheckState = (row: DateRow, deselectedCounts: Map<string, number>) => {
+  const deselectedCount = deselectedCounts.get(row.key) ?? 0
+  return { checked: deselectedCount === 0, indeterminate: deselectedCount > 0 && deselectedCount < row.days.length }
 }
 
 /**
@@ -109,7 +116,7 @@ export const getCheckState = (days: string[], deselectedDays: Set<string>) => {
  */
 export const toggleDays = (days: string[], deselectedDays: Set<string>) => {
   const next = new Set(deselectedDays)
-  const isAllSelected = getCheckState(days, deselectedDays).checked
+  const isAllSelected = !days.some((day) => deselectedDays.has(day))
   days.forEach((day) => (isAllSelected ? next.add(day) : next.delete(day)))
   return next
 }

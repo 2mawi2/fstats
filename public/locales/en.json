@@ -72,9 +72,7 @@
       "TRANSACTIONS": "Transactions",
       "STATS": "Stats"
     },
-    "DATE_EXPLORER": {
-      "CSV_DISABLED": "Switch to Transactions or Stats"
-    },
+    "CSV_DISABLED": "Switch to Transactions or Stats",
     "FILE_TOOLBAR": {
       "SELECT_ALL": "All",
       "SELECT_NONE": "None",
@@ -152,8 +150,7 @@
         "IN": "In",
         "IN_TITLE": "Money in",
         "OUT": "Out",
-        "OUT_TITLE": "Money out",
-        "CSV_DISABLED": "Switch to Transactions or Stats"
+        "OUT_TITLE": "Money out"
       }
     },
     "STATS_VIEW": {

@@ -4,6 +4,7 @@ import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/ty
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
 import { getFileTransactions, isError, isParsed, isUnknown, splitDuplicates } from '@/m-stats-file/service'
+import { getTransactionDay } from '@/utils/Date'
 import { AVAILABLE_PARSERS } from '@/utils/Parser'
 import { isExpense, isIncome } from '@/utils/Stats'
 import { i18n } from '@/lib/i18n'
@@ -181,19 +182,23 @@ export const filterTransactions = <T extends Transaction>(transactions: T[], fil
 }
 
 /**
- * Day of a transaction as `yyyy-MM-dd`, as it was parsed (ignoring time zones).
- */
-export const getTransactionDay = (transaction: Transaction) => {
-  return transaction.date.split('T')[0]
-}
-
-/**
  * Transactions without those on the deselected days of the date explorer.
  */
 export const filterDays = <T extends Transaction>(transactions: T[], deselectedDays: Set<string>) => {
   return deselectedDays.size
     ? transactions.filter((transaction) => !deselectedDays.has(getTransactionDay(transaction)))
     : transactions
+}
+
+/**
+ * Transactions shown by the amount filter and the date explorer.
+ */
+export const filterShown = <T extends Transaction>(
+  transactions: T[],
+  amountFilter: AmountFilter,
+  deselectedDays: Set<string>,
+) => {
+  return filterDays(filterTransactions(transactions, amountFilter), deselectedDays)
 }
 
 export const EmptyReason = {
@@ -238,9 +243,8 @@ export const getDuplicateCount = (
   amountFilter: AmountFilter,
   deselectedDays: Set<string>,
 ) => {
-  return splitDuplicates(
-    filterDays(filterTransactions(files.flatMap(getFileTransactions), amountFilter), deselectedDays),
-  ).duplicates.length
+  return splitDuplicates(filterShown(files.flatMap(getFileTransactions), amountFilter, deselectedDays)).duplicates
+    .length
 }
 
 // TODO: Once we have currency conversion logic, convert files with different currencies

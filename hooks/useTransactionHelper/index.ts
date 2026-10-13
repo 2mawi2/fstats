@@ -5,10 +5,11 @@ import { parseISO } from 'date-fns'
 import { ParsedStatsFile, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { splitDuplicates } from '@/m-stats-file/service'
+import { getTransactionDay } from '@/utils/Date'
 
-import { getTransactionRangeItems } from './helper'
+import { getTransactionRangeItems, getTransactionsDateRange } from './helper'
 
-export { getTransactionRangeItems, RangeGranularity } from './helper'
+export { getTransactionRangeItems, getTransactionsDateRange, RangeGranularity } from './helper'
 
 export const useTransactionHelper = ({
   files,
@@ -25,7 +26,7 @@ export const useTransactionHelper = ({
    */
   filterTransactions?: (transactions: Transaction[]) => Transaction[]
   /**
-   * Days (`yyyy-MM-dd`) removed by `filterTransactions`, shown as gaps.
+   * Days (`yyyy-MM-dd`) whose transactions are removed, shown as gaps.
    */
   excludedDays?: Set<string>
 }): {
@@ -33,7 +34,10 @@ export const useTransactionHelper = ({
   transactionRangeItems: TransactionRangeItem[]
 } => {
   const allTransactions = files.flatMap((file) => file.sections).flatMap((section) => section.transactions)
-  const transactions = filterTransactions(splitDuplicates(allTransactions).unique)
+  const filteredTransactions = filterTransactions(splitDuplicates(allTransactions).unique)
+  const transactions = excludedDays?.size
+    ? filteredTransactions.filter((transaction) => !excludedDays.has(getTransactionDay(transaction)))
+    : filteredTransactions
 
   if (!transactions.length) {
     return {
@@ -44,10 +48,7 @@ export const useTransactionHelper = ({
 
   transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
   const transactionRangeItems = getTransactionRangeItems({
-    dateRange: {
-      start: parseISO(transactions[0].date),
-      end: parseISO(transactions[transactions.length - 1].date),
-    },
+    dateRange: getTransactionsDateRange(transactions),
     transactions,
     locale,
     dateFormat,
