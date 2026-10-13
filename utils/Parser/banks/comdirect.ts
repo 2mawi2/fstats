@@ -5,13 +5,14 @@ import { defineBank } from '../definition'
 export const comdirect = defineBank({
   id: 'comdirect',
   name: 'Comdirect',
+  url: 'https://www.comdirect.de/',
   country: Country.DE,
   currency: Currency.EUR,
   formats: [
     {
       accountType: AccountType.CURRENT,
       accountName: 'Giro',
-      version: '1',
+      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: ['Buchungstag', 'Wertstellung (Valuta)', 'Vorgang', 'Buchungstext', 'Umsatz in EUR'],
@@ -21,13 +22,17 @@ export const comdirect = defineBank({
         amount: { type: 'signed', header: 'Umsatz in EUR' },
       },
       extraColumns: {
+        balance: null,
+        reference: null,
         transactionType: 'Vorgang',
+        category: null,
+        parentCategory: null,
       },
     },
     {
       accountType: AccountType.CREDIT_CARD,
       accountName: 'Visa',
-      version: '1',
+      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: ['Buchungstag', 'Umsatztag', 'Vorgang', 'Referenz', 'Buchungstext', 'Umsatz in EUR'],
@@ -37,8 +42,11 @@ export const comdirect = defineBank({
         amount: { type: 'signed', header: 'Umsatz in EUR' },
       },
       extraColumns: {
-        transactionType: 'Vorgang',
+        balance: null,
         reference: 'Referenz',
+        transactionType: 'Vorgang',
+        category: null,
+        parentCategory: null,
       },
     },
   ],

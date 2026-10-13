@@ -5,14 +5,16 @@ import { defineBank } from '../definition'
 export const capitec = defineBank({
   id: 'capitec',
   name: 'Capitec',
+  url: 'https://www.capitecbank.co.za/',
   country: Country.ZA,
   currency: Currency.ZAR,
   formats: [
     {
       accountType: AccountType.SAVINGS,
       accountName: 'Savings',
-      version: '1',
+      variant: 'default',
       dateFormat: 'yyyy-MM-dd HH:mm',
+      numberFormat: 'en',
       headers: [
         'Nr',
         'Account',
@@ -33,16 +35,19 @@ export const capitec = defineBank({
         amount: { type: 'firstOf', headers: ['Money In', 'Money Out', 'Fee'] },
       },
       extraColumns: {
-        parentCategory: 'Parent Category',
-        category: 'Category',
         balance: 'Balance',
+        reference: null,
+        transactionType: null,
+        category: 'Category',
+        parentCategory: 'Parent Category',
       },
     },
     {
       accountType: AccountType.SAVINGS,
       accountName: 'Savings',
-      version: '2',
+      variant: 'legacy',
       dateFormat: 'dd/MM/yyyy',
+      numberFormat: 'en',
       headers: [
         'Sequence Number',
         'Account',
@@ -62,9 +67,11 @@ export const capitec = defineBank({
         amount: { type: 'inOut', in: 'Credit Amount', out: 'Debit Amount' },
       },
       extraColumns: {
-        parentCategory: 'Parent Category',
-        category: 'Sub-category',
         balance: 'Balance',
+        reference: null,
+        transactionType: null,
+        category: 'Sub-category',
+        parentCategory: 'Parent Category',
       },
     },
   ],

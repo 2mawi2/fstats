@@ -19,13 +19,13 @@ import {
 describe('registry', () => {
   it('should derive literal ID types', () => {
     expectTypeOf<ParserId>().toEqualTypeOf<
-      | 'capitec__savings__1'
-      | 'capitec__savings__2'
-      | 'comdirect__current__1'
-      | 'comdirect__credit_card__1'
-      | 'fnb__credit_card__1'
-      | 'ing__current__1'
-      | 'lloyds__current__1'
+      | 'capitec__savings__default'
+      | 'capitec__savings__legacy'
+      | 'comdirect__current__default'
+      | 'comdirect__credit_card__default'
+      | 'fnb__credit_card__default'
+      | 'ing__current__default'
+      | 'lloyds__current__default'
     >()
     expectTypeOf<BankAccountId>().toEqualTypeOf<
       | 'capitec__savings'
@@ -86,18 +86,25 @@ describe('createParser', () => {
   const bank = defineBank({
     id: 'test',
     name: 'Test',
+    url: 'https://www.example.com/',
     country: Country.DE,
     currency: Currency.EUR,
     formats: [
       {
         accountType: AccountType.CURRENT,
         accountName: 'Giro',
-        version: '1',
+        variant: 'default',
         dateFormat: 'dd.MM.yyyy',
         numberFormat: 'de',
         headers: ['Datum', 'Text', 'Betrag', 'Saldo', 'Referenz'],
         columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
-        extraColumns: { balance: 'Saldo', reference: 'Referenz' },
+        extraColumns: {
+          balance: 'Saldo',
+          reference: 'Referenz',
+          transactionType: null,
+          category: null,
+          parentCategory: null,
+        },
       },
     ],
   })
@@ -126,17 +133,19 @@ describe('transaction IDs', () => {
     defineBank({
       id,
       name: id,
+      url: 'https://www.example.com/',
       country: Country.DE,
       currency: Currency.EUR,
       formats: [
         {
           accountType: AccountType.CURRENT,
           accountName: 'Giro',
-          version: '1',
+          variant: 'default',
           dateFormat: 'dd.MM.yyyy',
           numberFormat: 'de',
           headers: header,
           columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
+          extraColumns: { balance: null, reference: null, transactionType: null, category: null, parentCategory: null },
         },
       ],
     })
@@ -202,7 +211,10 @@ describe('findSections', () => {
     const { sections, error } = findSections(file)
 
     expect(error).toBe('')
-    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__current__1', 'comdirect__credit_card__1'])
+    expect(sections.map(({ parser }) => parser.id)).toEqual([
+      'comdirect__current__default',
+      'comdirect__credit_card__default',
+    ])
     expect(sections.map(({ parser, rows }) => parser.parse(rows).length)).toEqual([200, 1])
   })
 
@@ -215,13 +227,13 @@ describe('findSections', () => {
   it('should find a single section', () => {
     const { sections } = findSections([preamble('Umsätze Visa-Karte (Kreditkarte)'), visaHeader, visaRow])
 
-    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__1'])
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__default'])
   })
 
   it('should drop sections without transactions', () => {
     const { sections } = findSections([giroHeader, ['Keine Umsätze vorhanden.'], visaHeader, visaRow])
 
-    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__1'])
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__default'])
   })
 
   it('should explain why nothing matched', () => {

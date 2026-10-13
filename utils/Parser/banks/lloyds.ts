@@ -5,14 +5,16 @@ import { defineBank } from '../definition'
 export const lloyds = defineBank({
   id: 'lloyds',
   name: 'Lloyds',
+  url: 'https://www.lloydsbank.com/',
   country: Country.GB,
   currency: Currency.GBP,
   formats: [
     {
       accountType: AccountType.CURRENT,
       accountName: 'Current Account',
-      version: '1',
+      variant: 'default',
       dateFormat: 'dd/MM/yyyy',
+      numberFormat: 'en',
       headers: [
         'Transaction Date',
         'Transaction Type',
@@ -30,7 +32,10 @@ export const lloyds = defineBank({
       },
       extraColumns: {
         balance: 'Balance',
+        reference: null,
         transactionType: 'Transaction Type',
+        category: null,
+        parentCategory: null,
       },
     },
   ],

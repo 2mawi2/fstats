@@ -36,7 +36,7 @@ export type HeaderDef<H extends string = string> = H | { readonly header: H; rea
 
 /**
  * - `signed`: one signed column
- * - `inOut`: money in / money out columns, out is always negative
+ * - `inOut`: money in / money out columns, out values are stored as negative whether the file has them positive or negative
  * - `firstOf`: first non-empty signed column
  */
 export type AmountColumnDef<H extends string = string> =
@@ -44,15 +44,10 @@ export type AmountColumnDef<H extends string = string> =
   | { readonly type: 'inOut'; readonly in: H; readonly out: H }
   | { readonly type: 'firstOf'; readonly headers: readonly H[] }
 
-/**
- * Multiple headers are joined (empty values are skipped).
- */
-export type DescriptionColumnDef<H extends string = string> = H | readonly H[]
-
 export type FormatDef<H extends string = string> = {
   /**
    * Part of the persisted IDs.
-   * Parser ID: `${bank.id}__${accountType}__${version}`, bank account ID: `${bank.id}__${accountType}`.
+   * Parser ID: `${bank.id}__${accountType}__${variant}`, bank account ID: `${bank.id}__${accountType}`.
    */
   accountType: AccountType
   /**
@@ -60,14 +55,14 @@ export type FormatDef<H extends string = string> = {
    */
   accountName: string
   /**
-   * Part of the parser ID. "1" for the first CSV format of an account, then "2", "3", etc.
+   * Part of the parser ID, distinguishes multiple CSV formats of the same account ("default", "legacy", etc.).
    */
-  version: string
+  variant: string
   dateFormat: string
   /**
-   * 'de' = "1.234,56". 'en' = "1,234.56". Defaults to 'en'.
+   * 'de' = "1.234,56". 'en' = "1,234.56".
    */
-  numberFormat?: 'en' | 'de'
+  numberFormat: 'en' | 'de'
   /**
    * All CSV headers of the file, used for detection. A file matches if all non-optional headers are present (any
    * order), unlisted headers are logged but still match.
@@ -76,11 +71,11 @@ export type FormatDef<H extends string = string> = {
   /**
    * Core transaction fields, headers must be listed in `headers`.
    */
-  columns: { date: H; description: DescriptionColumnDef<H>; amount: AmountColumnDef<H> }
+  columns: { date: H; description: H; amount: AmountColumnDef<H> }
   /**
-   * Stored in `Transaction['extra']`, headers must be listed in `headers`.
+   * Stored in `Transaction['extra']`, headers must be listed in `headers`. `null` if the file has no such column.
    */
-  extraColumns?: Partial<Record<ExtraField, H>>
+  extraColumns: Record<ExtraField, H | null>
 }
 
 export type BankDef = {
@@ -89,6 +84,10 @@ export type BankDef = {
    */
   id: string
   name: string
+  /**
+   * Bank website.
+   */
+  url: string
   /**
    * Shown on the home page.
    */
@@ -112,7 +111,7 @@ export type ValidFormats<F extends readonly FormatDef[]> = { [K in keyof F]: For
 
 type ParserIdOf<BankId extends string, F> = F extends {
   accountType: infer A extends string
-  version: infer V extends string
+  variant: infer V extends string
 }
   ? `${BankId}__${A}__${V}`
   : never

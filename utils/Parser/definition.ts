@@ -1,4 +1,4 @@
-import type { AmountColumnDef, BankDef, DescriptionColumnDef, FormatDef, HeaderDef, ValidFormats } from '@/types'
+import type { AmountColumnDef, BankDef, FormatDef, HeaderDef, ValidFormats } from '@/types'
 
 type BankDefOf<Id extends string, F> = Omit<BankDef, 'id' | 'formats'> & { id: Id; formats: F }
 
@@ -23,19 +23,15 @@ export const getFormatHeaders = ({ headers }: FormatDef) => {
 /**
  * Headers read by `columns` and `extraColumns`.
  */
-export const getReferencedHeaders = ({ columns, extraColumns = {} }: FormatDef) => {
+export const getReferencedHeaders = ({ columns, extraColumns }: FormatDef) => {
   return [
     ...new Set([
       columns.date,
-      ...getDescriptionHeaders(columns.description),
+      columns.description,
       ...getAmountHeaders(columns.amount),
-      ...Object.values(extraColumns).filter((header) => !!header),
+      ...Object.values(extraColumns).filter((header) => header !== null),
     ]),
   ]
-}
-
-export const getDescriptionHeaders = (description: DescriptionColumnDef) => {
-  return typeof description === 'string' ? [description] : description
 }
 
 const getAmountHeaders = (amount: AmountColumnDef) => {
@@ -54,5 +50,5 @@ export const toAccountId = (bank: BankDef, format: FormatDef) => {
 }
 
 export const toParserId = (bank: BankDef, format: FormatDef) => {
-  return `${toAccountId(bank, format)}__${format.version}`
+  return `${toAccountId(bank, format)}__${format.variant}`
 }
