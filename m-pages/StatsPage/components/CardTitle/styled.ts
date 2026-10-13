@@ -7,7 +7,8 @@ export const ui = () => {
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 1,
-      minHeight: HEADER_HEIGHT,
+      // Fixed like the preview headers, so the titles line up when switching views
+      height: HEADER_HEIGHT,
       mb: 1,
     },
     title: {
@@ -15,6 +16,9 @@ export const ui = () => {
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
+    },
+    chip: {
+      ml: 1,
     },
     caption: {
       ml: 1,

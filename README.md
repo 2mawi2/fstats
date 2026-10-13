@@ -17,7 +17,7 @@ Try it for free at [fstats.site](https://fstats.site/).
 
 Your files are stored only in your browser and never leave your device.
 
-By default, your files **are deleted** when you close the tab or browser window. To keep them between sessions, open the "Settings" page and enable "Persist data".
+By default, your files **get deleted** when you close the tab or browser window. To keep them between sessions, open the "Settings" page and enable "Persist data".
 
 ### Supported banks
 

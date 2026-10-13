@@ -1,12 +1,14 @@
 import type { Theme } from '@mui/material/styles'
 
+import { ROW_HEIGHT } from './actions'
+
 export const ui = () => {
   return {
     wrapper: {
       border: 1,
       borderColor: 'divider',
     },
-    stickyWrapper: {
+    headerWrapper: {
       borderTop: 0,
     },
     scrollWrapper: {
@@ -18,9 +20,12 @@ export const ui = () => {
       width: '100%',
       borderCollapse: 'collapse',
       fontSize: 12,
+      // Fixed height, so content like the duplicate tag doesn't change it
       '& th, & td': {
+        height: ROW_HEIGHT,
         px: 1,
-        py: 0.5,
+        py: 0,
+        verticalAlign: 'middle',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
@@ -28,23 +33,24 @@ export const ui = () => {
         borderBottom: 1,
         borderColor: 'divider',
       },
+      // Collapsed borders don't move with sticky cells, so they are drawn as shadows, including the wrapper's top
+      // border which would scroll away. Also when not sticky, so the header row is always the same height.
       '& th': {
+        position: 'sticky',
+        zIndex: 1,
+        // Plus the two borders drawn inside, so it's as tall as a row with its border
+        height: ROW_HEIGHT + 2,
+        borderBottom: 0,
+        boxShadow: (theme: Theme) =>
+          `inset 0 1px 0 ${theme.vars.palette.divider}, inset 0 -1px 0 ${theme.vars.palette.divider}`,
         fontWeight: 'medium',
         // Opaque, so rows don't show through a sticky header
         bgcolor: 'background.default',
         backgroundImage: (theme: Theme) =>
           `linear-gradient(${theme.vars.palette.action.hover}, ${theme.vars.palette.action.hover})`,
       },
-      // Collapsed borders don't move with sticky cells, so they are drawn as shadows, including the wrapper's top
-      // border which would scroll away
-      '& th.sticky': {
-        position: 'sticky',
-        zIndex: 1,
-        borderBottom: 0,
-        boxShadow: (theme: Theme) =>
-          `inset 0 1px 0 ${theme.vars.palette.divider}, inset 0 -1px 0 ${theme.vars.palette.divider}`,
-      },
       '& tr.spacer td': {
+        height: 'auto',
         p: 0,
         border: 0,
       },
@@ -54,6 +60,13 @@ export const ui = () => {
       '& tbody tr:not(.spacer):hover': {
         bgcolor: 'action.hover',
       },
+      // Search matches
+      '& mark': (theme: Theme) => ({
+        color: 'inherit',
+        backgroundColor: '#fde68a',
+        borderRadius: '2px',
+        ...theme.applyStyles('dark', { backgroundColor: 'rgba(250, 204, 21, 0.4)' }),
+      }),
     },
   }
 }

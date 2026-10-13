@@ -18,9 +18,13 @@ type BalanceChartProps = {
    * Days with transactions deselected in the date explorer.
    */
   excludedDayCount: number
+  /**
+   * Next to the title, e.g. the currency when several are shown.
+   */
+  chip?: string
 }
 
-const Component = ({ transactionRangeItems, excludedDayCount }: BalanceChartProps) => {
+const Component = ({ transactionRangeItems, excludedDayCount, chip }: BalanceChartProps) => {
   const { t } = useTranslation()
   const isDarkMode = useIsDarkMode()
   const sx = ui()
@@ -55,6 +59,7 @@ const Component = ({ transactionRangeItems, excludedDayCount }: BalanceChartProp
   return (
     <Box>
       <CardTitle
+        chip={chip}
         caption={
           transactionRangeItems.length
             ? [

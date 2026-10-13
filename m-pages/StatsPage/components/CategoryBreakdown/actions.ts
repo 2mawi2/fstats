@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { mapValues } from 'lodash'
 
 import type {
@@ -11,7 +12,7 @@ import type {
 } from '@/types'
 import { ALL_CATEGORIES } from '@/common'
 import { sumValues } from '@/utils/Stats'
-import { getParentCategoryCode } from '@/utils/TransactionParser'
+import { getCategoryLabel, getParentCategoryCode } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
 
 export const COL_SPACING = { xs: 1, sm: 2 }
@@ -20,7 +21,10 @@ export const COL2 = [3.2, 3]
 export const COL3 = [2.3, 1]
 export const COL4 = [2, 5]
 
-export const getTransactionsGroupedByCategory = (transactions: Transaction[]): ParentCategoryWithTransactions[] => {
+export const getTransactionsGroupedByCategory = (
+  transactions: Transaction[],
+  t: TFunction,
+): ParentCategoryWithTransactions[] => {
   const categories: Record<ParentCategoryCode, ParentCategoryWithTransactions> = {}
 
   Object.values(ALL_CATEGORIES).forEach((category) => {
@@ -28,6 +32,7 @@ export const getTransactionsGroupedByCategory = (transactions: Transaction[]): P
     Object.values(category.subcategories).forEach((subcategory) => {
       subcategories[subcategory.code] = {
         ...subcategory,
+        label: getCategoryLabel(subcategory.code, t),
         transactions: [],
         total: '0',
       }
@@ -35,6 +40,7 @@ export const getTransactionsGroupedByCategory = (transactions: Transaction[]): P
 
     categories[category.code] = {
       ...category,
+      label: getCategoryLabel(category.code, t),
       subcategories,
       transactions: [],
       total: '0',

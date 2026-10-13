@@ -26,18 +26,7 @@ export const ui = () => {
       fontSize: 16,
     },
     bankChip: {
-      flexShrink: 0,
       maxWidth: '45%',
-      px: 0.75,
-      border: 1,
-      borderColor: 'divider',
-      borderRadius: '10px',
-      fontSize: 11,
-      lineHeight: '18px',
-      color: 'text.secondary',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
     },
   }
 }

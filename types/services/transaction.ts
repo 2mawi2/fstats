@@ -14,14 +14,12 @@ export type CategoryCode = z.infer<typeof zCategoryCode>
 
 export const zCategory = z.object({
   code: zCategoryCode,
-  label: z.string(),
 })
 
 export type Category = z.infer<typeof zCategory>
 
 export const zParentCategory = z.object({
   code: zParentCategoryCode,
-  label: z.string(),
   subcategories: z.record(zCategoryCode, zCategory),
 })
 

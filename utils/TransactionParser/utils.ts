@@ -1,5 +1,7 @@
+import type { TFunction } from 'i18next'
+
 import type { CategoryCode, GradientColorsLightDark, ParentCategoryCode, Transaction } from '@/types'
-import { ALL_CATEGORIES, PARENT_CATEGORY_COLORS } from '@/common'
+import { PARENT_CATEGORY_COLORS } from '@/common'
 import { isExpense } from '@/utils/Stats'
 
 import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './keyword-rules'
@@ -31,19 +33,11 @@ export const getCategoryCode = (row: Transaction): CategoryCode => {
   return isIncome ? 'TFI_02' : 'TFO_02'
 }
 
-export const getSubcategoryLabel = (code: CategoryCode | null): string => {
-  if (!code) {
-    return 'Uncategorised'
-  }
-
-  const category = ALL_CATEGORIES[getParentCategoryCode(code)]
-
-  if (!category) {
-    return code
-  }
-
-  const subcategory = category.subcategories[code]
-  return subcategory?.label ?? code
+/**
+ * Translated label of a (parent) category, the code itself when unknown.
+ */
+export const getCategoryLabel = (code: CategoryCode | ParentCategoryCode | null, t: TFunction): string => {
+  return t(code ?? 'UNCATEGORISED', { ns: 'categories' })
 }
 
 /**
