@@ -27,7 +27,7 @@ const toFile = (id: string, transactions: Transaction[]) =>
   ({
     id,
     status: StatsFileStatus.PARSED,
-    sections: [{ parserId: 'ing__current__1', transactions }],
+    sections: [{ parserId: 'ing__current__default', transactions }],
   }) as unknown as ParsedStatsFile
 
 const fileA = toFile('a', [

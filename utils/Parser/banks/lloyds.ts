@@ -11,7 +11,7 @@ export const lloyds = defineBank({
     {
       accountType: AccountType.CURRENT,
       accountName: 'Current Account',
-      version: '1',
+      variant: 'default',
       dateFormat: 'dd/MM/yyyy',
       headers: [
         'Transaction Date',

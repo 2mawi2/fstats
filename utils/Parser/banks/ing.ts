@@ -11,7 +11,7 @@ export const ing = defineBank({
     {
       accountType: AccountType.CURRENT,
       accountName: 'Giro',
-      version: '1',
+      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: [

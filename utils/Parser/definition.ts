@@ -54,5 +54,5 @@ export const toAccountId = (bank: BankDef, format: FormatDef) => {
 }
 
 export const toParserId = (bank: BankDef, format: FormatDef) => {
-  return `${toAccountId(bank, format)}__${format.version}`
+  return `${toAccountId(bank, format)}__${format.variant}`
 }

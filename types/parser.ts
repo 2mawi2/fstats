@@ -52,7 +52,7 @@ export type DescriptionColumnDef<H extends string = string> = H | readonly H[]
 export type FormatDef<H extends string = string> = {
   /**
    * Part of the persisted IDs.
-   * Parser ID: `${bank.id}__${accountType}__${version}`, bank account ID: `${bank.id}__${accountType}`.
+   * Parser ID: `${bank.id}__${accountType}__${variant}`, bank account ID: `${bank.id}__${accountType}`.
    */
   accountType: AccountType
   /**
@@ -60,9 +60,9 @@ export type FormatDef<H extends string = string> = {
    */
   accountName: string
   /**
-   * Part of the parser ID. "1" for the first CSV format of an account, then "2", "3", etc.
+   * Part of the parser ID, distinguishes multiple CSV formats of the same account ("default", "legacy", etc.).
    */
-  version: string
+  variant: string
   dateFormat: string
   /**
    * 'de' = "1.234,56". 'en' = "1,234.56". Defaults to 'en'.
@@ -112,7 +112,7 @@ export type ValidFormats<F extends readonly FormatDef[]> = { [K in keyof F]: For
 
 type ParserIdOf<BankId extends string, F> = F extends {
   accountType: infer A extends string
-  version: infer V extends string
+  variant: infer V extends string
 }
   ? `${BankId}__${A}__${V}`
   : never

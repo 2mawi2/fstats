@@ -57,7 +57,7 @@ export const newBank = defineBank({
     {
       accountType: AccountType.CURRENT, // bank account ID `new_bank__current`
       accountName: 'Giro', // display name
-      version: '1', // parser ID `new_bank__current__1`; '2', '3', etc. for additional formats of the same account
+      variant: 'default', // parser ID `new_bank__current__default`; additional formats of the same account get descriptive names (e.g. 'legacy')
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de', // optional, '1.234,56'
       // All CSV headers of the file (any order, header row found automatically). Used for detection: all

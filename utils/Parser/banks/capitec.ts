@@ -11,7 +11,7 @@ export const capitec = defineBank({
     {
       accountType: AccountType.SAVINGS,
       accountName: 'Savings',
-      version: '1',
+      variant: 'default',
       dateFormat: 'yyyy-MM-dd HH:mm',
       headers: [
         'Nr',
@@ -41,7 +41,7 @@ export const capitec = defineBank({
     {
       accountType: AccountType.SAVINGS,
       accountName: 'Savings',
-      version: '2',
+      variant: 'legacy',
       dateFormat: 'dd/MM/yyyy',
       headers: [
         'Sequence Number',

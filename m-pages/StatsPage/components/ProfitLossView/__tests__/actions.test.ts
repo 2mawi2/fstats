@@ -86,11 +86,11 @@ describe('getProfitLoss', () => {
     const fromGiro = toTransaction('2026-02-02', '500', 'TFI_02')
     const files = [
       toFile('a', [
-        { parserId: 'comdirect__current__1', transactions: [salary, groceries, toCreditCard, unknown] },
-        { parserId: 'comdirect__credit_card__1', transactions: [fromGiro, restaurant] },
+        { parserId: 'comdirect__current__default', transactions: [salary, groceries, toCreditCard, unknown] },
+        { parserId: 'comdirect__credit_card__default', transactions: [fromGiro, restaurant] },
       ]),
       // Overlapping statement
-      toFile('b', [{ parserId: 'comdirect__current__1', transactions: [{ ...groceries }, groceriesFeb] }]),
+      toFile('b', [{ parserId: 'comdirect__current__default', transactions: [{ ...groceries }, groceriesFeb] }]),
     ]
 
     const [profitLoss] = getProfitLoss(toAccountTransactions(files), BreakdownPeriod.MONTH, i18n.t)
@@ -121,8 +121,8 @@ describe('getProfitLoss', () => {
     const groceries = toTransaction('2026-01-03', '-20', 'GRO_01')
     const files = [
       toFile('a', [
-        { parserId: 'comdirect__current__1', transactions: [outgoing, groceries] },
-        { parserId: 'comdirect__credit_card__1', transactions: [incoming] },
+        { parserId: 'comdirect__current__default', transactions: [outgoing, groceries] },
+        { parserId: 'comdirect__credit_card__default', transactions: [incoming] },
       ]),
     ]
     const withoutIncoming = <T extends Transaction>(transactions: T[]) =>
@@ -137,7 +137,7 @@ describe('getProfitLoss', () => {
 
   it('should skip currencies without shown transactions', () => {
     const files = [
-      toFile('a', [{ parserId: 'ing__current__1', transactions: [toTransaction('2026-01-01', '-1', 'GRO_01')] }]),
+      toFile('a', [{ parserId: 'ing__current__default', transactions: [toTransaction('2026-01-01', '-1', 'GRO_01')] }]),
     ]
 
     expect(getProfitLoss(toAccountTransactions(files), BreakdownPeriod.YEAR, i18n.t, () => [])).toEqual([])
@@ -145,10 +145,10 @@ describe('getProfitLoss', () => {
 
   it('should return one per currency', () => {
     const files = [
-      toFile('a', [{ parserId: 'ing__current__1', transactions: [toTransaction('2026-01-01', '-1', 'GRO_01')] }]),
+      toFile('a', [{ parserId: 'ing__current__default', transactions: [toTransaction('2026-01-01', '-1', 'GRO_01')] }]),
       toFile('b', [
         {
-          parserId: 'fnb__credit_card__1',
+          parserId: 'fnb__credit_card__default',
           transactions: [toTransaction('2026-01-01', '-1', 'GRO_01', Currency.ZAR)],
         },
       ]),
