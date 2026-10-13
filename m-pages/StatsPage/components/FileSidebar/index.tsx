@@ -4,10 +4,9 @@ import { Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
-import { isParsed } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
-import { AmountFilter, filterFiles } from '../../actions'
+import { filterFiles } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
 import { useTransactionFilter } from '../../useTransactionFilter'
@@ -29,17 +28,10 @@ const Component = () => {
   // The summary is only a placeholder, the filters don't apply to the CSV view
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const csvTitle = t('STATS_PAGE.CSV_DISABLED')
-  const { excludedCategories } = useTransactionFilter()
-  // Only the category filter applies, the stats show money in and out side by side
-  const filter = useMemo(
-    () => ({ amount: AmountFilter.ALL, excludedCategories: isCsv ? new Set<string>() : excludedCategories }),
-    [isCsv, excludedCategories],
-  )
-  const summaryFiles = useMemo(() => filterFiles(allParsedFiles, filter), [allParsedFiles, filter])
-  const detailFiles = useMemo(
-    () => checkedFiles.map((file) => (isParsed(file) ? filterFiles([file], filter)[0] : file)),
-    [checkedFiles, filter],
-  )
+  // The stats show money in and out side by side, so only the category filter applies
+  const { categoryFilter } = useTransactionFilter()
+  const summaryFiles = useMemo(() => filterFiles(allParsedFiles, categoryFilter), [allParsedFiles, categoryFilter])
+  const detailFiles = useMemo(() => filterFiles(checkedFiles, categoryFilter), [checkedFiles, categoryFilter])
 
   if (!checkedFiles.length) {
     return <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />

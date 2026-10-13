@@ -209,14 +209,6 @@ export const filterTransactions = <T extends Transaction>(
 }
 
 /**
- * Transactions the category filter offers categories of: the counted ones (without duplicates, on selected days) of the
- * shown files, matching the amount filter.
- */
-export const getCategoryFilterTransactions = (shownFiles: ParsedStatsFile[], amount: AmountFilter) => {
-  return filterAmount(splitDuplicates(shownFiles.flatMap(getFileTransactions)).unique, amount)
-}
-
-/**
  * Transactions without those on the deselected days of the date explorer.
  */
 export const filterDays = <T extends Transaction>(transactions: T[], deselectedDays: Set<string>) => {
@@ -233,10 +225,16 @@ const filterFile = (file: ParsedStatsFile, filter: (transactions: Transaction[])
 }
 
 /**
- * Parsed files with only their transactions matching the filter.
+ * Parsed files with only their transactions matching the filter, the files as they are without one.
  */
-export const filterFiles = (files: ParsedStatsFile[], filter: TransactionFilter) => {
-  return files.map((file) => filterFile(file, (transactions) => filterTransactions(transactions, filter)))
+export const filterFiles = <T extends StatsFile>(files: T[], filter: TransactionFilter): T[] => {
+  if (filter.amount === AmountFilter.ALL && !filter.excludedCategories.size) {
+    return files
+  }
+
+  return files.map((file) =>
+    isParsed(file) ? (filterFile(file, (transactions) => filterTransactions(transactions, filter)) as T) : file,
+  )
 }
 
 /**

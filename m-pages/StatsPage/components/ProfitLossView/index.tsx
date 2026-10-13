@@ -11,10 +11,8 @@ import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import {
-  AmountFilter,
   filterFiles,
   filterTransactions,
-  getCategoryFilterTransactions,
   getEmptyReason,
   getTransactionCounts,
   getTransactionCountText,
@@ -44,9 +42,8 @@ const Component = () => {
     BreakdownPeriod.MONTH,
     { initializeWithValue: false },
   )
-  const { excludedCategories, setExcludedCategories } = useTransactionFilter()
   // Income and expenses are both part of it, so the amount filter doesn't apply
-  const filter = useMemo(() => ({ amount: AmountFilter.ALL, excludedCategories }), [excludedCategories])
+  const { categoryFilter: filter } = useTransactionFilter()
   const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
   const countsByCurrency = useMemo(
     () =>
@@ -63,20 +60,10 @@ const Component = () => {
     () => getProfitLoss(filterFiles(selectedFiles, filter), period),
     [selectedFiles, filter, period],
   )
-  const categoryTransactions = useMemo(
-    () => getCategoryFilterTransactions(selectedFiles, AmountFilter.ALL),
-    [selectedFiles],
-  )
 
   return (
     <>
-      <ViewToolbar
-        categoryFilter={
-          selectedFiles.length
-            ? { transactions: categoryTransactions, excluded: excludedCategories, onChange: setExcludedCategories }
-            : undefined
-        }
-      >
+      <ViewToolbar>
         <SegmentedToggle
           value={period}
           options={getBreakdownPeriodOptions()}

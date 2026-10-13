@@ -3,14 +3,18 @@
 import { ChevronRight, TuneOutlined } from '@mui/icons-material'
 import { Badge, Box, IconButton, Popover, Switch, Tooltip } from '@mui/material'
 import { sumBy } from 'lodash'
+import { useSearchParams } from 'next/navigation'
 import type { KeyboardEvent, ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 
-import type { Transaction } from '@/types'
 import { useTranslation } from '@/lib/i18n'
 
+import { AmountFilter } from '../../actions'
+import { useShownFiles } from '../../context'
+import { getView, WorkspaceView } from '../../params'
+import { useTransactionFilter } from '../../useTransactionFilter'
 import OutlineCheckbox from '../OutlineCheckbox'
-import { getCategoryGroups, getCheckState, toggleCategories } from './actions'
+import { getCategoryFilterTransactions, getCategoryGroups, getCheckState, toggleCategories } from './actions'
 import { ui } from './styled'
 
 export type FilterOption = {
@@ -24,25 +28,11 @@ export type FilterOption = {
   onChange: (checked: boolean) => void
 }
 
-export type CategoryFilter = {
-  /**
-   * Transactions whose categories are offered, before the category filter.
-   */
-  transactions: Transaction[]
-  excluded: Set<string>
-  onChange: (excluded: Set<string>) => void
-}
-
 type FiltersProps = {
+  /**
+   * Switches of the transactions table.
+   */
   options: FilterOption[]
-  /**
-   * The button is disabled without it.
-   */
-  categoryFilter?: CategoryFilter
-  /**
-   * Explains why the button is disabled, shown on hover.
-   */
-  disabledTooltip?: string
 }
 
 // Rows are buttons, like the rows of the date explorer
@@ -55,20 +45,29 @@ const onRowKeyDown = (event: KeyboardEvent<HTMLElement>) => {
 
 /**
  * Filters button on the right of the toolbar, with a panel of switches for the transactions table and the money in and
- * out categories as trees, styled like the date explorer. Marked while a filter is on.
+ * out categories (of the shown files) as trees, styled like the date explorer. Marked while a filter is on. Disabled in
+ * the CSV view and without checked files.
  */
-const Component = ({ options, categoryFilter, disabledTooltip }: FiltersProps) => {
+const Component = ({ options }: FiltersProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const disabled = !categoryFilter
-  const excluded = categoryFilter?.excluded ?? new Set<string>()
-  const groups = useMemo(() => getCategoryGroups(categoryFilter?.transactions ?? []), [categoryFilter?.transactions])
+  const view = getView(useSearchParams())
+  const { checkedFiles, parsedFiles } = useShownFiles()
+  const { amountFilter, excludedCategories: excluded, setExcludedCategories } = useTransactionFilter()
+  // The breakdown shows income and expenses, so the amount filter doesn't apply
+  const amount = view === WorkspaceView.BREAKDOWN ? AmountFilter.ALL : amountFilter
+  const groups = useMemo(
+    () => getCategoryGroups(getCategoryFilterTransactions(parsedFiles, amount)),
+    [parsedFiles, amount],
+  )
+  const disabled = !checkedFiles.length || view === WorkspaceView.CSV
+  const hasOptions = options.length > 0
   const allKeys = groups.flatMap((group) => group.parents.flatMap((parent) => parent.keys))
   const isActive = options.some((option) => option.checked && option.count) || !getCheckState(excluded, allKeys).checked
 
-  const onToggle = (keys: string[]) => categoryFilter?.onChange(toggleCategories(excluded, keys))
+  const onToggle = (keys: string[]) => setExcludedCategories(toggleCategories(excluded, keys))
 
   const toggleExpanded = (key: string) => {
     const next = new Set(expanded)
@@ -143,7 +142,15 @@ const Component = ({ options, categoryFilter, disabledTooltip }: FiltersProps) =
 
   return (
     <>
-      <Tooltip title={disabled && disabledTooltip ? disabledTooltip : t('STATS_PAGE.FILTERS.TITLE')}>
+      <Tooltip
+        title={
+          !checkedFiles.length
+            ? t('STATS_PAGE.NO_SELECTION.TITLE')
+            : disabled
+              ? t('STATS_PAGE.CSV_DISABLED')
+              : t('STATS_PAGE.FILTERS.TITLE')
+        }
+      >
         {/* Disabled buttons don't fire hover events */}
         <Box component="span" sx={sx.button}>
           <IconButton
@@ -166,10 +173,10 @@ const Component = ({ options, categoryFilter, disabledTooltip }: FiltersProps) =
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{ paper: { sx: sx.paper(options.length > 0) } }}
+        slotProps={{ paper: { sx: sx.paper(hasOptions) } }}
       >
-        <Box sx={sx.columns(options.length > 0)}>
-          {options.length ? (
+        <Box sx={sx.columns(hasOptions)}>
+          {hasOptions ? (
             <Box sx={sx.column}>
               <Box sx={sx.header}>{t('STATS_PAGE.FILTERS.SHOW')}</Box>
               {options.map((option) => (

@@ -2,7 +2,7 @@
 
 import { Box } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
@@ -12,7 +12,6 @@ import { useTranslation } from '@/lib/i18n'
 import {
   filterTransactions,
   getAmountFilterOptions,
-  getCategoryFilterTransactions,
   getEmptyReason,
   getTransactionCounts,
   getTransactionsLayoutOptions,
@@ -52,7 +51,7 @@ const Component = () => {
   const [search, setSearch] = useState('')
   const searchQuery = toSearchQuery(useDeferredValue(search))
   const { includeDuplicates, setIncludeDuplicates, includeDateExcluded, setIncludeDateExcluded } = useTableOptions()
-  const { filter, amountFilter, setAmountFilter, excludedCategories, setExcludedCategories } = useTransactionFilter()
+  const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
   const { deselectedDays } = useWorkspaceDayFilter()
   const { parsedFiles: shownParsedFiles } = useShownFiles()
   // All transactions, those on days deselected in the date explorer are greyed out or hidden
@@ -73,26 +72,11 @@ const Component = () => {
   // Only the combined table has duplicates
   const duplicateCount = isCombined && !isTransactionsSplit ? counts.duplicateCount : 0
 
-  const categoryTransactions = useMemo(
-    () => getCategoryFilterTransactions(shownParsedFiles, amountFilter),
-    [shownParsedFiles, amountFilter],
-  )
-
   return (
     <>
       {/* Outside the scroll container, so it stays in place */}
       <ViewToolbar
         end={<SearchField value={search} onChange={setSearch} disabled={isEmpty} />}
-        filtersDisabledTooltip={!checkedFiles.length ? t('STATS_PAGE.NO_SELECTION.TITLE') : undefined}
-        categoryFilter={
-          isTransactionsView
-            ? {
-                transactions: categoryTransactions,
-                excluded: excludedCategories,
-                onChange: setExcludedCategories,
-              }
-            : undefined
-        }
         options={
           isTransactionsView
             ? [

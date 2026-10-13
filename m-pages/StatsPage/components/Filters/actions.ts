@@ -1,11 +1,13 @@
 import { countBy, sumBy } from 'lodash'
 
-import type { ParentCategory, ParentCategoryCode, Transaction } from '@/types'
+import type { ParentCategory, ParentCategoryCode, ParsedStatsFile, Transaction } from '@/types'
 import { ALL_CATEGORIES, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
+import { getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { i18n } from '@/lib/i18n'
 
-import { getCategoryKey, NO_CATEGORY } from '../../actions'
+import type { AmountFilter } from '../../actions'
+import { filterAmount, getCategoryKey, NO_CATEGORY } from '../../actions'
 
 export type CategoryOption = {
   key: string
@@ -25,6 +27,16 @@ export type CategoryGroup = {
   key: string
   label: string
   parents: ParentCategoryOption[]
+}
+
+const KNOWN_KEYS = new Set(Object.values(ALL_CATEGORIES).flatMap((parent) => Object.keys(parent.subcategories)))
+
+/**
+ * Transactions whose categories are offered: the counted ones (without duplicates, on selected days) of the shown
+ * files, matching the amount filter.
+ */
+export const getCategoryFilterTransactions = (shownFiles: ParsedStatsFile[], amount: AmountFilter) => {
+  return filterAmount(splitDuplicates(shownFiles.flatMap(getFileTransactions)).unique, amount)
 }
 
 const toParentOptions = (
@@ -54,9 +66,8 @@ const toParentOptions = (
  */
 export const getCategoryGroups = (transactions: Transaction[]): CategoryGroup[] => {
   const counts = countBy(transactions, getCategoryKey)
-  const knownKeys = new Set(Object.values(ALL_CATEGORIES).flatMap((parent) => Object.keys(parent.subcategories)))
   const otherOptions = Object.keys(counts)
-    .filter((key) => !knownKeys.has(key))
+    .filter((key) => !KNOWN_KEYS.has(key))
     .map((key) => ({
       key,
       label: getSubcategoryLabel(key === NO_CATEGORY ? null : key),

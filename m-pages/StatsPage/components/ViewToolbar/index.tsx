@@ -9,7 +9,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
-import type { CategoryFilter, FilterOption } from '../Filters'
+import type { FilterOption } from '../Filters'
 import Filters from '../Filters'
 import { ui } from './styled'
 
@@ -20,24 +20,16 @@ type ViewToolbarProps = {
    */
   end?: ReactNode
   /**
-   * Overrides why the filters are disabled.
-   */
-  filtersDisabledTooltip?: string
-  /**
    * Switches of the transactions table.
    */
   options?: FilterOption[]
-  /**
-   * The filters button is disabled without it.
-   */
-  categoryFilter?: CategoryFilter
 }
 
 /**
  * Toolbar of the middle column: switches between the CSV, transactions, breakdown and stats views (raw to most summarised), followed by the view's own controls
  * and the filters.
  */
-const Component = ({ children, end, options, categoryFilter, filtersDisabledTooltip }: ViewToolbarProps) => {
+const Component = ({ children, end, options }: ViewToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -78,14 +70,7 @@ const Component = ({ children, end, options, categoryFilter, filtersDisabledTool
       <Box sx={sx.spacer} />
       {end}
       {/* On every view, so the toolbar doesn't change when switching */}
-      <Filters
-        options={options ?? []}
-        categoryFilter={categoryFilter}
-        disabledTooltip={
-          filtersDisabledTooltip ??
-          (activeView === WorkspaceView.CSV ? t('STATS_PAGE.CSV_DISABLED') : t('STATS_PAGE.NO_SELECTION.TITLE'))
-        }
-      />
+      <Filters options={options ?? []} />
     </Box>
   )
 }

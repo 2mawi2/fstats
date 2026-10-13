@@ -2,7 +2,6 @@
 
 import { InsertChartOutlined } from '@mui/icons-material'
 import { Box, Divider, Stack } from '@mui/material'
-import { useMemo } from 'react'
 
 import { getFileTransactions } from '@/m-stats-file/service'
 import { useTransactionHelper, useUserPreferences } from '@/hooks'
@@ -11,7 +10,6 @@ import { useTranslation } from '@/lib/i18n'
 import {
   filterTransactions,
   getAmountFilterOptions,
-  getCategoryFilterTransactions,
   getCurrency,
   getEmptyReason,
   getTransactionCounts,
@@ -38,7 +36,7 @@ const Component = () => {
   const { locale, dateFormat } = useUserPreferences()
   const { files } = useWorkspaceFiles()
   const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays, excludedDayCount } = useShownFiles()
-  const { filter, amountFilter, setAmountFilter, excludedCategories, setExcludedCategories } = useTransactionFilter()
+  const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
   const { transactions, transactionRangeItems } = useTransactionHelper({
     files: selectedFiles,
     locale,
@@ -53,24 +51,9 @@ const Component = () => {
   const currency = getCurrency(transactions)
   const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
 
-  const categoryTransactions = useMemo(
-    () => getCategoryFilterTransactions(selectedFiles, amountFilter),
-    [selectedFiles, amountFilter],
-  )
-
   return (
     <>
-      <ViewToolbar
-        categoryFilter={
-          selectedFiles.length
-            ? {
-                transactions: categoryTransactions,
-                excluded: excludedCategories,
-                onChange: setExcludedCategories,
-              }
-            : undefined
-        }
-      >
+      <ViewToolbar>
         <SegmentedToggle
           value={amountFilter}
           options={getAmountFilterOptions()}
