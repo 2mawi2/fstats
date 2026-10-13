@@ -11,6 +11,7 @@ export const WorkspaceView = {
   CSV: 'csv',
   TRANSACTIONS: 'transactions',
   STATS: 'stats',
+  BREAKDOWN: 'breakdown',
 } as const
 
 export type WorkspaceView = (typeof WorkspaceView)[keyof typeof WorkspaceView]

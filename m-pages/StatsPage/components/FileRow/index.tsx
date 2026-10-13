@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Checkbox, CircularProgress, ListItem, ListItemButton, Tooltip, Typography } from '@mui/material'
+import { Checkbox, CircularProgress, ListItem, ListItemButton, Tooltip, Typography } from '@mui/material'
 
 import type { StatsFile } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
@@ -9,6 +9,7 @@ import { useTranslation } from '@/lib/i18n'
 
 import { getFileFormat, getFileNameColor } from '../../actions'
 import FileStatusIcon from '../FileStatusIcon'
+import TextChip from '../TextChip'
 import { ui } from './styled'
 
 type FileRowProps = {
@@ -42,9 +43,9 @@ const Component = ({ file, isChecked, onToggle, disabled = false }: FileRowProps
           </Tooltip>
         ) : null}
         {isParsed(file) ? (
-          <Box component="span" title={format.value} sx={sx.bankChip}>
+          <TextChip title={format.value} sx={sx.bankChip}>
             {format.value}
-          </Box>
+          </TextChip>
         ) : null}
       </ListItemButton>
     </ListItem>

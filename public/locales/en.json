@@ -18,7 +18,11 @@
     "TOTAL_WITH_CURRENCY": "Total ({{currency}})",
     "TRANSACTION_COUNT_one": "{{count}} transaction",
     "TRANSACTION_COUNT_other": "{{count}} transactions",
-    "ALL_TRANSACTIONS": "All transactions"
+    "ALL_TRANSACTIONS": "All transactions",
+    "DATE_EXCLUDED_one": "{{count}} excluded by date",
+    "DATE_EXCLUDED_other": "{{count}} excluded by date",
+    "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
+    "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded"
   },
   "NAVIGATION": {
     "HOME": "Home",
@@ -70,13 +74,14 @@
     "VIEW": {
       "CSV": "CSV",
       "TRANSACTIONS": "Transactions",
-      "STATS": "Stats"
+      "STATS": "Stats",
+      "BREAKDOWN": "Breakdown"
     },
-    "CSV_DISABLED": "Switch to Transactions or Stats",
+    "CSV_DISABLED": "Not available in CSV view",
     "FILE_TOOLBAR": {
       "SELECT_ALL": "All",
       "SELECT_NONE": "None",
-      "SELECT_PARSED": "Parsed",
+      "SELECT_SUPPORTED": "Supported",
       "SELECT_UNSUPPORTED": "Unsupported",
       "SELECT_INVALID": "Invalid",
       "BANK_ACCOUNTS": "Bank accounts",
@@ -115,27 +120,35 @@
     },
     "SIDEBAR": {
       "DATE_FILTERED": "Filtered by date",
-      "DATE_EXCLUDED_one": "{{count}} excluded by date",
-      "DATE_EXCLUDED_other": "{{count}} excluded by date",
-      "FILE_DETAILS": "File details",
-      "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
-      "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
-      "DUPLICATES_INCLUDED_one": "{{count}} duplicate included",
-      "DUPLICATES_INCLUDED_other": "{{count}} duplicates included"
+      "FILE_DETAILS": "File details"
+    },
+    "FILTERS": {
+      "TITLE": "Filters",
+      "TABLE": "Table",
+      "CURRENCY": "Currency",
+      "ALL_CURRENCIES": "All"
     },
     "DEMO": {
       "BANNER": "You are viewing demo data",
       "END": "End demo",
-      "UPLOAD_YOUR_DATA": "Upload your data"
+      "UPLOAD_YOUR_DATA": "Use your own files"
     },
     "DATA_VIEW": {
-      "SHOW_DUPLICATES_one": "Show {{count}} duplicate",
-      "SHOW_DUPLICATES_other": "Show {{count}} duplicates",
+      "SHOW_DATE_EXCLUDED": "Show excluded by date",
+      "SHOW_DUPLICATES": "Show duplicates",
       "DUPLICATE_OF": "Duplicate, also in {{file}}",
       "DUPLICATE_TAG": "Duplicate",
       "ALSO_IN": "Also in {{files}}",
       "ROW_COUNT_one": "{{count}} row",
       "ROW_COUNT_other": "{{count}} rows",
+      "SEARCH": "Search",
+      "CLEAR_SEARCH": "Clear search",
+      "SEARCH_MATCHES_one": "{{count}} match",
+      "SEARCH_MATCHES_other": "{{count}} matches",
+      "NO_SEARCH_RESULTS": {
+        "TITLE": "No results",
+        "SUBTITLE": "Nothing matches “{{search}}”. Try a different search."
+      },
       "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
       "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
       "FILE_NOT_READ": "No preview, this file was not added: {{message}}",
@@ -168,6 +181,25 @@
       "SHOW_ALL_CATEGORIES": "Show all categories",
       "NO_INCOME": "No income for the selected period",
       "NO_EXPENSES": "No expenses for the selected period"
+    },
+    "PROFIT_LOSS": {
+      "TITLE": "Profit and loss",
+      "PERIOD": {
+        "MONTH": "Month",
+        "QUARTER": "Quarter",
+        "YEAR": "Year"
+      },
+      "UNCATEGORISED": "Uncategorised",
+      "TOTAL_INCOME": "Total income",
+      "TOTAL_EXPENSES": "Total expenses",
+      "NET": "Net result",
+      "NET_MARGIN": "Net margin",
+      "TRANSFERS": "Internal transfers",
+      "TRANSFERS_NOTE_one": "{{count}} transaction between your accounts, not counted as income or expenses",
+      "TRANSFERS_NOTE_other": "{{count}} transactions between your accounts, not counted as income or expenses",
+      "TRANSFERS_IN": "Transfers in",
+      "TRANSFERS_OUT": "Transfers out",
+      "TRANSFERS_NET": "Net transfers"
     }
   },
   "SETTINGS_PAGE": {

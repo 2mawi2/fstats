@@ -21,9 +21,13 @@ import { ui } from './styled'
 type TransactionChartProps = {
   transactions: Transaction[]
   currency: Currency
+  /**
+   * Next to the title, e.g. the currency when several are shown.
+   */
+  chip?: string
 }
 
-const Component = ({ transactions, currency }: TransactionChartProps) => {
+const Component = ({ transactions, currency, chip }: TransactionChartProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const sx = ui()
@@ -54,7 +58,7 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
 
   return (
     <Box>
-      <CardTitle>{t('STATS_PAGE.STATS_VIEW.CASHFLOW')}</CardTitle>
+      <CardTitle chip={chip}>{t('STATS_PAGE.STATS_VIEW.CASHFLOW')}</CardTitle>
 
       <Box sx={sx.chartCard} ref={ref}>
         {/* @ts-expect-error Type '"line"' is not assignable to type '"bar"'. */}

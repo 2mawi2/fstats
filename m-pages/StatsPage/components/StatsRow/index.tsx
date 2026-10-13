@@ -12,8 +12,10 @@ import { toFixedLocaleCurrency } from '@/utils/Number'
 import { getStats } from '@/utils/Stats'
 import { useTranslation } from '@/lib/i18n'
 
+import type { TransactionCounts } from '../../actions'
 import { getAmountColor } from '../../actions'
 import StatsList from '../StatsList'
+import TextChip from '../TextChip'
 import { ui } from './styled'
 
 type StatsRowProps = {
@@ -32,13 +34,9 @@ type StatsRowProps = {
    */
   chip?: string
   /**
-   * Shown after the transaction count, e.g. "5 duplicates excluded".
+   * Shown above the stats, those excluded by date are also indicated next to the balance.
    */
-  notes?: string[]
-  /**
-   * Transactions on days deselected in the date explorer, indicated next to the balance and as the first note.
-   */
-  dateExcludedCount?: number
+  counts?: TransactionCounts
   defaultExpanded?: boolean
   /**
    * Shown above the stats when expanded.
@@ -55,8 +53,7 @@ const Component = ({
   isTotal = false,
   stats,
   chip,
-  notes,
-  dateExcludedCount = 0,
+  counts,
   defaultExpanded = false,
   children,
 }: StatsRowProps) => {
@@ -75,12 +72,8 @@ const Component = ({
         >
           {title}
         </Typography>
-        {chip ? (
-          <Box component="span" sx={sx.chip}>
-            {chip}
-          </Box>
-        ) : null}
-        {dateExcludedCount ? (
+        {chip ? <TextChip sx={sx.chip}>{chip}</TextChip> : null}
+        {counts?.dateExcludedCount ? (
           <Tooltip title={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')}>
             <EventNoteOutlined sx={sx.dateFiltered} aria-label={t('STATS_PAGE.SIDEBAR.DATE_FILTERED')} />
           </Tooltip>
@@ -96,16 +89,7 @@ const Component = ({
       <Collapse in={isExpanded} unmountOnExit sx={sx.collapse}>
         <Box className="details" sx={sx.details}>
           {children}
-          {stats ? (
-            <StatsList
-              transactions={stats.transactions}
-              currency={stats.currency}
-              notes={[
-                ...(dateExcludedCount ? [t('STATS_PAGE.SIDEBAR.DATE_EXCLUDED', { count: dateExcludedCount })] : []),
-                ...(notes ?? []),
-              ]}
-            />
-          ) : null}
+          {stats ? <StatsList transactions={stats.transactions} currency={stats.currency} counts={counts} /> : null}
         </Box>
       </Collapse>
     </ListItem>

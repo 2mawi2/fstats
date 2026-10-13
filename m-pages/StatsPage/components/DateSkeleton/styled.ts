@@ -6,12 +6,17 @@ import { ui as explorerUi } from '../DateExplorer/styled'
  * The date explorer's row layout, static and greyed out.
  */
 export const ui = () => {
-  const { row, expandIcon, expandIconEnd, expandSpacer } = explorerUi()
+  const { row, label, expandIcon, expandIconEnd, expandSpacer } = explorerUi()
 
   return {
-    // Fills the pane, so the tooltip shows anywhere in it
     skeleton: {
       flexGrow: 1,
+    },
+    // Why it's shown, in place of the year
+    title: {
+      ...label,
+      flexGrow: 1,
+      color: 'text.disabled',
     },
     // Only the layout, not the positioning and hover of the virtual rows
     row: pick(row, ['display', 'alignItems', 'gap', 'pr']),

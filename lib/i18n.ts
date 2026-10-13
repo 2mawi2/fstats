@@ -6,12 +6,14 @@ import { initReactI18next, Trans, useTranslation } from 'react-i18next'
 
 import { UserLocale } from '@/types-enums'
 import { MISC } from '@/common'
+import deCategories from '@/public/locales/categories/de.json'
+import enCategories from '@/public/locales/categories/en.json'
 import de from '@/public/locales/de.json'
 import en from '@/public/locales/en.json'
 
 const resources = {
-  [UserLocale.EN]: { translation: en },
-  [UserLocale.DE]: { translation: de },
+  [UserLocale.EN]: { translation: en, categories: enCategories },
+  [UserLocale.DE]: { translation: de, categories: deCategories },
 } as const
 
 if (typeof window !== 'undefined') {

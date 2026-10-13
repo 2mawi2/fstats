@@ -4,29 +4,29 @@ import { Box, Typography } from '@mui/material'
 
 import type { Transaction } from '@/types'
 import type { Currency } from '@/types-enums'
-import { MISC } from '@/common'
 import { useUserPreferences } from '@/hooks'
 import { toFixedLocaleCurrency } from '@/utils/Number'
 import { getStats } from '@/utils/Stats'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { getAmountColor } from '../../actions'
+import type { TransactionCounts } from '../../actions'
+import { getAmountColor, getTransactionCountText } from '../../actions'
 import { ui } from './styled'
 
 type StatsListProps = {
   transactions: Transaction[]
   currency: Currency
   /**
-   * Shown after the transaction count.
+   * Shown above the stats, the count of `transactions` without.
    */
-  notes?: string[]
+  counts?: TransactionCounts
 }
 
 /**
  * Income minus expenses with the total below, like a ledger.
  */
-const Component = ({ transactions, currency, notes = [] }: StatsListProps) => {
+const Component = ({ transactions, currency, counts }: StatsListProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const { locale } = useUserPreferences()
@@ -40,7 +40,7 @@ const Component = ({ transactions, currency, notes = [] }: StatsListProps) => {
   return (
     <Box>
       <Typography component="div" sx={sx.count}>
-        {[t('MISC.TRANSACTION_COUNT', { count: transactions.length }), ...notes].join(` ${MISC.CENTER_DOT} `)}
+        {getTransactionCountText(counts ?? { count: transactions.length, dateExcludedCount: 0, duplicateCount: 0 })}
       </Typography>
       <Box component="dl" sx={sx.list}>
         {items.map((item) => (

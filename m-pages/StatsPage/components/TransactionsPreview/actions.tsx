@@ -4,9 +4,13 @@ import type { TFunction } from 'i18next'
 import { groupBy, uniq } from 'lodash'
 
 import type { ParsedStatsFile, Transaction } from '@/types'
-import type { Currency } from '@/types-enums'
+import type { Currency, DateFormat, UserLocale } from '@/types-enums'
 import { getFileCurrency, getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 import { getCurrencySymbol } from '@/utils/Currency'
+import { toDisplayDate } from '@/utils/Date'
+import { toFixedLocaleAmount, toFixedLocaleCurrency } from '@/utils/Number'
+import { getCategoryLabel } from '@/utils/TransactionParser'
+import { Big } from '@/lib/w-big'
 
 import { AmountFilter } from '../../actions'
 import type { VirtualTableColumn } from '../VirtualTable'
@@ -14,10 +18,16 @@ import type { VirtualTableColumn } from '../VirtualTable'
 // Equal width digits, so numbers align across rows
 const TABULAR_NUMS = { fontVariantNumeric: 'tabular-nums' } as const
 
-// Same as the bank chip of the file rows. Inline block, so the strikethrough of the row doesn't reach it
+// Same as the bank chip of the file rows, with the info icon. Inline flex, so the strikethrough of the row doesn't
+// reach it
 const DUPLICATE_TAG_SX = {
-  display: 'inline-block',
-  px: 0.75,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 0.5,
+  pl: 0.75,
+  pr: '4px',
+  // Into the cell padding, so the icon lines up with those of the other rows (padding and border)
+  mr: '-5px',
   cursor: 'default',
   border: 1,
   borderColor: 'divider',
@@ -26,6 +36,8 @@ const DUPLICATE_TAG_SX = {
   lineHeight: '16px',
   color: 'text.secondary',
 } as const
+
+const INFO_ICON_SX = { display: 'block', fontSize: 14, color: 'text.secondary' } as const
 
 export type SourcedTransaction = Transaction & {
   /**
@@ -111,18 +123,19 @@ export const getTransactionColumns = (
     ? [
         {
           label: t('MISC.SOURCE'),
-          fixedWidth: isDuplicate ? 84 : 32,
+          fixedWidth: isDuplicate ? 96 : 32,
           hideLabel: true,
           align: 'right' as const,
           renderCell: (source: string, rowIndex: number) => (
-            // Duplicates show a tag instead of the icon, with the same tooltip
+            // Duplicates show a tag with the icon
             <Tooltip title={<Box sx={{ whiteSpace: 'pre-line' }}>{source}</Box>} placement="left">
               {isDuplicate?.(rowIndex) ? (
                 <Box component="span" sx={DUPLICATE_TAG_SX}>
                   {t('STATS_PAGE.DATA_VIEW.DUPLICATE_TAG')}
+                  <InfoOutlined sx={INFO_ICON_SX} />
                 </Box>
               ) : (
-                <InfoOutlined sx={{ display: 'block', ml: 'auto', fontSize: 14, color: 'text.secondary' }} />
+                <InfoOutlined sx={{ ...INFO_ICON_SX, ml: 'auto' }} />
               )}
             </Tooltip>
           ),
@@ -130,3 +143,30 @@ export const getTransactionColumns = (
       ]
     : []),
 ]
+
+/**
+ * Shown values of the transaction, without the source (only a tooltip).
+ */
+export const getTransactionCells = (
+  transaction: SourcedTransaction,
+  {
+    currency,
+    amountFilter,
+    locale,
+    dateFormat,
+    t,
+  }: { currency: Currency | null; amountFilter: AmountFilter; locale: UserLocale; dateFormat: DateFormat; t: TFunction },
+) => {
+  // Signs are redundant when only one direction is shown
+  const isSigned = amountFilter === AmountFilter.ALL
+  const displayValue = isSigned ? transaction.value : Big(transaction.value).abs().toString()
+  // Mixed currencies show the symbol per amount
+  const formatAmount = currency ? toFixedLocaleAmount : toFixedLocaleCurrency
+
+  return [
+    toDisplayDate(transaction.date, locale, { formatTo: dateFormat }),
+    transaction.description,
+    formatAmount(displayValue, transaction.currency, locale, { showPlusSign: isSigned }),
+    getCategoryLabel(transaction.category, t),
+  ]
+}

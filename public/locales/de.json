@@ -18,7 +18,11 @@
     "TOTAL_WITH_CURRENCY": "Summe ({{currency}})",
     "TRANSACTION_COUNT_one": "{{count}} Umsatz",
     "TRANSACTION_COUNT_other": "{{count}} Umsätze",
-    "ALL_TRANSACTIONS": "Alle Umsätze"
+    "ALL_TRANSACTIONS": "Alle Umsätze",
+    "DATE_EXCLUDED_one": "{{count}} durch Datum ausgeschlossen",
+    "DATE_EXCLUDED_other": "{{count}} durch Datum ausgeschlossen",
+    "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
+    "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen"
   },
   "NAVIGATION": {
     "HOME": "Start",
@@ -70,13 +74,14 @@
     "VIEW": {
       "CSV": "CSV",
       "TRANSACTIONS": "Umsätze",
-      "STATS": "Statistiken"
+      "STATS": "Statistiken",
+      "BREAKDOWN": "Aufstellung"
     },
-    "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln",
+    "CSV_DISABLED": "In der CSV-Ansicht nicht verfügbar",
     "FILE_TOOLBAR": {
       "SELECT_ALL": "Alle",
       "SELECT_NONE": "Keine",
-      "SELECT_PARSED": "Ausgewertet",
+      "SELECT_SUPPORTED": "Unterstützt",
       "SELECT_UNSUPPORTED": "Nicht unterstützt",
       "SELECT_INVALID": "Ungültig",
       "BANK_ACCOUNTS": "Bankkonten",
@@ -115,27 +120,35 @@
     },
     "SIDEBAR": {
       "DATE_FILTERED": "Nach Datum gefiltert",
-      "DATE_EXCLUDED_one": "{{count}} durch Datum ausgeschlossen",
-      "DATE_EXCLUDED_other": "{{count}} durch Datum ausgeschlossen",
-      "FILE_DETAILS": "Dateidetails",
-      "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
-      "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen",
-      "DUPLICATES_INCLUDED_one": "{{count}} Duplikat einbezogen",
-      "DUPLICATES_INCLUDED_other": "{{count}} Duplikate einbezogen"
+      "FILE_DETAILS": "Dateidetails"
+    },
+    "FILTERS": {
+      "TITLE": "Filter",
+      "TABLE": "Tabelle",
+      "CURRENCY": "Währung",
+      "ALL_CURRENCIES": "Alle"
     },
     "DEMO": {
       "BANNER": "Du siehst Demodaten",
       "END": "Demo beenden",
-      "UPLOAD_YOUR_DATA": "Eigene Daten hochladen"
+      "UPLOAD_YOUR_DATA": "Eigene Dateien verwenden"
     },
     "DATA_VIEW": {
-      "SHOW_DUPLICATES_one": "{{count}} Duplikat anzeigen",
-      "SHOW_DUPLICATES_other": "{{count}} Duplikate anzeigen",
+      "SHOW_DATE_EXCLUDED": "Durch Datum ausgeschlossene anzeigen",
+      "SHOW_DUPLICATES": "Duplikate anzeigen",
       "DUPLICATE_OF": "Duplikat, auch in {{file}}",
       "DUPLICATE_TAG": "Duplikat",
       "ALSO_IN": "Auch in {{files}}",
       "ROW_COUNT_one": "{{count}} Zeile",
       "ROW_COUNT_other": "{{count}} Zeilen",
+      "SEARCH": "Suchen",
+      "CLEAR_SEARCH": "Suche löschen",
+      "SEARCH_MATCHES_one": "{{count}} Treffer",
+      "SEARCH_MATCHES_other": "{{count}} Treffer",
+      "NO_SEARCH_RESULTS": {
+        "TITLE": "Keine Ergebnisse",
+        "SUBTITLE": "Nichts passt zu „{{search}}“. Versuche eine andere Suche."
+      },
       "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
       "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
       "FILE_NOT_READ": "Keine Vorschau, diese Datei wurde nicht hinzugefügt: {{message}}",
@@ -168,6 +181,25 @@
       "SHOW_ALL_CATEGORIES": "Alle Kategorien anzeigen",
       "NO_INCOME": "Keine Einnahmen im ausgewählten Zeitraum",
       "NO_EXPENSES": "Keine Ausgaben im ausgewählten Zeitraum"
+    },
+    "PROFIT_LOSS": {
+      "TITLE": "Gewinn- und Verlustrechnung",
+      "PERIOD": {
+        "MONTH": "Monat",
+        "QUARTER": "Quartal",
+        "YEAR": "Jahr"
+      },
+      "UNCATEGORISED": "Nicht kategorisiert",
+      "TOTAL_INCOME": "Einnahmen gesamt",
+      "TOTAL_EXPENSES": "Ausgaben gesamt",
+      "NET": "Ergebnis",
+      "NET_MARGIN": "Nettomarge",
+      "TRANSFERS": "Interne Umbuchungen",
+      "TRANSFERS_NOTE_one": "{{count}} Buchung zwischen deinen Konten, nicht als Einnahme oder Ausgabe gezählt",
+      "TRANSFERS_NOTE_other": "{{count}} Buchungen zwischen deinen Konten, nicht als Einnahmen oder Ausgaben gezählt",
+      "TRANSFERS_IN": "Eingehende Umbuchungen",
+      "TRANSFERS_OUT": "Ausgehende Umbuchungen",
+      "TRANSFERS_NET": "Umbuchungen netto"
     }
   },
   "SETTINGS_PAGE": {

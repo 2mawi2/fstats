@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronRight, ExpandMore } from '@mui/icons-material'
-import { Box, Checkbox, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useMemo, useState } from 'react'
 
@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import DateSkeleton from '../DateSkeleton'
+import OutlineCheckbox from '../OutlineCheckbox'
 import type { DateRow } from './actions'
 import {
   getCheckState,
@@ -25,7 +26,6 @@ import {
   toggleDays,
   toggleExpanded,
 } from './actions'
-import { CheckBoxOutlineChecked, CheckBoxOutlineIndeterminate } from './icons'
 import { ui } from './styled'
 
 /**
@@ -129,14 +129,10 @@ const Component = () => {
             >
               {row.type === 'month' ? renderExpandIcon(row, isExpanded) : null}
               {row.type === 'day' ? <Box sx={sx.expandSpacer} /> : null}
-              <Checkbox
-                size="small"
+              <OutlineCheckbox
                 {...checkState}
-                checkedIcon={<CheckBoxOutlineChecked />}
-                indeterminateIcon={<CheckBoxOutlineIndeterminate />}
                 onClick={(event) => event.stopPropagation()}
                 onChange={() => toggleRow(row)}
-                sx={sx.checkbox}
               />
               <Typography
                 sx={{

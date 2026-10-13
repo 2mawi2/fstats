@@ -1,7 +1,7 @@
 import type { VirtualTableColumn } from '.'
 
-// Estimate only, rows are measured once rendered
-export const ROW_HEIGHT = 25 // px
+// Of the header and each row, including the border. Also the estimate of the virtualizer, which measures rows
+export const ROW_HEIGHT = 28 // px
 
 // Relative, columns without a width get an equal share
 export const DEFAULT_COLUMN_WIDTH = 100
@@ -29,4 +29,78 @@ export const getColWidths = (columns: VirtualTableColumn[] | null, columnCount: 
 
     return index === autoIndex ? 'auto' : `${(width / totalWidth) * 100}%`
   })
+}
+
+// Accents, e.g. of "ä" once decomposed into "a" and the diaeresis
+const COMBINING_MARKS = /\p{M}/gu
+
+/**
+ * Lowercase text without accents and "ß" as "ss", so e.g. "muller" finds "Müller" and "strasse" finds "Straße".
+ */
+export const foldText = (text: string) => {
+  return text.toLowerCase().normalize('NFD').replace(COMBINING_MARKS, '').replace(/ß/g, 'ss')
+}
+
+/**
+ * Query of the search field, see `foldText`. Empty when there is nothing to search for.
+ */
+export const toSearchQuery = (search: string) => {
+  return foldText(search.trim())
+}
+
+/**
+ * Text of the cells to search in, see `foldText`. Separated, so matches don't span cells.
+ */
+export const toSearchText = (cells: string[]) => {
+  return foldText(cells.join('\n'))
+}
+
+/**
+ * The rows whose search text (see `toSearchText`, by row index) contains the query, all rows without a query.
+ */
+export const filterBySearch = <T>(rows: T[], searchTexts: string[], query: string) => {
+  return query ? rows.filter((_, index) => searchTexts[index].includes(query)) : rows
+}
+
+/**
+ * Splits the text into parts, the odd ones match the query (see `toSearchQuery`), e.g. "a" matches the "ä" of "Bäcker".
+ */
+export const splitMatches = (text: string, query: string) => {
+  if (!query) {
+    return [text]
+  }
+
+  // Folded per character with the original range of each folded character, as folding can change the length (ß to ss)
+  let folded = ''
+  const starts: number[] = []
+  const ends: number[] = []
+  let index = 0
+
+  for (const char of text) {
+    const foldedChar = foldText(char)
+    folded += foldedChar
+
+    for (let i = 0; i < foldedChar.length; i++) {
+      starts.push(index)
+      ends.push(index + char.length)
+    }
+    index += char.length
+  }
+
+  const parts: string[] = []
+  let last = 0
+
+  for (let match = folded.indexOf(query); match !== -1; match = folded.indexOf(query, match + query.length)) {
+    const start = starts[match]
+
+    // Skips a match starting within the character the previous one ended in (e.g. "s" in "ß")
+    if (start >= last) {
+      const end = ends[match + query.length - 1]
+      parts.push(text.slice(last, start), text.slice(start, end))
+      last = end
+    }
+  }
+
+  parts.push(text.slice(last))
+  return parts
 }

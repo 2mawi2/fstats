@@ -30,6 +30,9 @@ export const ui = () => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
+    chip: {
+      ml: 1,
+    },
     rowCount: {
       ml: 1,
       fontSize: 12,

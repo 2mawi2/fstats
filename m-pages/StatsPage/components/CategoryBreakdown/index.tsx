@@ -16,12 +16,16 @@ type CategoryBreakdownProps = {
   transactions: Transaction[]
   currency: Currency
   amountFilter: AmountFilter
+  /**
+   * Next to the title, e.g. the currency when several are shown.
+   */
+  chip?: string
 }
 
-const Component = ({ transactions, currency, amountFilter }: CategoryBreakdownProps) => {
+const Component = ({ transactions, currency, amountFilter, chip }: CategoryBreakdownProps) => {
   const { t } = useTranslation()
   const { totalIncome, totalExpense } = getStats(transactions)
-  const groupedTransactions = getTransactionsGroupedByCategory(transactions)
+  const groupedTransactions = getTransactionsGroupedByCategory(transactions, t)
   const income = groupedTransactions.filter((cat) => Object.keys(INCOME_CATEGORIES).includes(cat.code))
   const expenses = groupedTransactions.filter((cat) => Object.keys(EXPENSE_CATEGORIES).includes(cat.code))
   const [showAll, setShowAll] = useState(false)
@@ -29,6 +33,7 @@ const Component = ({ transactions, currency, amountFilter }: CategoryBreakdownPr
   return (
     <Box>
       <CardTitle
+        chip={chip}
         action={
           <FormControlLabel
             control={<Switch size="small" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} />}

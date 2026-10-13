@@ -3,26 +3,37 @@
 import { AccountBalanceOutlined, CreditCardOutlined } from '@mui/icons-material'
 import { Box, Chip } from '@mui/material'
 
-import type { StatsFile } from '@/types'
+import type { StatsFile, Transaction } from '@/types'
 import { MISC } from '@/common'
 import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 
-import { getFileAccount, getFileFormat, getFileNameColor } from '../../actions'
+import {
+  filterDays,
+  getFileAccount,
+  getFileFormat,
+  getFileNameColor,
+  getTransactionCounts,
+  withoutDuplicates,
+} from '../../actions'
 import StatsRow from '../StatsRow'
 import { ui } from './styled'
 
 type FileDetailsProps = {
-  file: StatsFile
   /**
-   * Transactions on days deselected in the date explorer, `file` is without them.
+   * Before the date explorer.
    */
-  dateExcludedCount: number
+  file: StatsFile
+  deselectedDays: Set<string>
+  /**
+   * Duplicates across all checked files, see `getDuplicates`.
+   */
+  duplicates: Set<Transaction>
 }
 
-const Component = ({ file, dateExcludedCount }: FileDetailsProps) => {
+const Component = ({ file, deselectedDays, duplicates }: FileDetailsProps) => {
   const sx = ui()
   const { locale } = useUserPreferences()
 
@@ -60,8 +71,15 @@ const Component = ({ file, dateExcludedCount }: FileDetailsProps) => {
     <StatsRow
       title={file.file.name}
       titleColor={getFileNameColor(file)}
-      stats={isParsed(file) ? { transactions: getFileTransactions(file), currency: getFileCurrency(file) } : null}
-      dateExcludedCount={dateExcludedCount}
+      stats={
+        isParsed(file)
+          ? {
+              transactions: filterDays(withoutDuplicates(getFileTransactions(file), duplicates), deselectedDays),
+              currency: getFileCurrency(file),
+            }
+          : null
+      }
+      counts={isParsed(file) ? getTransactionCounts(getFileTransactions(file), deselectedDays, duplicates) : undefined}
     >
       <Box sx={sx.info}>
         {renderAccount()}

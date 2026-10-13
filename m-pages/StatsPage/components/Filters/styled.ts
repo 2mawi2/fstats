@@ -1,0 +1,148 @@
+export const ui = () => {
+  return {
+    // On the right of the toolbar
+    button: {
+      mr: -0.75,
+    },
+    icon: {
+      fontSize: 18,
+    },
+    // Like `DropdownMenu`, wide enough for the columns
+    paper: (hasOptions: boolean) => ({
+      width: `min(${hasOptions ? 840 : 560}px, calc(100vw - 32px))`,
+      mt: 0.5,
+      borderRadius: '6px',
+      border: 1,
+      borderColor: 'divider',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+    }),
+    // Options, money in and money out side by side in equal columns, stacked on small screens
+    columns: (hasOptions: boolean) => ({
+      display: 'grid',
+      gridTemplateColumns: { xs: '1fr', sm: hasOptions ? 'repeat(3, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))' },
+      '& > * + *': {
+        borderLeft: { xs: 0, sm: 1 },
+        borderTop: { xs: 1, sm: 0 },
+        borderColor: { xs: 'divider', sm: 'divider' },
+      },
+    }),
+    column: {
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: 0,
+      py: 0.5,
+    },
+    // Same height as the rows, so the columns line up
+    header: {
+      display: 'flex',
+      alignItems: 'center',
+      height: 30,
+      px: 1.5,
+      fontSize: 11,
+      fontWeight: 'medium',
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase',
+      color: 'text.secondary',
+    },
+    // Currencies above the switches
+    section: {
+      display: 'flex',
+      flexDirection: 'column',
+      '& + *': { mt: 0.5 },
+    },
+    scroll: {
+      maxHeight: { sm: 'min(480px, 60vh)' },
+      overflowY: 'auto',
+    },
+    // Same as the rows of the date explorer
+    row: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 0.25,
+      height: 30,
+      pr: 1.5,
+      cursor: 'pointer',
+      userSelect: 'none',
+      '&:hover': { bgcolor: 'action.hover' },
+    },
+    optionRow: {
+      gap: 1,
+      pl: 1.5,
+    },
+    disabledRow: {
+      cursor: 'default',
+      color: 'text.disabled',
+      '&:hover': { bgcolor: 'transparent' },
+    },
+    // Money in or out, on the left like the years of the date explorer
+    groupRow: {
+      pl: '4px',
+    },
+    groupLabel: {
+      fontSize: 11,
+      fontWeight: 500,
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase',
+    },
+    parentRow: {
+      pl: '6px',
+    },
+    childRow: {
+      pl: '28px',
+    },
+    label: {
+      flexGrow: 1,
+      minWidth: 0,
+      fontSize: 13,
+      lineHeight: 1.4,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+    count: {
+      flexShrink: 0,
+      ml: 1,
+      fontSize: 12,
+      color: 'text.secondary',
+      fontVariantNumeric: 'tabular-nums',
+    },
+    emptyCount: {
+      color: 'text.disabled',
+    },
+    expandIcon: {
+      display: 'flex',
+      flexShrink: 0,
+      justifyContent: 'center',
+      width: 22,
+      color: 'text.secondary',
+      '& .MuiSvgIcon-root': { fontSize: 18, transition: 'transform 150ms' },
+    },
+    expandSpacer: {
+      flexShrink: 0,
+      width: 22,
+    },
+    // Like `OutlineCheckbox`
+    radio: {
+      flexShrink: 0,
+      p: 0.5,
+      ml: -0.5,
+      color: 'action.disabled',
+      // The row handles the click
+      pointerEvents: 'none',
+      '& .MuiSvgIcon-root': { fontSize: 18 },
+      '&.Mui-checked': { color: 'text.secondary' },
+    },
+    // Smaller than the small switch, to fit the compact rows
+    switch: {
+      width: 32,
+      height: 20,
+      p: 0.5,
+      ml: -0.5,
+      // The row handles the click
+      pointerEvents: 'none',
+      '& .MuiSwitch-switchBase': { p: 0.5 },
+      '& .MuiSwitch-switchBase.Mui-checked': { transform: 'translateX(12px)' },
+      '& .MuiSwitch-thumb': { width: 12, height: 12 },
+    },
+  }
+}

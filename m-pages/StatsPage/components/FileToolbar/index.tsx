@@ -1,15 +1,16 @@
 'use client'
 
 import { ArrowDropDown, CreateNewFolderOutlined, DeleteOutlined, NoteAddOutlined } from '@mui/icons-material'
-import { Box, Checkbox, Divider, IconButton, ListSubheader, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
+import { Box, Checkbox, Divider, IconButton, Tooltip, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { MISC } from '@/common'
+import { DropdownMenu, DropdownMenuDivider, DropdownMenuItem, DropdownMenuSubheader } from '@/components'
 import { isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace, useWorkspaceFiles } from '../../context'
-import { getBankAccountOptions, isSameSelection } from './actions'
+import { getBankAccountOptions, isSameSelection, toggleFileIds } from './actions'
 import { ui } from './styled'
 
 const Component = () => {
@@ -26,16 +27,19 @@ const Component = () => {
   const selectOptions = [
     { id: 'all', label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_ALL'), fileIds: toIds(files) },
     { id: 'none', label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_NONE'), fileIds: [] },
-    { id: 'parsed', label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_PARSED'), fileIds: toIds(files.filter(isParsed)) },
+    { id: 'supported', label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_SUPPORTED'), fileIds: toIds(files.filter(isParsed)) },
+    // Same colors as the file names in the list
     {
       id: 'unsupported',
       label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_UNSUPPORTED'),
       fileIds: toIds(files.filter(isUnknown)),
+      color: 'warning.main',
     },
     {
       id: 'invalid',
       label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_INVALID'),
       fileIds: toIds(files.filter(isError)),
+      color: 'error.main',
     },
   ]
 
@@ -48,19 +52,6 @@ const Component = () => {
         isActive(option.fileIds),
       )?.label
     : undefined
-
-  const renderItemContent = (label: string, count: number | null) => (
-    <>
-      <Box component="span" sx={sx.menuItemLabel}>
-        {label}
-      </Box>
-      {count !== null ? (
-        <Box component="span" sx={sx.menuItemCount}>
-          {count}
-        </Box>
-      ) : null}
-    </>
-  )
 
   const selectFiles = (fileIds: string[]) => {
     setSelectedFileIds(fileIds)
@@ -88,33 +79,52 @@ const Component = () => {
         </IconButton>
       </Box>
 
-      <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)} sx={sx.menu}>
-        {selectOptions.map((option) => (
-          <MenuItem
-            key={option.id}
-            disabled={option.id !== 'none' && !option.fileIds.length}
-            onClick={() => selectFiles(option.fileIds)}
-            selected={isActive(option.fileIds)}
-            sx={sx.menuItem}
-          >
-            {renderItemContent(option.label, option.id === 'none' ? null : option.fileIds.length)}
-          </MenuItem>
-        ))}
-        {bankOptions.length ? <Divider sx={sx.menuDivider} /> : null}
+      <DropdownMenu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}>
+        {selectOptions.map((option) => {
+          const isDisabled = option.id !== 'none' && !option.fileIds.length
+
+          return (
+            <DropdownMenuItem
+              key={option.id}
+              disabled={isDisabled}
+              onClick={() => selectFiles(option.fileIds)}
+              // Without files, an option would match an empty selection
+              selected={!isDisabled && isActive(option.fileIds)}
+              label={option.label}
+              count={option.id === 'none' ? null : option.fileIds.length}
+              sx={'color' in option ? { color: option.color } : undefined}
+            />
+          )
+        })}
+        {bankOptions.length ? <DropdownMenuDivider /> : null}
         {bankOptions.length ? (
-          <ListSubheader sx={sx.menuSubheader}>{t('STATS_PAGE.FILE_TOOLBAR.BANK_ACCOUNTS')}</ListSubheader>
+          <DropdownMenuSubheader>{t('STATS_PAGE.FILE_TOOLBAR.BANK_ACCOUNTS')}</DropdownMenuSubheader>
         ) : null}
-        {bankOptions.map((option) => (
-          <MenuItem
-            key={option.value}
-            onClick={() => selectFiles(option.fileIds)}
-            selected={isActive(option.fileIds)}
-            sx={sx.menuItem}
-          >
-            {renderItemContent(option.label, option.fileIds.length)}
-          </MenuItem>
-        ))}
-      </Menu>
+        {/* Checkboxes, so accounts can be combined, e.g. all of one bank. The menu stays open */}
+        {bankOptions.map((option) => {
+          const checkedCount = option.fileIds.filter((id) => checkedIds.includes(id)).length
+
+          return (
+            <DropdownMenuItem
+              key={option.value}
+              onClick={() => setSelectedFileIds(toggleFileIds(option.fileIds, checkedIds))}
+              role="menuitemcheckbox"
+              aria-checked={checkedCount === option.fileIds.length}
+              start={
+                <Checkbox
+                  size="small"
+                  checked={checkedCount === option.fileIds.length}
+                  indeterminate={checkedCount > 0 && checkedCount < option.fileIds.length}
+                  tabIndex={-1}
+                  sx={sx.menuCheckbox}
+                />
+              }
+              label={option.label}
+              count={option.fileIds.length}
+            />
+          )
+        })}
+      </DropdownMenu>
 
       {checkedIds.length && !isDemoMode ? (
         <>

@@ -17,7 +17,7 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 - One module per route (`app/{route}/page.tsx` only renders it): `index.tsx`, `actions.ts` (pure helpers), `styled.ts` (`ui()` sx objects), `components/{Component}/` (same structure, nested per component)
 - `StatsPage` (`/stats`) is the main 3-column page: file explorer | data or stats view (`?view=stats`) | file sidebar; demo mode via `?demo=true`. Its `context.ts` holds synchronous UI state only (demo mode, file pickers)
-- Translations in `public/locales/{en,de}.json`, namespaced per page (e.g. `STATS_PAGE.*`); always update both files
+- Translations in `public/locales/{en,de}.json`, namespaced per page (e.g. `STATS_PAGE.*`); category labels in `public/locales/categories/{en,de}.json` (`categories` namespace, keyed by code, via `getCategoryLabel`); always update both files
 
 ### Data Access Rules
 

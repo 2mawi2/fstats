@@ -13,6 +13,10 @@ export const ui = () => {
       pl: 1.5,
       pr: 1,
     },
+    // Right after the title, pushing the rest to the right
+    chip: {
+      mr: 'auto',
+    },
     title: {
       flexGrow: 1,
       minWidth: 0,
@@ -22,18 +26,6 @@ export const ui = () => {
       overflow: 'hidden',
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
-    },
-    // Same as the bank chip of the file rows
-    chip: {
-      flexShrink: 0,
-      mr: 'auto',
-      px: 0.75,
-      border: 1,
-      borderColor: 'divider',
-      borderRadius: '10px',
-      fontSize: 11,
-      lineHeight: '18px',
-      color: 'text.secondary',
     },
     // Greyed out like the transactions on deselected days in the table
     dateFiltered: {
