@@ -5,24 +5,24 @@ import { Box, Chip } from '@mui/material'
 
 import type { StatsFile } from '@/types'
 import { MISC } from '@/common'
-import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/service'
+import { getFileCurrency, getFileTransactions, isParsed, splitDuplicates } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 
-import { getFileAccount, getFileFormat, getFileNameColor } from '../../actions'
+import { filterDays, getFileAccount, getFileFormat, getFileNameColor, getTransactionCounts } from '../../actions'
 import StatsRow from '../StatsRow'
 import { ui } from './styled'
 
 type FileDetailsProps = {
-  file: StatsFile
   /**
-   * Transactions on days deselected in the date explorer, `file` is without them.
+   * Before the date explorer.
    */
-  dateExcludedCount: number
+  file: StatsFile
+  deselectedDays: Set<string>
 }
 
-const Component = ({ file, dateExcludedCount }: FileDetailsProps) => {
+const Component = ({ file, deselectedDays }: FileDetailsProps) => {
   const sx = ui()
   const { locale } = useUserPreferences()
 
@@ -60,8 +60,15 @@ const Component = ({ file, dateExcludedCount }: FileDetailsProps) => {
     <StatsRow
       title={file.file.name}
       titleColor={getFileNameColor(file)}
-      stats={isParsed(file) ? { transactions: getFileTransactions(file), currency: getFileCurrency(file) } : null}
-      dateExcludedCount={dateExcludedCount}
+      stats={
+        isParsed(file)
+          ? {
+              transactions: filterDays(splitDuplicates(getFileTransactions(file)).unique, deselectedDays),
+              currency: getFileCurrency(file),
+            }
+          : null
+      }
+      counts={isParsed(file) ? getTransactionCounts(getFileTransactions(file), deselectedDays) : undefined}
     >
       <Box sx={sx.info}>
         {renderAccount()}

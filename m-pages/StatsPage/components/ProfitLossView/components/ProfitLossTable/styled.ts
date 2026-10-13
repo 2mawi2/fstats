@@ -93,7 +93,13 @@ export const ui = () => {
       fontSize: variant === 'subcategory' || variant === 'transaction' ? 12 : 13,
       color: variant === 'subcategory' || variant === 'transaction' ? 'text.secondary' : 'text.primary',
     }),
+    labelContent: (variant: RowVariant) => ({
+      // The cell's width without its padding (8px per spacing unit)
+      width: LABEL_WIDTH - (2 + INDENT[variant]) * 8,
+      overflow: 'hidden',
+    }),
     labelText: {
+      display: 'block',
       minWidth: 0,
       overflow: 'hidden',
       textOverflow: 'ellipsis',

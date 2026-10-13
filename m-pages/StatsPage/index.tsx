@@ -5,9 +5,7 @@ import type { SxProps, Theme } from '@mui/material'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { Fragment, useRef } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC } from '@/common'
 import { PageWrapper } from '@/components'
 import { useDataLayout, useFileHelper, useResizeHandle } from '@/hooks'
 
@@ -31,9 +29,6 @@ const Component = () => {
   const view = getView(searchParams)
   const isDemoMode = isDemo(searchParams)
   const { isLoadingFiles } = useFileHelper()
-  const [includeDuplicates] = useLocalStorage(MISC.LS_DATA_INCLUDE_DUPLICATES_KEY, false, {
-    initializeWithValue: false,
-  })
   const dayFilter = useDayFilter({ isDemoMode, isDisabled: view === WorkspaceView.CSV })
   const { columnWidths: widths, setColumnWidths: setWidths } = useDataLayout()
   // Leave demo mode once real files are added, so they are shown
@@ -71,8 +66,7 @@ const Component = () => {
     {
       id: 'right',
       sx: { ...sx.fullHeightColumn, ...sx.toolbarColumn, ...sx.rightColumn },
-      // Duplicates are always excluded from the stats, the date explorer is hidden in the CSV view
-      content: <FileSidebar includeDuplicates={view === WorkspaceView.TRANSACTIONS && includeDuplicates} />,
+      content: <FileSidebar />,
     },
   ]
 

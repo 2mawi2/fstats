@@ -19,6 +19,7 @@ export const MISC = {
   LS_DATA_LAYOUT_KEY: 'fstats__data_layout',
   LS_DATA_TRANSACTIONS_LAYOUT_KEY: 'fstats__data_transactions_layout',
   LS_DATA_INCLUDE_DUPLICATES_KEY: 'fstats__data_include_duplicates',
+  LS_DATA_INCLUDE_DATE_EXCLUDED_KEY: 'fstats__data_include_date_excluded',
   LS_DATA_AMOUNT_FILTER_KEY: 'fstats__data_amount_filter',
   LS_DATA_DESELECTED_DAYS_KEY: 'fstats__data_deselected_days',
   LS_DATA_BREAKDOWN_PERIOD_KEY: 'fstats__data_breakdown_period',

@@ -14,10 +14,16 @@ import type { VirtualTableColumn } from '../VirtualTable'
 // Equal width digits, so numbers align across rows
 const TABULAR_NUMS = { fontVariantNumeric: 'tabular-nums' } as const
 
-// Same as the bank chip of the file rows. Inline block, so the strikethrough of the row doesn't reach it
+// Same as the bank chip of the file rows, with the info icon. Inline flex, so the strikethrough of the row doesn't
+// reach it
 const DUPLICATE_TAG_SX = {
-  display: 'inline-block',
-  px: 0.75,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 0.5,
+  pl: 0.75,
+  pr: '4px',
+  // Into the cell padding, so the icon lines up with those of the other rows (padding and border)
+  mr: '-5px',
   cursor: 'default',
   border: 1,
   borderColor: 'divider',
@@ -26,6 +32,8 @@ const DUPLICATE_TAG_SX = {
   lineHeight: '16px',
   color: 'text.secondary',
 } as const
+
+const INFO_ICON_SX = { display: 'block', fontSize: 14, color: 'text.secondary' } as const
 
 export type SourcedTransaction = Transaction & {
   /**
@@ -111,18 +119,19 @@ export const getTransactionColumns = (
     ? [
         {
           label: t('MISC.SOURCE'),
-          fixedWidth: isDuplicate ? 84 : 32,
+          fixedWidth: isDuplicate ? 96 : 32,
           hideLabel: true,
           align: 'right' as const,
           renderCell: (source: string, rowIndex: number) => (
-            // Duplicates show a tag instead of the icon, with the same tooltip
+            // Duplicates show a tag with the icon
             <Tooltip title={<Box sx={{ whiteSpace: 'pre-line' }}>{source}</Box>} placement="left">
               {isDuplicate?.(rowIndex) ? (
                 <Box component="span" sx={DUPLICATE_TAG_SX}>
                   {t('STATS_PAGE.DATA_VIEW.DUPLICATE_TAG')}
+                  <InfoOutlined sx={INFO_ICON_SX} />
                 </Box>
               ) : (
-                <InfoOutlined sx={{ display: 'block', ml: 'auto', fontSize: 14, color: 'text.secondary' }} />
+                <InfoOutlined sx={{ ...INFO_ICON_SX, ml: 'auto' }} />
               )}
             </Tooltip>
           ),

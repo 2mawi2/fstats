@@ -3,10 +3,17 @@
 import { InsertChartOutlined } from '@mui/icons-material'
 import { Box, Divider, Stack } from '@mui/material'
 
+import { getFileTransactions } from '@/m-stats-file/service'
 import { useTransactionHelper, useUserPreferences } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
-import { filterTransactions, getAmountFilterOptions, getCurrency, getEmptyReason } from '../../actions'
+import {
+  filterTransactions,
+  getAmountFilterOptions,
+  getCurrency,
+  getEmptyReason,
+  getTransactionCounts,
+} from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
 import { useAmountFilter } from '../../useAmountFilter'
 import BalanceChart from '../BalanceChart'
@@ -37,6 +44,10 @@ const Component = () => {
     filterTransactions: (unique) => filterTransactions(unique, amountFilter),
     excludedDays: deselectedDays,
   })
+  const counts = getTransactionCounts(
+    filterTransactions(allParsedFiles.flatMap(getFileTransactions), amountFilter),
+    deselectedDays,
+  )
   const currency = getCurrency(transactions)
   const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, amountFilter)
 
@@ -69,7 +80,7 @@ const Component = () => {
             </Box>
 
             <Box sx={sx.section}>
-              <TransactionCountChart transactions={transactions} excludedDays={deselectedDays} />
+              <TransactionCountChart transactions={transactions} excludedDays={deselectedDays} counts={counts} />
             </Box>
 
             <Box sx={sx.section}>

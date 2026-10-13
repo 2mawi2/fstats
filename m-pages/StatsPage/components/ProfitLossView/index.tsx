@@ -2,13 +2,15 @@
 
 import { ReceiptLongOutlined } from '@mui/icons-material'
 import { Box, Divider, Stack } from '@mui/material'
+import { groupBy, mapValues } from 'lodash'
 import { useMemo } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
+import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
-import { AmountFilter, getEmptyReason } from '../../actions'
+import { AmountFilter, getEmptyReason, getTransactionCounts, getTransactionCountText } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
 import CardTitle from '../CardTitle'
 import DropZoneDisplay from '../DropZoneDisplay'
@@ -27,7 +29,7 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { files } = useWorkspaceFiles()
-  const { parsedFiles: selectedFiles, allParsedFiles } = useShownFiles()
+  const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays } = useShownFiles()
   const [period, setPeriod] = useLocalStorage<BreakdownPeriod>(
     MISC.LS_DATA_BREAKDOWN_PERIOD_KEY,
     BreakdownPeriod.MONTH,
@@ -35,7 +37,21 @@ const Component = () => {
   )
   // Income and expenses are both part of it, so the amount filter doesn't apply
   const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, AmountFilter.ALL)
+  const countsByCurrency = useMemo(
+    () =>
+      mapValues(
+        groupBy(allParsedFiles.flatMap(getFileTransactions), (transaction) => transaction.currency),
+        (transactions) => getTransactionCounts(transactions, deselectedDays),
+      ),
+    [allParsedFiles, deselectedDays],
+  )
   const profitLosses = useMemo(() => getProfitLoss(selectedFiles, period), [selectedFiles, period])
+  const getCaption = (currency: string) => {
+    const counts = countsByCurrency[currency]
+    return [...(profitLosses.length > 1 ? [currency] : []), ...(counts ? [getTransactionCountText(counts)] : [])].join(
+      ` ${MISC.CENTER_DOT} `,
+    )
+  }
 
   return (
     <>
@@ -63,9 +79,7 @@ const Component = () => {
           <Stack divider={<Divider flexItem />}>
             {profitLosses.map((profitLoss) => (
               <Box key={profitLoss.currency} sx={sx.section}>
-                <CardTitle caption={profitLosses.length > 1 ? profitLoss.currency : undefined}>
-                  {t('STATS_PAGE.PROFIT_LOSS.TITLE')}
-                </CardTitle>
+                <CardTitle caption={getCaption(profitLoss.currency)}>{t('STATS_PAGE.PROFIT_LOSS.TITLE')}</CardTitle>
                 <ProfitLossTable profitLoss={profitLoss} period={period} />
               </Box>
             ))}

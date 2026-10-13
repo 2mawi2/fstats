@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 
 import type { StatsFile } from '@/types'
-import { MISC } from '@/common'
 import { isParsed } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
@@ -12,7 +11,7 @@ import { getSubcategoryLabel } from '@/utils/TransactionParser'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { AmountFilter, filterTransactions } from '../../actions'
+import { AmountFilter, filterTransactions, getTransactionCounts, getTransactionCountText } from '../../actions'
 import { useWorkspaceDayFilter } from '../../context'
 import FileMessage from '../FileMessage'
 import PreviewSection from '../PreviewSection'
@@ -29,13 +28,23 @@ type TransactionsPreviewProps = {
   files: StatsFile[]
   amountFilter: AmountFilter
   includeDuplicates: boolean
+  /**
+   * Transactions on days deselected in the date explorer are greyed out, otherwise hidden.
+   */
+  includeDateExcluded: boolean
   scrollElement: HTMLElement | null
 }
 
 /**
  * Transactions of all files in a single table, with their source file when there is more than one.
  */
-const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: TransactionsPreviewProps) => {
+const Component = ({
+  files,
+  amountFilter,
+  includeDuplicates,
+  includeDateExcluded,
+  scrollElement,
+}: TransactionsPreviewProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const { deselectedDays } = useWorkspaceDayFilter()
@@ -48,13 +57,18 @@ const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: Tr
     () => filterTransactions(getSourcedTransactions(parsedFiles), amountFilter),
     [parsedFiles, amountFilter],
   )
-  const transactions = useMemo(
+  const shownTransactions = useMemo(
     () => (includeDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),
     [allTransactions, includeDuplicates],
   )
-  const dateExcludedCount = transactions.filter((transaction) =>
-    deselectedDays.has(getTransactionDay(transaction)),
-  ).length
+  const counts = useMemo(() => getTransactionCounts(allTransactions, deselectedDays), [allTransactions, deselectedDays])
+  const transactions = useMemo(
+    () =>
+      includeDateExcluded
+        ? shownTransactions
+        : shownTransactions.filter((transaction) => !deselectedDays.has(getTransactionDay(transaction))),
+    [shownTransactions, includeDateExcluded, deselectedDays],
+  )
   const columns = useMemo(
     () =>
       getTransactionColumns(
@@ -90,15 +104,8 @@ const Component = ({ files, amountFilter, includeDuplicates, scrollElement }: Tr
     <PreviewSection
       title={singleFile ? singleFile.file.name : t('MISC.ALL_TRANSACTIONS')}
       file={singleFile}
-      // Like the summary in the sidebar, the greyed out transactions on deselected days aren't counted
-      caption={
-        parsedFiles.length
-          ? [
-              t('MISC.TRANSACTION_COUNT', { count: transactions.length - dateExcludedCount }),
-              ...(dateExcludedCount ? [t('STATS_PAGE.SIDEBAR.DATE_EXCLUDED', { count: dateExcludedCount })] : []),
-            ].join(` ${MISC.CENTER_DOT} `)
-          : undefined
-      }
+      // Like everywhere else, those greyed out or struck through aren't counted
+      caption={parsedFiles.length ? getTransactionCountText(counts) : undefined}
       // A single table, so its title and header row can stay in view
       isSticky={isCombined}
     >

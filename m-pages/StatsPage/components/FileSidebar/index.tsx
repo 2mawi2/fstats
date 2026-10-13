@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { useTranslation } from '@/lib/i18n'
 
-import { useShownFiles } from '../../context'
+import { useShownFiles, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
 import FileDetails from '../FileDetails'
 import StatsCard from '../StatsCard'
@@ -13,17 +13,15 @@ import StatsSkeleton from '../StatsSkeleton'
 import TransactionsSummary from '../TransactionsSummary'
 import { ui } from './styled'
 
-type FileSidebarProps = {
-  includeDuplicates: boolean
-}
-
 /**
  * Summary of the checked files and the details per file.
  */
-const Component = ({ includeDuplicates }: FileSidebarProps) => {
+const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  const { checkedFiles, parsedFiles: checkedParsedFiles, allParsedFiles, getExcludedCount } = useShownFiles()
+  // Before the date explorer, the counts include those on deselected days
+  const { checkedFiles } = useWorkspaceFiles()
+  const { parsedFiles: checkedParsedFiles, allParsedFiles, deselectedDays } = useShownFiles()
   // The summary is only a placeholder, the filters don't apply to the CSV view
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const csvTitle = t('STATS_PAGE.CSV_DISABLED')
@@ -40,11 +38,7 @@ const Component = ({ includeDuplicates }: FileSidebarProps) => {
             <StatsSkeleton title={csvTitle} />
           ) : (
             <StatsCard>
-              <TransactionsSummary
-                files={checkedParsedFiles}
-                includeDuplicates={includeDuplicates}
-                allFiles={allParsedFiles}
-              />
+              <TransactionsSummary files={allParsedFiles} deselectedDays={deselectedDays} />
             </StatsCard>
           )}
           <Typography component="h2" sx={sx.subheader}>
@@ -54,7 +48,7 @@ const Component = ({ includeDuplicates }: FileSidebarProps) => {
       ) : null}
       <StatsCard>
         {checkedFiles.map((file) => (
-          <FileDetails key={file.id} file={file} dateExcludedCount={getExcludedCount(file.id)} />
+          <FileDetails key={file.id} file={file} deselectedDays={deselectedDays} />
         ))}
       </StatsCard>
     </>

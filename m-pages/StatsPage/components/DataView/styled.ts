@@ -6,9 +6,5 @@ export const ui = () => {
       overflowY: 'auto',
       p: isEmpty ? 0 : 2,
     }),
-    duplicatesSwitch: {
-      ml: 'auto',
-      mr: 0,
-    },
   }
 }

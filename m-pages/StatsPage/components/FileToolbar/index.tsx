@@ -1,10 +1,11 @@
 'use client'
 
 import { ArrowDropDown, CreateNewFolderOutlined, DeleteOutlined, NoteAddOutlined } from '@mui/icons-material'
-import { Box, Checkbox, Divider, IconButton, ListSubheader, Menu, MenuItem, Tooltip, Typography } from '@mui/material'
+import { Box, Checkbox, Divider, IconButton, Tooltip, Typography } from '@mui/material'
 import { useState } from 'react'
 
 import { MISC } from '@/common'
+import { DropdownMenu, DropdownMenuDivider, DropdownMenuItem, DropdownMenuSubheader } from '@/components'
 import { isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
@@ -49,19 +50,6 @@ const Component = () => {
       )?.label
     : undefined
 
-  const renderItemContent = (label: string, count: number | null) => (
-    <>
-      <Box component="span" sx={sx.menuItemLabel}>
-        {label}
-      </Box>
-      {count !== null ? (
-        <Box component="span" sx={sx.menuItemCount}>
-          {count}
-        </Box>
-      ) : null}
-    </>
-  )
-
   const selectFiles = (fileIds: string[]) => {
     setSelectedFileIds(fileIds)
     setMenuAnchor(null)
@@ -88,33 +76,31 @@ const Component = () => {
         </IconButton>
       </Box>
 
-      <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)} sx={sx.menu}>
+      <DropdownMenu anchorEl={menuAnchor} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}>
         {selectOptions.map((option) => (
-          <MenuItem
+          <DropdownMenuItem
             key={option.id}
             disabled={option.id !== 'none' && !option.fileIds.length}
             onClick={() => selectFiles(option.fileIds)}
             selected={isActive(option.fileIds)}
-            sx={sx.menuItem}
-          >
-            {renderItemContent(option.label, option.id === 'none' ? null : option.fileIds.length)}
-          </MenuItem>
+            label={option.label}
+            count={option.id === 'none' ? null : option.fileIds.length}
+          />
         ))}
-        {bankOptions.length ? <Divider sx={sx.menuDivider} /> : null}
+        {bankOptions.length ? <DropdownMenuDivider /> : null}
         {bankOptions.length ? (
-          <ListSubheader sx={sx.menuSubheader}>{t('STATS_PAGE.FILE_TOOLBAR.BANK_ACCOUNTS')}</ListSubheader>
+          <DropdownMenuSubheader>{t('STATS_PAGE.FILE_TOOLBAR.BANK_ACCOUNTS')}</DropdownMenuSubheader>
         ) : null}
         {bankOptions.map((option) => (
-          <MenuItem
+          <DropdownMenuItem
             key={option.value}
             onClick={() => selectFiles(option.fileIds)}
             selected={isActive(option.fileIds)}
-            sx={sx.menuItem}
-          >
-            {renderItemContent(option.label, option.fileIds.length)}
-          </MenuItem>
+            label={option.label}
+            count={option.fileIds.length}
+          />
         ))}
-      </Menu>
+      </DropdownMenu>
 
       {checkedIds.length && !isDemoMode ? (
         <>

@@ -26,7 +26,6 @@ describe('getShownFiles', () => {
     expect(shown.allParsedFiles).toEqual([fileA, fileB])
     // Only days of the files count, not stale ones
     expect(shown.excludedDayCount).toBe(1)
-    expect([shown.getExcludedCount('a'), shown.getExcludedCount('b'), shown.getExcludedCount('c')]).toEqual([1, 1, 0])
   })
 
   it('should keep the files as they are without deselected days', () => {

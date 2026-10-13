@@ -8,6 +8,8 @@ import { useIsDarkMode, useUserPreferences } from '@/hooks'
 import { getAreaFill, getThemeColor } from '@/utils/Chart'
 import { useTranslation } from '@/lib/i18n'
 
+import type { TransactionCounts } from '../../actions'
+import { getTransactionCountText } from '../../actions'
 import { ui } from '../BalanceChart/styled'
 import CardTitle from '../CardTitle'
 import { getChartOptions, getLineColors, getMonthlyCounts } from './actions'
@@ -21,12 +23,16 @@ type TransactionCountChartProps = {
    * Days deselected in the date explorer, months without other transactions are gaps.
    */
   excludedDays: Set<string>
+  /**
+   * Of the transactions before the date explorer, see `getTransactionCounts`.
+   */
+  counts: TransactionCounts
 }
 
 /**
  * Number of transactions per month.
  */
-const Component = ({ transactions, excludedDays }: TransactionCountChartProps) => {
+const Component = ({ transactions, excludedDays, counts: transactionCounts }: TransactionCountChartProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const isDarkMode = useIsDarkMode()
@@ -55,7 +61,7 @@ const Component = ({ transactions, excludedDays }: TransactionCountChartProps) =
 
   return (
     <Box>
-      <CardTitle caption={t('MISC.TRANSACTION_COUNT', { count: transactions.length })}>
+      <CardTitle caption={getTransactionCountText(transactionCounts)}>
         {t('STATS_PAGE.STATS_VIEW.TRANSACTIONS_PER_MONTH')}
       </CardTitle>
       <Box sx={sx.chartCard}>

@@ -18,7 +18,11 @@
     "TOTAL_WITH_CURRENCY": "Total ({{currency}})",
     "TRANSACTION_COUNT_one": "{{count}} transaction",
     "TRANSACTION_COUNT_other": "{{count}} transactions",
-    "ALL_TRANSACTIONS": "All transactions"
+    "ALL_TRANSACTIONS": "All transactions",
+    "DATE_EXCLUDED_one": "{{count}} excluded by date",
+    "DATE_EXCLUDED_other": "{{count}} excluded by date",
+    "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
+    "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded"
   },
   "NAVIGATION": {
     "HOME": "Home",
@@ -116,13 +120,7 @@
     },
     "SIDEBAR": {
       "DATE_FILTERED": "Filtered by date",
-      "DATE_EXCLUDED_one": "{{count}} excluded by date",
-      "DATE_EXCLUDED_other": "{{count}} excluded by date",
-      "FILE_DETAILS": "File details",
-      "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
-      "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
-      "DUPLICATES_INCLUDED_one": "{{count}} duplicate included",
-      "DUPLICATES_INCLUDED_other": "{{count}} duplicates included"
+      "FILE_DETAILS": "File details"
     },
     "DEMO": {
       "BANNER": "You are viewing demo data",
@@ -130,8 +128,10 @@
       "UPLOAD_YOUR_DATA": "Upload your data"
     },
     "DATA_VIEW": {
-      "SHOW_DUPLICATES_one": "Show {{count}} duplicate",
-      "SHOW_DUPLICATES_other": "Show {{count}} duplicates",
+      "TABLE_OPTIONS": "Table options",
+      "TABLE_OPTIONS_DISABLED": "Only applies to the transactions view",
+      "SHOW_DATE_EXCLUDED": "Show excluded by date",
+      "SHOW_DUPLICATES": "Show duplicates",
       "DUPLICATE_OF": "Duplicate, also in {{file}}",
       "DUPLICATE_TAG": "Duplicate",
       "ALSO_IN": "Also in {{files}}",

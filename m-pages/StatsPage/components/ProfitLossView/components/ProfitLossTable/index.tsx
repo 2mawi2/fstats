@@ -79,19 +79,22 @@ const Component = ({ profitLoss, period }: ProfitLossTableProps) => {
       <Fragment key={key}>
         <Box component="tr" sx={sx.row(variant)}>
           <Box component="th" scope="row" sx={sx.labelCell(variant)} title={label}>
-            {isExpandable ? (
-              <ButtonBase onClick={() => toggle(key)} aria-expanded={isExpanded} sx={sx.expandButton}>
-                <ExpandMore sx={{ ...sx.chevron, transform: isExpanded ? 'none' : 'rotate(-90deg)' }} />
-                <Box component="span" sx={sx.labelText}>
+            {/* Fixed width, so long descriptions are truncated rather than widening the cell */}
+            <Box sx={sx.labelContent(variant)}>
+              {isExpandable ? (
+                <ButtonBase onClick={() => toggle(key)} aria-expanded={isExpanded} sx={sx.expandButton}>
+                  <ExpandMore sx={{ ...sx.chevron, transform: isExpanded ? 'none' : 'rotate(-90deg)' }} />
+                  <Box component="span" sx={sx.labelText}>
+                    {label}
+                  </Box>
+                </ButtonBase>
+              ) : (
+                // Aligned with the labels after the chevrons
+                <Box component="span" sx={{ ...sx.labelText, ...(variant === 'category' ? sx.chevronIndent : {}) }}>
                   {label}
                 </Box>
-              </ButtonBase>
-            ) : (
-              // Aligned with the labels after the chevrons
-              <Box component="span" sx={{ ...sx.labelText, ...(variant === 'category' ? sx.chevronIndent : {}) }}>
-                {label}
-              </Box>
-            )}
+              )}
+            </Box>
           </Box>
           {periods.map((periodKey) => renderAmount(row.values[periodKey], periodKey, variant))}
           {renderAmount(row.total, 'total', variant)}

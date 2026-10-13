@@ -9,16 +9,23 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
+import type { TableOption } from '../TableOptions'
+import TableOptions from '../TableOptions'
 import { ui } from './styled'
 
 type ViewToolbarProps = {
   children?: ReactNode
+  /**
+   * Options of the transactions table, the button is disabled without them.
+   */
+  tableOptions?: TableOption[]
 }
 
 /**
- * Toolbar of the middle column: switches between the CSV, transactions, stats and breakdown views, followed by the view's own controls.
+ * Toolbar of the middle column: switches between the CSV, transactions, stats and breakdown views, followed by the view's own controls
+ * and the options of the transactions table.
  */
-const Component = ({ children }: ViewToolbarProps) => {
+const Component = ({ children, tableOptions }: ViewToolbarProps) => {
   const sx = ui()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -56,6 +63,16 @@ const Component = ({ children }: ViewToolbarProps) => {
       </Box>
       {children ? <Divider orientation="vertical" flexItem sx={sx.divider} /> : null}
       {children}
+      {/* On every view, so the toolbar doesn't change when switching */}
+      <TableOptions
+        options={tableOptions ?? []}
+        disabled={!tableOptions}
+        disabledTooltip={
+          activeView === WorkspaceView.TRANSACTIONS
+            ? t('STATS_PAGE.NO_SELECTION.TITLE')
+            : t('STATS_PAGE.DATA_VIEW.TABLE_OPTIONS_DISABLED')
+        }
+      />
     </Box>
   )
 }

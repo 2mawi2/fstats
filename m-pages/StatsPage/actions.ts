@@ -212,12 +212,6 @@ export const getShownFiles = (checkedFiles: StatsFile[], deselectedDays: Set<str
   const shownCheckedFiles = deselectedDays.size
     ? checkedFiles.map((file) => (isParsed(file) ? filterFileDays(file, deselectedDays) : file))
     : checkedFiles
-  const excludedCounts = new Map(
-    allParsedFiles.map((file) => [
-      file.id,
-      getFileTransactions(file).filter((t) => deselectedDays.has(getTransactionDay(t))).length,
-    ]),
-  )
   const days = new Set(allParsedFiles.flatMap(getFileTransactions).map(getTransactionDay))
 
   return {
@@ -235,10 +229,6 @@ export const getShownFiles = (checkedFiles: StatsFile[], deselectedDays: Set<str
      * Days with transactions of the checked files that are deselected.
      */
     excludedDayCount: [...days].filter((day) => deselectedDays.has(day)).length,
-    /**
-     * Transactions of a checked file on deselected days.
-     */
-    getExcludedCount: (fileId: string) => excludedCounts.get(fileId) ?? 0,
   }
 }
 
@@ -271,11 +261,46 @@ export const getEmptyReason = (
   return filterTransactions(shownTransactions, amountFilter).length ? null : EmptyReason.NO_MATCHES
 }
 
+export type TransactionCounts = {
+  /**
+   * Counted in the stats: without duplicates and those on deselected days.
+   */
+  count: number
+  /**
+   * On days deselected in the date explorer.
+   */
+  dateExcludedCount: number
+  /**
+   * Also in an earlier file (e.g. overlapping statements), on selected days.
+   */
+  duplicateCount: number
+}
+
 /**
- * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount filter.
+ * Counts of the transactions (before the date explorer), the same wherever a transaction count is shown. Duplicates
+ * and transactions on deselected days are never counted, also when shown in the transactions table.
  */
-export const getDuplicateCount = (files: ParsedStatsFile[], amountFilter: AmountFilter) => {
-  return splitDuplicates(filterTransactions(files.flatMap(getFileTransactions), amountFilter)).duplicates.length
+export const getTransactionCounts = (transactions: Transaction[], deselectedDays: Set<string>): TransactionCounts => {
+  const { unique, duplicates } = splitDuplicates(transactions)
+  const isOnSelectedDay = (transaction: Transaction) => !deselectedDays.has(getTransactionDay(transaction))
+  const count = unique.filter(isOnSelectedDay).length
+
+  return {
+    count,
+    dateExcludedCount: unique.length - count,
+    duplicateCount: duplicates.filter(isOnSelectedDay).length,
+  }
+}
+
+/**
+ * E.g. "20 transactions · 12 excluded by date · 5 duplicates excluded".
+ */
+export const getTransactionCountText = ({ count, dateExcludedCount, duplicateCount }: TransactionCounts) => {
+  return [
+    i18n.t('MISC.TRANSACTION_COUNT', { count }),
+    ...(dateExcludedCount ? [i18n.t('MISC.DATE_EXCLUDED', { count: dateExcludedCount })] : []),
+    ...(duplicateCount ? [i18n.t('MISC.DUPLICATES_EXCLUDED', { count: duplicateCount })] : []),
+  ].join(` ${MISC.CENTER_DOT} `)
 }
 
 // TODO: Once we have currency conversion logic, convert files with different currencies
