@@ -11,15 +11,20 @@ import { MISC } from '@/common'
 import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
-import { filterDays, filterTransactions, getEmptyReason, getTransactionCountText } from '../../actions'
+import {
+  EMPTY_REASON_TITLE_KEYS,
+  filterDays,
+  filterTransactions,
+  getEmptyReason,
+  getTransactionCountText,
+  isMissingData,
+} from '../../actions'
 import { useStatsTransactions, useWorkspaceFiles } from '../../context'
 import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
-import DropZoneDisplay from '../DropZoneDisplay'
-import NoSelectionDisplay from '../NoSelectionDisplay'
-import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import PreviewSection from '../PreviewSection'
 import SegmentedToggle from '../SegmentedToggle'
+import ViewEmptyState from '../ViewEmptyState'
 import ViewToolbar from '../ViewToolbar'
 import { BreakdownPeriod, getAccountTransactions, getBreakdownPeriodOptions, getProfitLoss } from './actions'
 import { ProfitLossTable } from './components'
@@ -31,7 +36,7 @@ import { ui } from './styled'
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  const { files, selectedFiles } = useWorkspaceFiles()
+  const { files, checkedFiles, selectedFiles } = useWorkspaceFiles()
   const { all, shown, byCurrency, deselectedDays, count } = useStatsTransactions()
   const [period, setPeriod] = useLocalStorage<BreakdownPeriod>(
     MISC.LS_DATA_BREAKDOWN_PERIOD_KEY,
@@ -40,7 +45,15 @@ const Component = () => {
   )
   // Income and expenses are both part of it, so the amount filter doesn't apply
   const { categoryFilter: filter } = useTransactionFilter()
-  const emptyReason = useMemo(() => getEmptyReason(all, shown, filter), [all, shown, filter])
+  const emptyReason = useMemo(
+    () =>
+      getEmptyReason({
+        fileCount: files.length,
+        checkedCount: checkedFiles.length,
+        transactions: { all, shown, filter },
+      }),
+    [files.length, checkedFiles.length, all, shown, filter],
+  )
   const countsByCurrency = useMemo(
     () => mapValues(byCurrency, (transactions) => count(filterTransactions(transactions!.all, filter))),
     [byCurrency, count, filter],
@@ -68,21 +81,20 @@ const Component = () => {
           value={period}
           options={getBreakdownPeriodOptions()}
           onChange={setPeriod}
-          disabled={!selectedFiles.length}
-          disabledTooltip={t('STATS_PAGE.NO_SELECTION.TITLE')}
+          disabled={isMissingData(emptyReason)}
+          disabledTooltip={emptyReason ? t(EMPTY_REASON_TITLE_KEYS[emptyReason]) : undefined}
         />
       </ViewToolbar>
       <Box sx={sx.scroll}>
-        {!files.length ? (
-          <DropZoneDisplay
-            icon={ReceiptLongOutlined}
-            title={t('STATS_PAGE.STATS_VIEW.NO_DATA')}
-            subtitleKey="STATS_PAGE.STATS_VIEW.NO_DATA_SELECT"
+        {emptyReason ? (
+          <ViewEmptyState
+            reason={emptyReason}
+            dropZone={{
+              icon: ReceiptLongOutlined,
+              title: t('STATS_PAGE.STATS_VIEW.NO_DATA'),
+              subtitleKey: 'STATS_PAGE.STATS_VIEW.NO_DATA_SELECT',
+            }}
           />
-        ) : !selectedFiles.length ? (
-          <NoSelectionDisplay />
-        ) : emptyReason ? (
-          <NoTransactionsDisplay reason={emptyReason} />
         ) : (
           // Sections like the transactions view, so the headings line up when switching. Padded per currency, so the
           // dividers between them go edge to edge.

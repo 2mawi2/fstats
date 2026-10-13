@@ -78,14 +78,34 @@ describe('getTransactionCounts', () => {
 })
 
 describe('getEmptyReason', () => {
-  it('should tell deselected days from filters without matches', () => {
-    const all = fileB.sections[0].transactions
+  const all = fileB.sections[0].transactions
+  const toInput = (transactions?: Parameters<typeof getEmptyReason>[0]['transactions']) => ({
+    fileCount: 2,
+    checkedCount: 1,
+    transactions,
+  })
 
-    expect(getEmptyReason(all, [], toFilter(AmountFilter.ALL))).toBe(EmptyReason.NO_DATES)
-    expect(getEmptyReason(all, all, toFilter(AmountFilter.IN))).toBe(EmptyReason.NO_MATCHES)
-    expect(getEmptyReason(all, all, toFilter(AmountFilter.OUT))).toBeNull()
-    expect(getEmptyReason(all, all, toFilter(AmountFilter.OUT, [NO_CATEGORY]))).toBe(EmptyReason.NO_MATCHES)
-    expect(getEmptyReason([], [], toFilter(AmountFilter.ALL))).toBeNull()
+  it('should tell missing files and selections apart', () => {
+    expect(getEmptyReason({ fileCount: 0, checkedCount: 0 })).toBe(EmptyReason.NO_FILES)
+    expect(getEmptyReason({ fileCount: 2, checkedCount: 0, transactions: { all, shown: all } })).toBe(
+      EmptyReason.NO_SELECTION,
+    )
+    expect(getEmptyReason(toInput())).toBeNull()
+  })
+
+  it('should tell checked files without transactions apart, unless the view shows them', () => {
+    expect(getEmptyReason(toInput({ all: [], shown: [] }))).toBe(EmptyReason.NO_TRANSACTIONS)
+    expect(getEmptyReason(toInput({ all: [], shown: [], allowEmpty: true }))).toBeNull()
+  })
+
+  it('should tell deselected days from filters without matches', () => {
+    expect(getEmptyReason(toInput({ all, shown: [], filter: toFilter(AmountFilter.ALL) }))).toBe(EmptyReason.NO_DATES)
+    expect(getEmptyReason(toInput({ all, shown: all, filter: toFilter(AmountFilter.IN) }))).toBe(EmptyReason.NO_MATCHES)
+    expect(getEmptyReason(toInput({ all, shown: all, filter: toFilter(AmountFilter.OUT) }))).toBeNull()
+    expect(getEmptyReason(toInput({ all, shown: all, filter: toFilter(AmountFilter.OUT, [NO_CATEGORY]) }))).toBe(
+      EmptyReason.NO_MATCHES,
+    )
+    expect(getEmptyReason(toInput({ all, shown: all }))).toBeNull()
   })
 })
 

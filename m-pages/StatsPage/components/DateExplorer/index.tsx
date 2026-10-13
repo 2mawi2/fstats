@@ -9,7 +9,8 @@ import { useUserPreferences } from '@/hooks'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
-import { useStatsTransactions, useWorkspaceDayFilter } from '../../context'
+import { EMPTY_REASON_TITLE_KEYS, getEmptyReason } from '../../actions'
+import { useStatsTransactions, useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import DateSkeleton from '../DateSkeleton'
 import OutlineCheckbox from '../OutlineCheckbox'
 import type { DateRow } from './actions'
@@ -34,6 +35,7 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
+  const { files, checkedFiles } = useWorkspaceFiles()
   const { all } = useStatsTransactions()
   const { deselectedDays, setDeselectedDays } = useWorkspaceDayFilter()
   // `null` until the user expands or collapses a row, so the default follows the files
@@ -86,9 +88,15 @@ const Component = () => {
     )
   }
 
-  // No files, or none checked
-  if (!tree.length) {
-    return <DateSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
+  // The days are those of all transactions, deselected ones included
+  const emptyReason = getEmptyReason({
+    fileCount: files.length,
+    checkedCount: checkedFiles.length,
+    transactions: { all, shown: all },
+  })
+
+  if (emptyReason) {
+    return <DateSkeleton title={t(EMPTY_REASON_TITLE_KEYS[emptyReason])} />
   }
 
   return (

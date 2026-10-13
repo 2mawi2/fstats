@@ -10,6 +10,7 @@ import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
 import {
+  EMPTY_REASON_TITLE_KEYS,
   filterTransactions,
   getAmountFilterOptions,
   getEmptyReason,
@@ -24,13 +25,11 @@ import { ALL_CURRENCIES, useCurrencySelect } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import CsvPreview from '../CsvPreview'
-import DropZoneDisplay from '../DropZoneDisplay'
 import NoSearchResultsDisplay from '../NoSearchResultsDisplay'
-import NoSelectionDisplay from '../NoSelectionDisplay'
-import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import SearchField from '../SearchField'
 import SegmentedToggle from '../SegmentedToggle'
 import TransactionsPreview from '../TransactionsPreview'
+import ViewEmptyState from '../ViewEmptyState'
 import ViewToolbar from '../ViewToolbar'
 import { toSearchQuery } from '../VirtualTable/actions'
 import { ui } from './styled'
@@ -58,13 +57,18 @@ const Component = () => {
   // All transactions, those on days deselected in the date explorer are greyed out or hidden
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
   const visible = includeDateExcluded ? unique : shown
-  // The filters don't apply to the CSV view
-  // Memoized, the view re-renders on each search keystroke
+  // The transactions and filters don't apply to the CSV view. The transactions view also shows the messages of files
+  // without transactions. Memoized, the view re-renders on each search keystroke.
   const emptyReason = useMemo(
-    () => (isTransactions ? getEmptyReason(all, visible, filter) : null),
-    [isTransactions, all, visible, filter],
+    () =>
+      getEmptyReason({
+        fileCount: files.length,
+        checkedCount: checkedFiles.length,
+        transactions: isTransactions ? { all, shown: visible, filter, allowEmpty: true } : undefined,
+      }),
+    [files.length, checkedFiles.length, isTransactions, all, visible, filter],
   )
-  const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
+  const isEmpty = !!emptyReason
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && isTransactions
   // Multiple parsed files are shown as one, with combined stats above the stats per file
@@ -148,8 +152,8 @@ const Component = () => {
           onChange={setAmountFilter}
           disabled={!isTransactionsView}
           disabledTooltip={
-            !checkedFiles.length
-              ? t('STATS_PAGE.NO_SELECTION.TITLE')
+            !checkedFiles.length && emptyReason
+              ? t(EMPTY_REASON_TITLE_KEYS[emptyReason])
               : !isTransactions
                 ? t('STATS_PAGE.CSV_DISABLED')
                 : undefined
@@ -166,12 +170,8 @@ const Component = () => {
       <Box ref={setMiddleColumn} sx={sx.middleScroll(isEmpty)}>
         {/* Single child, observed by the tables for layout changes above them */}
         <Box sx={sx.tables}>
-          {!files.length ? (
-            <DropZoneDisplay />
-          ) : !checkedFiles.length ? (
-            <NoSelectionDisplay />
-          ) : emptyReason ? (
-            <NoTransactionsDisplay reason={emptyReason} />
+          {emptyReason ? (
+            <ViewEmptyState reason={emptyReason} />
           ) : isTransactions ? (
             isTransactionsSplit ? (
               splitFiles.map((fileGroup) => (

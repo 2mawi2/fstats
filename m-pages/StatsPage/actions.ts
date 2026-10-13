@@ -309,26 +309,84 @@ export const getStatsTransactions = (
 }
 
 export const EmptyReason = {
+  NO_FILES: 'noFiles',
+  NO_SELECTION: 'noSelection',
+  NO_TRANSACTIONS: 'noTransactions',
   NO_DATES: 'noDates',
   NO_MATCHES: 'noMatches',
 } as const
 
 export type EmptyReason = (typeof EmptyReason)[keyof typeof EmptyReason]
 
+export const EMPTY_REASON_TITLE_KEYS: Record<EmptyReason, string> = {
+  [EmptyReason.NO_FILES]: 'STATS_PAGE.NO_FILES.TITLE',
+  [EmptyReason.NO_SELECTION]: 'STATS_PAGE.NO_SELECTION.TITLE',
+  [EmptyReason.NO_TRANSACTIONS]: 'STATS_PAGE.NO_TRANSACTIONS.EMPTY_TITLE',
+  [EmptyReason.NO_DATES]: 'STATS_PAGE.NO_TRANSACTIONS.NO_DATES_TITLE',
+  [EmptyReason.NO_MATCHES]: 'STATS_PAGE.NO_TRANSACTIONS.NO_MATCHES_TITLE',
+}
+
 /**
- * Why the date explorer (`all` vs `shown`) or the filters leave no transactions, `null` if some are left (or there are
- * none).
+ * There's nothing the view's controls could change, unlike deselected days or filters without matches.
  */
-export const getEmptyReason = (all: Transaction[], shown: Transaction[], filter: TransactionFilter) => {
-  if (!all.length) {
+export const isMissingData = (reason: EmptyReason | null) => {
+  return (
+    reason === EmptyReason.NO_FILES || reason === EmptyReason.NO_SELECTION || reason === EmptyReason.NO_TRANSACTIONS
+  )
+}
+
+type EmptyReasonInput = {
+  fileCount: number
+  checkedCount: number
+  /**
+   * Of the checked files, omitted for views that don't show transactions (the CSV view).
+   */
+  transactions?: {
+    all: Transaction[]
+    /**
+     * Without those on deselected days.
+     */
+    shown: Transaction[]
+    /**
+     * Omitted where the filters don't apply (the date explorer).
+     */
+    filter?: TransactionFilter
+    /**
+     * The view also shows files without transactions (e.g. the messages of unsupported files).
+     */
+    allowEmpty?: boolean
+  }
+}
+
+/**
+ * Why a view of the checked files is empty, in this order: no files, none checked, no transactions (e.g. only
+ * unsupported files), all days deselected in the date explorer, or the filters leave none. `null` if there's
+ * something to show.
+ */
+export const getEmptyReason = ({ fileCount, checkedCount, transactions }: EmptyReasonInput): EmptyReason | null => {
+  if (!fileCount) {
+    return EmptyReason.NO_FILES
+  }
+
+  if (!checkedCount) {
+    return EmptyReason.NO_SELECTION
+  }
+
+  if (!transactions) {
     return null
+  }
+
+  const { all, shown, filter, allowEmpty = false } = transactions
+
+  if (!all.length) {
+    return allowEmpty ? null : EmptyReason.NO_TRANSACTIONS
   }
 
   if (!shown.length) {
     return EmptyReason.NO_DATES
   }
 
-  return filterTransactions(shown, filter).length ? null : EmptyReason.NO_MATCHES
+  return !filter || filterTransactions(shown, filter).length ? null : EmptyReason.NO_MATCHES
 }
 
 export type TransactionCounts = {

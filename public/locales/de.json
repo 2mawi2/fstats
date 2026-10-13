@@ -108,11 +108,16 @@
       "PARSING": "Wird ausgewertet…",
       "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format"
     },
+    "NO_FILES": {
+      "TITLE": "Keine Dateien"
+    },
     "NO_SELECTION": {
       "TITLE": "Keine Datei ausgewählt",
       "SUBTITLE": "Wähle links eine Datei aus, um ihre Umsätze zu sehen."
     },
     "NO_TRANSACTIONS": {
+      "EMPTY_TITLE": "Keine Umsätze",
+      "EMPTY_SUBTITLE": "Keine der ausgewählten Dateien enthält Umsätze.",
       "NO_DATES_TITLE": "Kein Datum ausgewählt",
       "NO_DATES_SUBTITLE": "Wähle links Daten aus, um ihre Umsätze zu sehen.",
       "NO_MATCHES_TITLE": "Keine Umsätze",

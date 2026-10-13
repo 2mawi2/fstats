@@ -108,11 +108,16 @@
       "PARSING": "Parsing…",
       "UNSUPPORTED_FORMAT": "Unsupported format"
     },
+    "NO_FILES": {
+      "TITLE": "No files"
+    },
     "NO_SELECTION": {
       "TITLE": "No file selected",
       "SUBTITLE": "Pick a file on the left to see its transactions."
     },
     "NO_TRANSACTIONS": {
+      "EMPTY_TITLE": "No transactions",
+      "EMPTY_SUBTITLE": "None of the selected files have transactions.",
       "NO_DATES_TITLE": "No dates selected",
       "NO_DATES_SUBTITLE": "Select dates on the left to see their transactions.",
       "NO_MATCHES_TITLE": "No transactions",
