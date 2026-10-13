@@ -16,6 +16,10 @@ type PreviewSectionProps = {
    */
   file?: StatsFile
   /**
+   * Small label next to the title, e.g. the currency.
+   */
+  chip?: string
+  /**
    * Next to the title, e.g. the row count.
    */
   caption?: string
@@ -31,6 +35,7 @@ type PreviewSectionProps = {
 const Component = ({
   title,
   file,
+  chip,
   caption,
   isLoading = false,
   error = null,
@@ -45,6 +50,11 @@ const Component = ({
       <Box sx={isSticky ? { ...sx.header, ...sx.stickyHeader } : sx.header}>
         <Typography variant="body2" sx={file ? { ...sx.title, color: getFileNameColor(file) } : sx.title}>
           {title}
+          {chip ? (
+            <Box component="span" sx={sx.chip}>
+              {chip}
+            </Box>
+          ) : null}
           {caption ? (
             <Box component="span" sx={sx.rowCount}>
               {caption}

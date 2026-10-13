@@ -46,12 +46,6 @@ const Component = () => {
     [allParsedFiles, deselectedDays],
   )
   const profitLosses = useMemo(() => getProfitLoss(selectedFiles, period), [selectedFiles, period])
-  const getCaption = (currency: string) => {
-    const counts = countsByCurrency[currency]
-    return [...(profitLosses.length > 1 ? [currency] : []), ...(counts ? [getTransactionCountText(counts)] : [])].join(
-      ` ${MISC.CENTER_DOT} `,
-    )
-  }
 
   return (
     <>
@@ -82,7 +76,12 @@ const Component = () => {
               <PreviewSection
                 key={profitLoss.currency}
                 title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
-                caption={getCaption(profitLoss.currency)}
+                chip={profitLosses.length > 1 ? profitLoss.currency : undefined}
+                caption={
+                  countsByCurrency[profitLoss.currency]
+                    ? getTransactionCountText(countsByCurrency[profitLoss.currency])
+                    : undefined
+                }
               >
                 <ProfitLossTable profitLoss={profitLoss} period={period} />
               </PreviewSection>
