@@ -1,54 +1,35 @@
 'use client'
 
 import { DeleteOutlined, FolderOutlined, StorageRounded } from '@mui/icons-material'
-import { Box, Button, Card, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { Box, Button, Typography } from '@mui/material'
 
-import { useFiles, useMutateRemoveAllFiles } from '@/m-stats-file/service'
+import { useFiles, useMutateRemoveAllFiles, useStorageSize } from '@/m-stats-file/service'
 import { formatFileSize } from '@/utils/File'
+import { useTranslation } from '@/lib/i18n'
 
-import { calculateStorageSize } from './actions'
+import SettingsCard from '../SettingsCard'
 import { ui } from './styled'
 
 const Component = () => {
   const sx = ui()
+  const { t } = useTranslation()
   const { data: files = [], isLoading: isLoadingFiles } = useFiles()
   const { mutate: removeAllFiles, isPending: isRemovingFiles } = useMutateRemoveAllFiles()
-  const [storageSize, setStorageSize] = useState<string>(formatFileSize(0))
-  const [isCalculating, setIsCalculating] = useState(true)
-
-  useEffect(() => {
-    const calculateInfo = async () => {
-      setIsCalculating(true)
-      try {
-        const size = await calculateStorageSize()
-        setStorageSize(formatFileSize(size))
-      } catch {
-        setStorageSize('Failed to calculate')
-      } finally {
-        setIsCalculating(false)
-      }
-    }
-
-    calculateInfo()
-  }, [files.length])
+  const { data: size = 0, isLoading: isCalculating, isError } = useStorageSize()
+  const storageSize = isError ? t('SETTINGS_PAGE.STORAGE.FAILED_TO_CALCULATE') : formatFileSize(size)
 
   const fileCount = files.length
   const hasFiles = fileCount > 0
 
   return (
-    <Card sx={{ borderRadius: 2, p: 3 }}>
-      <Typography variant="caption" component="p" sx={{ mb: 2 }}>
-        Storage details
-      </Typography>
-
+    <SettingsCard title={t('SETTINGS_PAGE.STORAGE.TITLE')}>
       <Box sx={sx.statsContainer}>
         <Box sx={sx.statItem}>
           <FolderOutlined sx={sx.statIcon} />
           <Box>
             <Typography sx={sx.statValue(isLoadingFiles)}>{fileCount}</Typography>
             <Typography variant="caption" sx={sx.statLabel}>
-              {fileCount === 1 ? 'File' : 'Files'}
+              {t('SETTINGS_PAGE.STORAGE.FILES', { count: fileCount })}
             </Typography>
           </Box>
         </Box>
@@ -58,7 +39,7 @@ const Component = () => {
           <Box>
             <Typography sx={sx.statValue(isLoadingFiles || isCalculating)}>{storageSize}</Typography>
             <Typography variant="caption" sx={sx.statLabel}>
-              Storage used
+              {t('SETTINGS_PAGE.STORAGE.STORAGE_USED')}
             </Typography>
           </Box>
         </Box>
@@ -69,16 +50,16 @@ const Component = () => {
         variant="outlined"
         startIcon={<DeleteOutlined />}
         onClick={() => {
-          if (confirm('Are you sure you want to clear all data?')) {
+          if (confirm(t('SETTINGS_PAGE.STORAGE.CONFIRM_CLEAR'))) {
             removeAllFiles()
           }
         }}
         disabled={!hasFiles}
         loading={isRemovingFiles}
       >
-        Clear all data
+        {t('SETTINGS_PAGE.STORAGE.CLEAR_ALL_DATA')}
       </Button>
-    </Card>
+    </SettingsCard>
   )
 }
 

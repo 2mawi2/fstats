@@ -1,16 +1,201 @@
 {
   "MISC": {
+    "OR": "or",
     "VERSION": "Version",
-    "ALL_RIGHTS_RESERVED": "All rights reserved."
+    "ALL_RIGHTS_RESERVED": "All rights reserved.",
+    "VIEW_DEMO": "View demo",
+    "LOADING": "Loading…",
+    "TRANSACTIONS": "Transactions",
+    "INCOME": "Income",
+    "EXPENSES": "Expenses",
+    "TOTAL": "Total",
+    "DATE": "Date",
+    "DESCRIPTION": "Description",
+    "SOURCE": "Source",
+    "CATEGORY": "Category",
+    "AMOUNT": "Amount",
+    "AMOUNT_WITH_CURRENCY": "Amount ({{currency}})",
+    "TOTAL_WITH_CURRENCY": "Total ({{currency}})",
+    "TRANSACTION_COUNT_one": "{{count}} transaction",
+    "TRANSACTION_COUNT_other": "{{count}} transactions",
+    "ALL_TRANSACTIONS": "All transactions"
   },
   "NAVIGATION": {
     "HOME": "Home",
-    "DATA": "Data",
     "STATS": "Stats",
     "SETTINGS": "Settings",
     "ABOUT": "About",
+    "GITHUB": "GitHub",
     "EXPAND_MENU": "Expand menu",
     "COLLAPSE_MENU": "Collapse menu"
+  },
+  "HOME_PAGE": {
+    "HERO_TITLE": "Analyse bank statements <accent>privately</accent>",
+    "HERO_SUBTITLE": "Turn CSV bank statements into clear stats. Everything stays in your browser.",
+    "GET_STARTED": "Get started",
+    "HOW_IT_WORKS": "How it works",
+    "SUPPORTED_BANKS": "Supported banks",
+    "BADGES": {
+      "NO_TRACKING": "No tracking",
+      "NO_ACCOUNT": "No account",
+      "WORKS_OFFLINE": "Works offline"
+    },
+    "STEPS": {
+      "GO_OFFLINE": {
+        "TITLE": "Go offline (optional)",
+        "DESCRIPTION": "Open the Stats page, then disconnect from the internet for extra peace of mind."
+      },
+      "ADD_FILES": {
+        "TITLE": "Add your files",
+        "DESCRIPTION": "Drop CSV statements or a whole folder. Your bank is detected automatically."
+      },
+      "VIEW_STATS": {
+        "TITLE": "Explore your stats",
+        "DESCRIPTION": "See your balance, cashflow and spending by category across all selected files."
+      }
+    },
+    "OPEN_SOURCE": {
+      "TITLE": "Open source",
+      "DESCRIPTION": "The full source code is public, so anyone can verify that your data never leaves your device."
+    },
+    "MISSING_BANK": "Missing your bank?",
+    "REQUEST_BANK": "Request it on GitHub"
+  },
+  "COUNTRY": {
+    "DE": "Germany",
+    "GB": "United Kingdom",
+    "ZA": "South Africa"
+  },
+  "STATS_PAGE": {
+    "VIEW": {
+      "CSV": "CSV",
+      "TRANSACTIONS": "Transactions",
+      "STATS": "Stats"
+    },
+    "CSV_DISABLED": "Switch to Transactions or Stats",
+    "FILE_TOOLBAR": {
+      "SELECT_ALL": "All",
+      "SELECT_NONE": "None",
+      "SELECT_PARSED": "Parsed",
+      "SELECT_UNSUPPORTED": "Unsupported",
+      "SELECT_INVALID": "Invalid",
+      "BANK_ACCOUNTS": "Bank accounts",
+      "REMOVE_SELECTED": "Remove selected",
+      "ADD_FILES": "Add files",
+      "ADD_FOLDER": "Add folder",
+      "SELECTED_COUNT": "{{selected}} of {{total}}",
+      "FILE_COUNT_one": "{{count}} file",
+      "FILE_COUNT_other": "{{count}} files"
+    },
+    "DROP_ZONE": {
+      "DROP_FILES_HERE": "Drop your files here",
+      "DROP_FILES_ANYWHERE": "Drop files anywhere",
+      "CLICK_TO_SELECT": "or <files>select files</files> {{dot}} <link>select a folder</link>",
+      "FILE_RESTRICTIONS": "CSV files only, max 5MB each",
+      "DROP_TIP": "Tip: Drop files anywhere to add them"
+    },
+    "FOLDER": {
+      "NOT_SUPPORTED": "Folder selection is not supported in your browser. Please use a browser that supports the local File API (e.g. Chrome or Edge).",
+      "EMPTY": "No files found in the selected folder.",
+      "ACCESS_FAILED": "Failed to access the folder. Please try again."
+    },
+    "FILE_STATUS": {
+      "PARSING": "Parsing…",
+      "UNSUPPORTED_FORMAT": "Unsupported format"
+    },
+    "NO_SELECTION": {
+      "TITLE": "No file selected",
+      "SUBTITLE": "Pick a file on the left to see its transactions."
+    },
+    "NO_TRANSACTIONS": {
+      "NO_DATES_TITLE": "No dates selected",
+      "NO_DATES_SUBTITLE": "Select dates on the left to see their transactions.",
+      "NO_MATCHES_TITLE": "No transactions",
+      "NO_MATCHES_SUBTITLE": "None of the selected dates have transactions matching this filter."
+    },
+    "SIDEBAR": {
+      "DATE_FILTERED": "Filtered by date",
+      "DATE_EXCLUDED_one": "{{count}} excluded by date",
+      "DATE_EXCLUDED_other": "{{count}} excluded by date",
+      "FILE_DETAILS": "File details",
+      "DUPLICATES_EXCLUDED_one": "{{count}} duplicate excluded",
+      "DUPLICATES_EXCLUDED_other": "{{count}} duplicates excluded",
+      "DUPLICATES_INCLUDED_one": "{{count}} duplicate included",
+      "DUPLICATES_INCLUDED_other": "{{count}} duplicates included"
+    },
+    "DEMO": {
+      "BANNER": "You are viewing demo data",
+      "END": "End demo",
+      "UPLOAD_YOUR_DATA": "Upload your data"
+    },
+    "DATA_VIEW": {
+      "SHOW_DUPLICATES_one": "Show {{count}} duplicate",
+      "SHOW_DUPLICATES_other": "Show {{count}} duplicates",
+      "DUPLICATE_OF": "Duplicate, also in {{file}}",
+      "DUPLICATE_TAG": "Duplicate",
+      "ALSO_IN": "Also in {{files}}",
+      "ROW_COUNT_one": "{{count}} row",
+      "ROW_COUNT_other": "{{count}} rows",
+      "FAILED_TO_READ_FILE": "Failed to read file: {{message}}",
+      "FILE_NOT_PARSED": "No transactions, this file was not parsed.",
+      "FILE_NOT_READ": "No preview, this file was not added: {{message}}",
+      "TRANSACTIONS_LAYOUT": {
+        "COMBINED": "Combined",
+        "COMBINED_TITLE": "All files in one table",
+        "SPLIT": "Split",
+        "SPLIT_TITLE": "One table per file"
+      },
+      "AMOUNT_FILTER": {
+        "ALL": "All",
+        "ALL_TITLE": "All transactions",
+        "IN": "In",
+        "IN_TITLE": "Money in",
+        "OUT": "Out",
+        "OUT_TITLE": "Money out"
+      }
+    },
+    "STATS_VIEW": {
+      "NO_DATA": "No data to analyse",
+      "NO_DATA_SELECT": "Drop or <files>select files</files> {{dot}} <link>select a folder</link>",
+      "BALANCE": "Balance",
+      "DATE_RANGE": "{{start}} to {{end}}",
+      "DAYS_EXCLUDED_one": "{{count}} day excluded",
+      "DAYS_EXCLUDED_other": "{{count}} days excluded",
+      "TRANSACTIONS_PER_MONTH": "Transactions per month",
+      "AVERAGE_PER_MONTH": "Average {{average}}",
+      "CASHFLOW": "Cashflow",
+      "BREAKDOWN_BY_CATEGORY": "Breakdown by category",
+      "SHOW_ALL_CATEGORIES": "Show all categories",
+      "NO_INCOME": "No income for the selected period",
+      "NO_EXPENSES": "No expenses for the selected period"
+    }
+  },
+  "SETTINGS_PAGE": {
+    "DEVICE": {
+      "TITLE": "Device settings",
+      "PERSIST_DATA": "Persist data",
+      "PERSIST_ON": "Files will be kept in your browser storage until manually deleted.",
+      "PERSIST_OFF": "Files will be automatically cleared when you close the tab or app."
+    },
+    "STORAGE": {
+      "TITLE": "Storage details",
+      "FILES_one": "File",
+      "FILES_other": "Files",
+      "STORAGE_USED": "Storage used",
+      "FAILED_TO_CALCULATE": "Failed to calculate",
+      "CONFIRM_CLEAR": "Are you sure you want to clear all data?",
+      "CLEAR_ALL_DATA": "Clear all data"
+    },
+    "LAYOUT": {
+      "TITLE": "Stats page layout",
+      "CUSTOM": "Custom",
+      "DEFAULT": "Default",
+      "COLUMNS": "Columns",
+      "HINT": "Resizing columns while the default layout is selected starts a new custom layout."
+    },
+    "PREFERENCES": {
+      "TITLE": "Preferences"
+    }
   },
   "ABOUT_PAGE": {
     "TITLE": "About",
@@ -22,8 +207,11 @@
   },
   "PAGE_404": {
     "TITLE": "The URL in the address bar does not exist!",
-    "BLURB": "The content you are looking for might have moved and is possibly available at a different URL. Alternatively, check the URL for typos.",
-    "BACK_TO_HOMEPAGE": "Back to homepage"
+    "BLURB": "The content you are looking for might have moved and is possibly available at a different URL. Alternatively, check the URL for typos."
+  },
+  "ERROR_PAGE": {
+    "TITLE": "An unknown error has occurred.",
+    "BLURB": "If the problem persists, please contact support."
   },
   "COMPONENTS": {
     "THEME_SWITCHER": {

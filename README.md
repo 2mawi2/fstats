@@ -1,18 +1,44 @@
 # fstats
 
-Privacy-focused bank statement parser. Turns CSV exports from your bank into income/expense stats. Everything runs in the browser: no uploads, no tracking, no accounts.
+A privacy-focused bank statement parser.
 
+Turn your bank's CSV exports into detailed income and expense stats. Everything runs in your browser: no uploads, no tracking, no account and no internet connection required.
+
+Try it for free at [fstats.site](https://fstats.site/).
 
 ## How it works
 
-1. **Add files** — On the Data page, drop CSV bank statements or add an entire folder. Files are stored locally in the browser (IndexedDB).
-2. **Parse** — Each file is matched to a supported bank format by its CSV headers and parsed into transactions. Transactions are categorised automatically.
-3. **Select** — Choose which files to include, then continue to Stats.
-4. **Analyse** — View profit/loss, income and expense breakdowns by category, charts and a transactions table. Filter by bank and date range, combine datasets and pick a display currency.
+1. Go to [fstats.site/stats](https://fstats.site/stats)
+2. Turn off your internet connection (optional)
+3. Add your files
+4. View and analyse your statements
 
-Supported banks: Capitec, FNB (South Africa), Comdirect, ING (Germany), Lloyds (UK). Try it at [fstats.site](https://fstats.site/).
+### Privacy
 
+Your files are stored only in your browser and never leave your device.
+
+By default, your files **are deleted** when you close the tab or browser window. To keep them between sessions, open the "Settings" page and enable "Persist data".
+
+### Supported banks
+
+#### United Kingdom
+
+- [Lloyds](https://www.lloydsbank.com/)
+
+#### Germany
+
+- [Comdirect](https://www.comdirect.de/)
+- [ING](https://www.ing.de/)
+
+#### South Africa
+
+- [Capitec](https://www.capitecbank.co.za/)
+- [FNB](https://www.fnb.co.za/)
 
 ## Development
 
 See [DEVELOPMENT.md](DEVELOPMENT.md).
+
+### Important files
+
+- [utils/Parser](./utils/Parser/create-parser.ts): how CSV files are parsed

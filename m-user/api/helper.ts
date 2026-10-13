@@ -1,22 +1,7 @@
 import type { User, UserAtRest } from '@/types'
 import { zSyncableUser } from '@/types'
+import { parseOrThrow } from '@/lib/zod'
 
 export const syncUser = (dataToSync: User): UserAtRest => {
-  const res = zSyncableUser.safeParse(dataToSync)
-
-  if (!res.success) {
-    const errors = res.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join(', ')
-    throw new Error(`Cannot sync User: ${errors}`)
-  }
-
-  return {
-    ...res.data,
-  }
-}
-
-export const parseUser = (dataToParse: UserAtRest): User => {
-  const res: User = {
-    ...dataToParse,
-  }
-  return res
+  return parseOrThrow(zSyncableUser, dataToSync, 'Cannot sync User')
 }

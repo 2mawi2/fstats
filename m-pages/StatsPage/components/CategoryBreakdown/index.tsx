@@ -1,46 +1,71 @@
-import { Box, Card, FormControlLabel, Switch, Typography } from '@mui/material'
+import { Box, FormControlLabel, Switch } from '@mui/material'
 import { useState } from 'react'
 
 import type { Transaction } from '@/types'
 import { Currency } from '@/types-enums'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
 import { getStats } from '@/utils/Stats'
+import { useTranslation } from '@/lib/i18n'
 
+import { AmountFilter } from '../../actions'
+import CardTitle from '../CardTitle'
 import { getTransactionsGroupedByCategory } from './actions'
-import { ExpensesBreakdown, IncomeBreakdown } from './components'
+import { BreakdownTable } from './components'
 
 type CategoryBreakdownProps = {
   transactions: Transaction[]
   currency: Currency
+  amountFilter: AmountFilter
 }
 
-const Component = ({ transactions, currency }: CategoryBreakdownProps) => {
+const Component = ({ transactions, currency, amountFilter }: CategoryBreakdownProps) => {
+  const { t } = useTranslation()
   const { totalIncome, totalExpense } = getStats(transactions)
-  const groupedTransactions = Object.values(getTransactionsGroupedByCategory(transactions))
+  const groupedTransactions = getTransactionsGroupedByCategory(transactions)
   const income = groupedTransactions.filter((cat) => Object.keys(INCOME_CATEGORIES).includes(cat.code))
   const expenses = groupedTransactions.filter((cat) => Object.keys(EXPENSE_CATEGORIES).includes(cat.code))
   const [showAll, setShowAll] = useState(false)
 
   return (
-    <Card sx={{ height: '100%' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6" color="secondary">
-          Breakdown by category
-        </Typography>
+    <Box>
+      <CardTitle
+        action={
+          <FormControlLabel
+            control={<Switch size="small" checked={showAll} onChange={(event) => setShowAll(event.target.checked)} />}
+            label={t('STATS_PAGE.STATS_VIEW.SHOW_ALL_CATEGORIES')}
+            slotProps={{ typography: { variant: 'caption', color: 'text.secondary' } }}
+            sx={{ mr: 0 }}
+          />
+        }
+      >
+        {t('STATS_PAGE.STATS_VIEW.BREAKDOWN_BY_CATEGORY')}
+      </CardTitle>
 
-        <FormControlLabel
-          control={<Switch color="primary" value={showAll} onChange={() => setShowAll(!showAll)} />}
-          label="Show all categories"
-          sx={{ color: showAll ? 'text.primary' : 'text.secondary' }}
+      {/* Only the table matching the amount filter */}
+      {amountFilter !== AmountFilter.OUT ? (
+        <Box sx={amountFilter === AmountFilter.ALL ? { mb: 3 } : undefined}>
+          <BreakdownTable
+            title={t('MISC.INCOME')}
+            emptyText={t('STATS_PAGE.STATS_VIEW.NO_INCOME')}
+            transactionsGrouped={income}
+            total={totalIncome}
+            currency={currency}
+            showAll={showAll}
+          />
+        </Box>
+      ) : null}
+
+      {amountFilter !== AmountFilter.IN ? (
+        <BreakdownTable
+          title={t('MISC.EXPENSES')}
+          emptyText={t('STATS_PAGE.STATS_VIEW.NO_EXPENSES')}
+          transactionsGrouped={expenses}
+          total={totalExpense}
+          currency={currency}
+          showAll={showAll}
         />
-      </Box>
-
-      <Box sx={{ mb: 4 }}>
-        <IncomeBreakdown transactionsGrouped={income} total={totalIncome} currency={currency} showAll={showAll} />
-      </Box>
-
-      <ExpensesBreakdown transactionsGrouped={expenses} total={totalExpense} currency={currency} showAll={showAll} />
-    </Card>
+      ) : null}
+    </Box>
   )
 }
 

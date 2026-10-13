@@ -10,14 +10,27 @@ type SidebarNavButtonProps = {
   icon: SvgIconComponent
   expanded: boolean
   route?: string
+  isExternal?: boolean
   onClick?: VoidFunction
   isActive?: boolean
 }
 
-const Component = ({ label, icon: Icon, expanded, route, onClick, isActive = false }: SidebarNavButtonProps) => {
+const Component = ({
+  label,
+  icon: Icon,
+  expanded,
+  route,
+  isExternal = false,
+  onClick,
+  isActive = false,
+}: SidebarNavButtonProps) => {
   const theme = useTheme()
   const sx = ui(theme, isActive)
-  const linkProps = route ? { component: Link, href: route } : { onClick }
+  const linkProps = route
+    ? isExternal
+      ? { component: 'a', href: route, target: '_blank', rel: 'noopener noreferrer' }
+      : { component: Link, href: route }
+    : { onClick }
 
   return (
     <Tooltip title={expanded ? '' : label} placement="right">

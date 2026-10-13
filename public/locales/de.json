@@ -1,0 +1,250 @@
+{
+  "MISC": {
+    "OR": "oder",
+    "VERSION": "Version",
+    "ALL_RIGHTS_RESERVED": "Alle Rechte vorbehalten.",
+    "VIEW_DEMO": "Demo ansehen",
+    "LOADING": "Wird geladen…",
+    "TRANSACTIONS": "Umsätze",
+    "INCOME": "Einnahmen",
+    "EXPENSES": "Ausgaben",
+    "TOTAL": "Summe",
+    "DATE": "Datum",
+    "DESCRIPTION": "Beschreibung",
+    "SOURCE": "Quelle",
+    "CATEGORY": "Kategorie",
+    "AMOUNT": "Betrag",
+    "AMOUNT_WITH_CURRENCY": "Betrag ({{currency}})",
+    "TOTAL_WITH_CURRENCY": "Summe ({{currency}})",
+    "TRANSACTION_COUNT_one": "{{count}} Umsatz",
+    "TRANSACTION_COUNT_other": "{{count}} Umsätze",
+    "ALL_TRANSACTIONS": "Alle Umsätze"
+  },
+  "NAVIGATION": {
+    "HOME": "Start",
+    "STATS": "Statistiken",
+    "SETTINGS": "Einstellungen",
+    "ABOUT": "Über",
+    "GITHUB": "GitHub",
+    "EXPAND_MENU": "Menü ausklappen",
+    "COLLAPSE_MENU": "Menü einklappen"
+  },
+  "HOME_PAGE": {
+    "HERO_TITLE": "Kontoauszüge <accent>privat</accent> analysieren",
+    "HERO_SUBTITLE": "Verwandle CSV-Kontoauszüge in übersichtliche Statistiken. Alles bleibt in deinem Browser.",
+    "GET_STARTED": "Loslegen",
+    "HOW_IT_WORKS": "So funktioniert's",
+    "SUPPORTED_BANKS": "Unterstützte Banken",
+    "BADGES": {
+      "NO_TRACKING": "Kein Tracking",
+      "NO_ACCOUNT": "Kein Konto",
+      "WORKS_OFFLINE": "Funktioniert offline"
+    },
+    "STEPS": {
+      "GO_OFFLINE": {
+        "TITLE": "Offline gehen (optional)",
+        "DESCRIPTION": "Öffne die Statistik-Seite und trenne dann die Internetverbindung, für zusätzliche Sicherheit."
+      },
+      "ADD_FILES": {
+        "TITLE": "Dateien hinzufügen",
+        "DESCRIPTION": "Ziehe CSV-Kontoauszüge oder einen ganzen Ordner hinein. Deine Bank wird automatisch erkannt."
+      },
+      "VIEW_STATS": {
+        "TITLE": "Statistiken entdecken",
+        "DESCRIPTION": "Sieh dir Saldo, Cashflow und Ausgaben nach Kategorie über alle ausgewählten Dateien an."
+      }
+    },
+    "OPEN_SOURCE": {
+      "TITLE": "Open Source",
+      "DESCRIPTION": "Der gesamte Quellcode ist öffentlich, sodass jeder prüfen kann, dass deine Daten dein Gerät nie verlassen."
+    },
+    "MISSING_BANK": "Deine Bank fehlt?",
+    "REQUEST_BANK": "Auf GitHub anfragen"
+  },
+  "COUNTRY": {
+    "DE": "Deutschland",
+    "GB": "Vereinigtes Königreich",
+    "ZA": "Südafrika"
+  },
+  "STATS_PAGE": {
+    "VIEW": {
+      "CSV": "CSV",
+      "TRANSACTIONS": "Umsätze",
+      "STATS": "Statistiken"
+    },
+    "CSV_DISABLED": "Zu Umsätze oder Statistiken wechseln",
+    "FILE_TOOLBAR": {
+      "SELECT_ALL": "Alle",
+      "SELECT_NONE": "Keine",
+      "SELECT_PARSED": "Ausgewertet",
+      "SELECT_UNSUPPORTED": "Nicht unterstützt",
+      "SELECT_INVALID": "Ungültig",
+      "BANK_ACCOUNTS": "Bankkonten",
+      "REMOVE_SELECTED": "Auswahl entfernen",
+      "ADD_FILES": "Dateien hinzufügen",
+      "ADD_FOLDER": "Ordner hinzufügen",
+      "SELECTED_COUNT": "{{selected}} von {{total}}",
+      "FILE_COUNT_one": "{{count}} Datei",
+      "FILE_COUNT_other": "{{count}} Dateien"
+    },
+    "DROP_ZONE": {
+      "DROP_FILES_HERE": "Dateien hier ablegen",
+      "DROP_FILES_ANYWHERE": "Dateien irgendwo ablegen",
+      "CLICK_TO_SELECT": "oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
+      "FILE_RESTRICTIONS": "Nur CSV-Dateien, max. 5 MB pro Datei",
+      "DROP_TIP": "Tipp: Dateien einfach irgendwo ablegen, um sie hinzuzufügen"
+    },
+    "FOLDER": {
+      "NOT_SUPPORTED": "Die Ordnerauswahl wird von deinem Browser nicht unterstützt. Bitte verwende einen Browser, der die lokale File API unterstützt (z. B. Chrome oder Edge).",
+      "EMPTY": "Im ausgewählten Ordner wurden keine Dateien gefunden.",
+      "ACCESS_FAILED": "Zugriff auf den Ordner fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "FILE_STATUS": {
+      "PARSING": "Wird ausgewertet…",
+      "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format"
+    },
+    "NO_SELECTION": {
+      "TITLE": "Keine Datei ausgewählt",
+      "SUBTITLE": "Wähle links eine Datei aus, um ihre Umsätze zu sehen."
+    },
+    "NO_TRANSACTIONS": {
+      "NO_DATES_TITLE": "Kein Datum ausgewählt",
+      "NO_DATES_SUBTITLE": "Wähle links Daten aus, um ihre Umsätze zu sehen.",
+      "NO_MATCHES_TITLE": "Keine Umsätze",
+      "NO_MATCHES_SUBTITLE": "An den ausgewählten Daten gibt es keine Umsätze für diesen Filter."
+    },
+    "SIDEBAR": {
+      "DATE_FILTERED": "Nach Datum gefiltert",
+      "DATE_EXCLUDED_one": "{{count}} durch Datum ausgeschlossen",
+      "DATE_EXCLUDED_other": "{{count}} durch Datum ausgeschlossen",
+      "FILE_DETAILS": "Dateidetails",
+      "DUPLICATES_EXCLUDED_one": "{{count}} Duplikat ausgeschlossen",
+      "DUPLICATES_EXCLUDED_other": "{{count}} Duplikate ausgeschlossen",
+      "DUPLICATES_INCLUDED_one": "{{count}} Duplikat einbezogen",
+      "DUPLICATES_INCLUDED_other": "{{count}} Duplikate einbezogen"
+    },
+    "DEMO": {
+      "BANNER": "Du siehst Demodaten",
+      "END": "Demo beenden",
+      "UPLOAD_YOUR_DATA": "Eigene Daten hochladen"
+    },
+    "DATA_VIEW": {
+      "SHOW_DUPLICATES_one": "{{count}} Duplikat anzeigen",
+      "SHOW_DUPLICATES_other": "{{count}} Duplikate anzeigen",
+      "DUPLICATE_OF": "Duplikat, auch in {{file}}",
+      "DUPLICATE_TAG": "Duplikat",
+      "ALSO_IN": "Auch in {{files}}",
+      "ROW_COUNT_one": "{{count}} Zeile",
+      "ROW_COUNT_other": "{{count}} Zeilen",
+      "FAILED_TO_READ_FILE": "Datei konnte nicht gelesen werden: {{message}}",
+      "FILE_NOT_PARSED": "Keine Umsätze, diese Datei wurde nicht ausgewertet.",
+      "FILE_NOT_READ": "Keine Vorschau, diese Datei wurde nicht hinzugefügt: {{message}}",
+      "TRANSACTIONS_LAYOUT": {
+        "COMBINED": "Kombiniert",
+        "COMBINED_TITLE": "Alle Dateien in einer Tabelle",
+        "SPLIT": "Getrennt",
+        "SPLIT_TITLE": "Eine Tabelle pro Datei"
+      },
+      "AMOUNT_FILTER": {
+        "ALL": "Alle",
+        "ALL_TITLE": "Alle Umsätze",
+        "IN": "Ein",
+        "IN_TITLE": "Geldeingänge",
+        "OUT": "Aus",
+        "OUT_TITLE": "Geldausgänge"
+      }
+    },
+    "STATS_VIEW": {
+      "NO_DATA": "Keine Daten zum Analysieren",
+      "NO_DATA_SELECT": "Ablegen oder <files>Dateien auswählen</files> {{dot}} <link>Ordner auswählen</link>",
+      "BALANCE": "Saldo",
+      "DATE_RANGE": "{{start}} bis {{end}}",
+      "DAYS_EXCLUDED_one": "{{count}} Tag ausgeschlossen",
+      "DAYS_EXCLUDED_other": "{{count}} Tage ausgeschlossen",
+      "TRANSACTIONS_PER_MONTH": "Umsätze pro Monat",
+      "AVERAGE_PER_MONTH": "Durchschnitt {{average}}",
+      "CASHFLOW": "Cashflow",
+      "BREAKDOWN_BY_CATEGORY": "Aufschlüsselung nach Kategorie",
+      "SHOW_ALL_CATEGORIES": "Alle Kategorien anzeigen",
+      "NO_INCOME": "Keine Einnahmen im ausgewählten Zeitraum",
+      "NO_EXPENSES": "Keine Ausgaben im ausgewählten Zeitraum"
+    }
+  },
+  "SETTINGS_PAGE": {
+    "DEVICE": {
+      "TITLE": "Geräteeinstellungen",
+      "PERSIST_DATA": "Daten behalten",
+      "PERSIST_ON": "Dateien bleiben im Browserspeicher, bis du sie manuell löschst.",
+      "PERSIST_OFF": "Dateien werden automatisch gelöscht, wenn du den Tab oder die App schließt."
+    },
+    "STORAGE": {
+      "TITLE": "Speicherdetails",
+      "FILES_one": "Datei",
+      "FILES_other": "Dateien",
+      "STORAGE_USED": "Belegter Speicher",
+      "FAILED_TO_CALCULATE": "Berechnung fehlgeschlagen",
+      "CONFIRM_CLEAR": "Möchtest du wirklich alle Daten löschen?",
+      "CLEAR_ALL_DATA": "Alle Daten löschen"
+    },
+    "LAYOUT": {
+      "TITLE": "Layout der Statistikseite",
+      "CUSTOM": "Benutzerdefiniert",
+      "DEFAULT": "Standard",
+      "COLUMNS": "Spalten",
+      "HINT": "Wenn du Spalten anpasst, während das Standardlayout ausgewählt ist, wird ein neues benutzerdefiniertes Layout angelegt."
+    },
+    "PREFERENCES": {
+      "TITLE": "Präferenzen"
+    }
+  },
+  "ABOUT_PAGE": {
+    "TITLE": "Über",
+    "BLURB": "fstats ist Open Source. Sieh dir den Code an, melde Probleme oder trage auf GitHub bei.",
+    "VIEW_ON_GITHUB": "Auf GitHub ansehen"
+  },
+  "DATA_DISPLAY": {
+    "MENU": "Menü"
+  },
+  "PAGE_404": {
+    "TITLE": "Die URL in der Adresszeile existiert nicht!",
+    "BLURB": "Der gesuchte Inhalt wurde möglicherweise verschoben und ist unter einer anderen URL verfügbar. Prüfe alternativ die URL auf Tippfehler."
+  },
+  "ERROR_PAGE": {
+    "TITLE": "Ein unbekannter Fehler ist aufgetreten.",
+    "BLURB": "Wenn das Problem weiterhin besteht, wende dich bitte an den Support."
+  },
+  "COMPONENTS": {
+    "THEME_SWITCHER": {
+      "THEME": "Design",
+      "CHOOSE_THEME": "Design wählen",
+      "THEME_LIGHT": "Hell",
+      "THEME_DARK": "Dunkel",
+      "THEME_SYSTEM": "System"
+    },
+    "LANGUAGE_SWITCHER": {
+      "LANGUAGE": "Sprache",
+      "CHANGE_LANGUAGE": "Sprache ändern",
+      "LOCALE_EN_LANGUAGE_EN": "English",
+      "LOCALE_EN_LANGUAGE_DE": "Englisch",
+      "LOCALE_DE_LANGUAGE_EN": "German",
+      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
+    },
+    "DATE_FORMAT_SWITCHER": {
+      "TITLE": "Datumsformat",
+      "CHANGE_DATE_FORMAT": "Datumsformat ändern",
+      "DATE_FORMAT_OPTIONS": {
+        "DMY_LONG": "Englisch – Langformat",
+        "DMY_SHORT": "Englisch – Kurzformat",
+        "MDY_LONG": "Amerikanisch – Langformat",
+        "MDY_SHORT": "Amerikanisch – Kurzformat",
+        "DMY_SLASH": "TT/MM/JJJJ",
+        "DMY_DOT": "TT.MM.JJJJ",
+        "DMY_DASH": "TT-MM-JJJJ",
+        "YMD_SLASH": "JJJJ/MM/TT",
+        "YMD_DOT": "JJJJ.MM.TT",
+        "YMD_DASH": "JJJJ-MM-TT",
+        "YMD": "JJJJMMTT"
+      }
+    }
+  }
+}

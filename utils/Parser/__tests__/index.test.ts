@@ -1,9 +1,14 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
+import { AccountType, Country, Currency } from '@/types-enums'
 import type { BankAccountId, ParserId } from '@/utils/Parser'
 import {
   AVAILABLE_PARSERS,
   BANKS,
+  createParser,
+  defineBank,
+  extractFileRows,
+  findSections,
   getFormatHeaders,
   getReferencedHeaders,
   normalizeHeader,
@@ -74,5 +79,166 @@ describe('registry', () => {
     )
 
     expect(unlisted).toEqual([])
+  })
+})
+
+describe('createParser', () => {
+  const bank = defineBank({
+    id: 'test',
+    name: 'Test',
+    country: Country.DE,
+    currency: Currency.EUR,
+    formats: [
+      {
+        accountType: AccountType.CURRENT,
+        accountName: 'Giro',
+        version: '1',
+        dateFormat: 'dd.MM.yyyy',
+        numberFormat: 'de',
+        headers: ['Datum', 'Text', 'Betrag', 'Saldo', 'Referenz'],
+        columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
+        extraColumns: { balance: 'Saldo', reference: 'Referenz' },
+      },
+    ],
+  })
+  const parser = createParser(bank, bank.formats[0])
+  const header = ['Datum', 'Text', 'Betrag', 'Saldo', 'Referenz']
+
+  it('should omit empty extra cells and use null when all are empty', () => {
+    const transactions = parser.parse([
+      header,
+      ['01.01.2024', 'A', '-1,50', '1.234,56', 'Ref'],
+      ['02.01.2024', 'B', '2,00', '', 'Ref'],
+      ['03.01.2024', 'C', '3,00', '', ''],
+    ])
+
+    expect(transactions.map((transaction) => transaction.extra)).toEqual([
+      { balance: '1234.56', reference: 'Ref' },
+      { reference: 'Ref' },
+      null,
+    ])
+  })
+})
+
+describe('transaction IDs', () => {
+  const header = ['Datum', 'Text', 'Betrag']
+  const defineTestBank = (id: string) =>
+    defineBank({
+      id,
+      name: id,
+      country: Country.DE,
+      currency: Currency.EUR,
+      formats: [
+        {
+          accountType: AccountType.CURRENT,
+          accountName: 'Giro',
+          version: '1',
+          dateFormat: 'dd.MM.yyyy',
+          numberFormat: 'de',
+          headers: header,
+          columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
+        },
+      ],
+    })
+  const bankA = defineTestBank('bank_a')
+  const parser = createParser(bankA, bankA.formats[0])
+  const rows = [
+    ['01.01.2024', 'A', '-1,00'],
+    ['01.01.2024', 'Coffee', '-3,50'],
+    ['01.01.2024', 'Coffee', '-3,50'],
+    ['02.01.2024', 'B', '2,00'],
+  ]
+
+  it('should match for overlapping statements, even when a day is only partially included', () => {
+    const full = parser.parse([header, ...rows])
+    const partial = parser.parse([header, ...rows.slice(1)])
+
+    expect(partial.map(({ id }) => id)).toEqual(full.slice(1).map(({ id }) => id))
+  })
+
+  it('should keep identical transactions on the same day apart', () => {
+    const [, first, second] = parser.parse([header, ...rows])
+
+    expect(first.id).not.toBe(second.id)
+  })
+
+  it('should differ between accounts', () => {
+    const bankB = defineTestBank('bank_b')
+    const otherParser = createParser(bankB, bankB.formats[0])
+
+    expect(otherParser.parse([header, rows[0]])[0].id).not.toBe(parser.parse([header, rows[0]])[0].id)
+  })
+})
+
+describe('findSections', () => {
+  const giroHeader = ['Buchungstag', 'Wertstellung (Valuta)', 'Vorgang', 'Buchungstext', 'Umsatz in EUR', '']
+  const visaHeader = ['Buchungstag', 'Umsatztag', 'Vorgang', 'Referenz', 'Buchungstext', 'Umsatz in EUR', '']
+  const giroRow = (day: number) => [
+    '30.01.2026',
+    `${String(day).padStart(2, '0')}.01.2026`,
+    'Lastschrift',
+    `G${day}`,
+    '-1,00',
+    '',
+  ]
+  const visaRow = ['29.01.2026', '28.01.2026', 'Kartenumsatz', '123', 'Shop', '-159,00', '']
+  const preamble = (title: string) => [title, 'Zeitraum: 01.01.2026 - 31.01.2026', '']
+
+  // Giro section long enough that the Visa header is far from the top
+  const giroRows = Array.from({ length: 200 }, (_, index) => giroRow((index % 28) + 1))
+  const file = [
+    [''],
+    preamble('Umsätze Girokonto'),
+    giroHeader,
+    ...giroRows,
+    ['Alter Kontostand', '1.000,00 EUR'],
+    preamble('Umsätze Visa-Karte (Kreditkarte)'),
+    visaHeader,
+    visaRow,
+    ['Neuer Kontostand', '-159,00 EUR'],
+  ]
+
+  it('should find one section per account anywhere in the file', () => {
+    const { sections, error } = findSections(file)
+
+    expect(error).toBe('')
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__current__1', 'comdirect__credit_card__1'])
+    expect(sections.map(({ parser, rows }) => parser.parse(rows).length)).toEqual([200, 1])
+  })
+
+  it('should not include rows of the next section', () => {
+    const [giro] = findSections(file).sections
+
+    expect(giro.rows.at(-1)).toEqual(preamble('Umsätze Visa-Karte (Kreditkarte)'))
+  })
+
+  it('should find a single section', () => {
+    const { sections } = findSections([preamble('Umsätze Visa-Karte (Kreditkarte)'), visaHeader, visaRow])
+
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__1'])
+  })
+
+  it('should drop sections without transactions', () => {
+    const { sections } = findSections([giroHeader, ['Keine Umsätze vorhanden.'], visaHeader, visaRow])
+
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__1'])
+  })
+
+  it('should explain why nothing matched', () => {
+    expect(findSections([giroHeader]).error).toContain('Header found in row 1, but no transaction rows')
+    expect(findSections([giroHeader.slice(0, 4), giroRow(1)]).error).toContain('Missing columns: "Umsatz in EUR"')
+    expect(
+      findSections([
+        ['a', 'b'],
+        ['1', '2'],
+      ]).error,
+    ).toBe('No matching parser found!')
+  })
+
+  it('should extract the rows of each section', () => {
+    expect(extractFileRows(file)).toEqual([
+      { accountName: 'Giro', header: giroHeader, rows: giroRows },
+      { accountName: 'Visa', header: visaHeader, rows: [visaRow] },
+    ])
   })
 })

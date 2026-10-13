@@ -4,8 +4,6 @@ import { z } from 'zod'
 // See: https://github.com/mui/material-ui/issues/35910
 import type {} from '@mui/material/themeCssVarsAugmentation'
 
-import type { Big as TypeBig } from 'big.js'
-
 // -------------------------------------------------------
 
 export const zNonEmptyString = z.string().trim().nonempty({ error: 'ERRORS:REQUIRED' })
@@ -26,16 +24,11 @@ export type IdString = z.infer<typeof zIdString>
 
 // -------------------------------------------------------
 
-export const zDateRange = z.object({
-  /** Start date of the interval */
+const zDateRange = z.object({
   start: z.date(),
-  /** End date of the interval */
   end: z.date(),
 })
 
-/**
- * Interval of a period where start and end date are Date objects
- */
 export type DateRange = z.infer<typeof zDateRange>
 
 // -------------------------------------------------------
@@ -52,19 +45,7 @@ export type DateTimeString = z.infer<typeof zDateTimeString>
 
 // -------------------------------------------------------
 
-export const zSystemDateString = z.iso.date({ error: 'ERRORS:INVALID_DATE' })
-
-/**
- * The SystemDateString must be a string in the MISC.SYSTEM_DATE_FORMAT = DateFormat.YMD_DASH format,
- * i.e. "2020-01-01".
- *
- * For more info see: https://github.com/colinhacks/zod?tab=readme-ov-file#dates
- */
-export type SystemDateString = z.infer<typeof zSystemDateString>
-
-// -------------------------------------------------------
-
-export const zSelectOptionWithType = <T>(valueSchema: z.ZodType<T>) => {
+const zSelectOptionWithType = <T>(valueSchema: z.ZodType<T>) => {
   return z.object({
     value: valueSchema,
     label: z.custom<ReactNode>(),
@@ -82,24 +63,6 @@ export const zNumberString = z.string().nonempty({ error: 'ERRORS:REQUIRED' })
  * i.e. '0' and never '', as using `Big('')` would fail.
  */
 export type NumberString = z.infer<typeof zNumberString>
-
-// -------------------------------------------------------
-
-/**
- * Proxy for Big type.
- */
-export type NumberBig = TypeBig
-
-// -------------------------------------------------------
-
-export type ChartDataPoint = {
-  label: string
-  value: number
-}
-
-export type ChartDataPointWithData<T> = ChartDataPoint & {
-  data: T
-}
 
 // -------------------------------------------------------
 

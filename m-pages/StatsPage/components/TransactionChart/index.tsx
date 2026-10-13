@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Card, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import type { ChartData, ChartDataset } from 'chart.js'
 import { useRef, useState } from 'react'
 import type { RefObject } from 'react'
@@ -11,8 +11,10 @@ import { Currency } from '@/types-enums'
 import { BarChart } from '@/components'
 import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
+import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
+import CardTitle from '../CardTitle'
 import { getBackgroundColour, getBarThickness, getBorderRadius, getChartOptions } from './actions'
 import { ui } from './styled'
 
@@ -22,6 +24,7 @@ type TransactionChartProps = {
 }
 
 const Component = ({ transactions, currency }: TransactionChartProps) => {
+  const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const sx = ui()
   const ref = useRef<HTMLDivElement>(null)
@@ -34,7 +37,7 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
 
   const dataset: ChartDataset<'bar'> = {
     type: 'bar',
-    label: 'Transactions',
+    label: t('MISC.TRANSACTIONS'),
     data: transactions.map((row) => Big(row.value).toNumber()),
     backgroundColor: getBackgroundColour,
     borderRadius: getBorderRadius,
@@ -50,16 +53,14 @@ const Component = ({ transactions, currency }: TransactionChartProps) => {
   const chartOptions = getChartOptions({ currency, locale })
 
   return (
-    <Card>
-      <Typography variant="h6" color="secondary">
-        Cashflow
-      </Typography>
+    <Box>
+      <CardTitle>{t('STATS_PAGE.STATS_VIEW.CASHFLOW')}</CardTitle>
 
       <Box sx={sx.chartCard} ref={ref}>
         {/* @ts-expect-error Type '"line"' is not assignable to type '"bar"'. */}
         <BarChart type="bar" data={chartData} options={chartOptions} />
       </Box>
-    </Card>
+    </Box>
   )
 }
 

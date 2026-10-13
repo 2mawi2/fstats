@@ -6,7 +6,7 @@ import { zDateTimeString, zIdString, zNumberString } from '../global'
 import type { _KeysCheck } from '../key-check'
 import { _zKeysCheck } from '../key-check'
 
-export const zParentCategoryCode = z.string().regex(/^[A-Z]{3}$/)
+const zParentCategoryCode = z.string().regex(/^[A-Z]{3}$/)
 export const zCategoryCode = z.string().regex(/^[A-Z]{3}_\d{2}$/)
 
 export type ParentCategoryCode = z.infer<typeof zParentCategoryCode>
@@ -56,8 +56,6 @@ export const zTransactionAtRest = z.object({
   currency: z.string(),
 })
 
-export type TransactionAtRest = z.infer<typeof zTransactionAtRest>
-
 // Safety checks
-const assertKeys: _KeysCheck<Transaction, TransactionAtRest> = true
+const assertKeys: _KeysCheck<Transaction, z.infer<typeof zTransactionAtRest>> = true
 _zKeysCheck(zTransaction, zTransactionAtRest, assertKeys)

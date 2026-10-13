@@ -1,83 +1,58 @@
 'use client'
 
 import { parseISO } from 'date-fns'
-import { difference, uniqBy } from 'lodash'
 
-import {
-  DateRange,
-  GroupDataByOption,
-  ParsedStatsFile,
-  SelectOptionBankAccountId,
-  Transaction,
-  TransactionRangeItem,
-} from '@/types'
+import { ParsedStatsFile, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
-import { DEMO_TRANSACTIONS } from '@/common'
-import { getBankAccountId } from '@/utils/Parser'
+import { splitDuplicates } from '@/m-stats-file/service'
 
-import { getTransactionsGroupedIntoRanges } from './helper'
+import { getTransactionRangeItems, getTransactionsDateRange } from './helper'
+
+export { getTransactionRangeItems, getTransactionsDateRange, RangeGranularity } from './helper'
 
 export const useTransactionHelper = ({
-  isDemoMode,
-  selectedId,
   files,
-  groupDataBy,
   locale,
   dateFormat,
+  filterTransactions = (transactions) => transactions,
+  excludedDays,
 }: {
-  isDemoMode: boolean
-  selectedId: SelectOptionBankAccountId
   files: ParsedStatsFile[]
-  groupDataBy: GroupDataByOption
   locale: UserLocale
   dateFormat: DateFormat
+  /**
+   * Applied to the unique transactions, before the range items are grouped.
+   */
+  filterTransactions?: (transactions: Transaction[]) => Transaction[]
+  /**
+   * Days (`yyyy-MM-dd`) whose transactions were removed from `files`, shown as gaps.
+   */
+  excludedDays?: Set<string>
 }): {
   transactions: Transaction[]
-  duplicates: Transaction[]
-  dateRange: DateRange | null
   transactionRangeItems: TransactionRangeItem[]
 } => {
-  let allTransactions: Transaction[] = []
+  const allTransactions = files.flatMap((file) => file.sections).flatMap((section) => section.transactions)
+  const transactions = filterTransactions(splitDuplicates(allTransactions).unique)
 
-  if (isDemoMode) {
-    allTransactions = DEMO_TRANSACTIONS
-  } else {
-    const filesForSelectedId =
-      selectedId === 'all' ? files : files.filter((file) => getBankAccountId(file.parserId) === selectedId)
-    allTransactions = filesForSelectedId.flatMap((file) => file.transactions)
-  }
-
-  if (!allTransactions.length) {
+  if (!transactions.length) {
     return {
       transactions: [],
-      duplicates: [],
-      dateRange: null,
       transactionRangeItems: [],
     }
   }
 
-  // IDs are content hashes, so this removes identical transactions (e.g. from overlapping statements)
-  const transactions = uniqBy(allTransactions, 'id')
-  const duplicates = difference(allTransactions, transactions)
-  const transactionsSortedByDate = transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
-  const earliestTransaction = transactionsSortedByDate[0]
-  const latestTransaction = transactionsSortedByDate[transactionsSortedByDate.length - 1]
-  const dateRange: DateRange = {
-    start: earliestTransaction ? parseISO(earliestTransaction.date) : new Date(),
-    end: latestTransaction ? parseISO(latestTransaction.date) : new Date(),
-  }
-  const transactionRangeItems = getTransactionsGroupedIntoRanges({
-    groupDataBy,
-    dateRange,
+  transactions.sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
+  const transactionRangeItems = getTransactionRangeItems({
+    dateRange: getTransactionsDateRange(transactions),
     transactions,
     locale,
     dateFormat,
+    excludedDays,
   })
 
   return {
     transactions,
-    duplicates,
-    dateRange,
     transactionRangeItems,
   }
 }

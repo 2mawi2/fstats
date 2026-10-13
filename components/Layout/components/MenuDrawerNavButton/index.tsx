@@ -2,7 +2,7 @@
 
 import { ListItem, ListItemButton, ListItemText } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 type MenuDrawerNavButtonProps = {
@@ -10,20 +10,26 @@ type MenuDrawerNavButtonProps = {
   onClose: VoidFunction
   children: ReactNode
   isActive?: boolean
+  isExternal?: boolean
 }
 
-const Component = ({ route, onClose, children, isActive = false }: MenuDrawerNavButtonProps) => {
+const Component = ({
+  route,
+  onClose,
+  children,
+  isActive = false,
+  isExternal = false,
+}: MenuDrawerNavButtonProps) => {
   const theme = useTheme()
-  const router = useRouter()
+  const linkProps = isExternal
+    ? { component: 'a', href: route, target: '_blank', rel: 'noopener noreferrer' }
+    : { component: Link, href: route }
 
   return (
     <ListItem disablePadding>
       <ListItemButton
-        onMouseEnter={() => router.prefetch(route)}
-        onClick={() => {
-          router.push(route)
-          onClose()
-        }}
+        {...linkProps}
+        onClick={onClose}
         sx={{
           mx: 1.5,
           mb: 0.5,
