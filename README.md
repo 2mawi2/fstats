@@ -23,17 +23,17 @@ By default, your files **get deleted** when you close the tab or browser window.
 
 #### United Kingdom
 
-- [Lloyds](https://www.lloydsbank.com/)
+- [Lloyds](utils/Parser/banks/lloyds.ts)
 
 #### Germany
 
-- [Comdirect](https://www.comdirect.de/)
-- [ING](https://www.ing.de/)
+- [Comdirect](utils/Parser/banks/comdirect.ts)
+- [ING](utils/Parser/banks/ing.ts)
 
 #### South Africa
 
-- [Capitec](https://www.capitecbank.co.za/)
-- [FNB](https://www.fnb.co.za/)
+- [Capitec](utils/Parser/banks/capitec.ts)
+- [FNB](utils/Parser/banks/fnb.ts)
 
 ## Development
 

@@ -5,6 +5,7 @@ import { defineBank } from '../definition'
 export const fnb = defineBank({
   id: 'fnb',
   name: 'FNB',
+  url: 'https://www.fnb.co.za/',
   country: Country.ZA,
   currency: Currency.ZAR,
   formats: [

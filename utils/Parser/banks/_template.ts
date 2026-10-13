@@ -23,6 +23,10 @@ export const newBank = defineBank({
    */
   name: 'New Bank',
   /**
+   * Bank website.
+   */
+  url: 'https://www.example.com/',
+  /**
    * Shown on the home page. New countries: add to `Country` in
    * `types-enums/index.ts` and to `COUNTRY` in `public/locales/{en,de}.json`.
    */

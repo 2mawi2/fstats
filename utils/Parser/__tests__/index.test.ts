@@ -86,6 +86,7 @@ describe('createParser', () => {
   const bank = defineBank({
     id: 'test',
     name: 'Test',
+    url: 'https://www.example.com/',
     country: Country.DE,
     currency: Currency.EUR,
     formats: [
@@ -132,6 +133,7 @@ describe('transaction IDs', () => {
     defineBank({
       id,
       name: id,
+      url: 'https://www.example.com/',
       country: Country.DE,
       currency: Currency.EUR,
       formats: [

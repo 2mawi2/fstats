@@ -85,6 +85,10 @@ export type BankDef = {
   id: string
   name: string
   /**
+   * Bank website.
+   */
+  url: string
+  /**
    * Shown on the home page.
    */
   country: Country

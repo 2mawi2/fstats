@@ -5,6 +5,7 @@ import { defineBank } from '../definition'
 export const capitec = defineBank({
   id: 'capitec',
   name: 'Capitec',
+  url: 'https://www.capitecbank.co.za/',
   country: Country.ZA,
   currency: Currency.ZAR,
   formats: [

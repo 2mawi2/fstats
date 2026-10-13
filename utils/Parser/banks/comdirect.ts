@@ -5,6 +5,7 @@ import { defineBank } from '../definition'
 export const comdirect = defineBank({
   id: 'comdirect',
   name: 'Comdirect',
+  url: 'https://www.comdirect.de/',
   country: Country.DE,
   currency: Currency.EUR,
   formats: [
