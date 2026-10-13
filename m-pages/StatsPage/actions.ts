@@ -324,16 +324,33 @@ export type TransactionCounts = {
  * Counts of the transactions (before the date explorer), the same wherever a transaction count is shown. Duplicates
  * and transactions on deselected days are never counted, also when shown in the transactions table.
  */
-export const getTransactionCounts = (transactions: Transaction[], deselectedDays: Set<string>): TransactionCounts => {
-  const { unique, duplicates } = splitDuplicates(transactions)
+export const getTransactionCounts = (
+  transactions: Transaction[],
+  deselectedDays: Set<string>,
+  duplicates = getDuplicates(transactions),
+): TransactionCounts => {
+  const unique = withoutDuplicates(transactions, duplicates)
   const isOnSelectedDay = (transaction: Transaction) => !deselectedDays.has(getTransactionDay(transaction))
   const count = unique.filter(isOnSelectedDay).length
 
   return {
     count,
     dateExcludedCount: unique.length - count,
-    duplicateCount: duplicates.filter(isOnSelectedDay).length,
+    duplicateCount: transactions.filter((transaction) => duplicates.has(transaction) && isOnSelectedDay(transaction))
+      .length,
   }
+}
+
+/**
+ * Transactions that are also earlier in the list (e.g. in an earlier file with overlapping statements), by reference.
+ * Determined across all checked files, so the stats of a single file agree with the totals.
+ */
+export const getDuplicates = (transactions: Transaction[]) => {
+  return new Set(splitDuplicates(transactions).duplicates)
+}
+
+export const withoutDuplicates = (transactions: Transaction[], duplicates: Set<Transaction>) => {
+  return transactions.filter((transaction) => !duplicates.has(transaction))
 }
 
 /**

@@ -3,7 +3,16 @@ import { describe, expect, it } from 'vitest'
 import type { ParsedStatsFile, StatsFile, Transaction } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 
-import { AmountFilter, EmptyReason, filterTransactions, getEmptyReason, getShownFiles, NO_CATEGORY } from '../actions'
+import {
+  AmountFilter,
+  EmptyReason,
+  filterTransactions,
+  getDuplicates,
+  getEmptyReason,
+  getShownFiles,
+  getTransactionCounts,
+  NO_CATEGORY,
+} from '../actions'
 
 const toTransaction = (date: string, value: string, category: string | null = null) =>
   ({ id: `${date}-${value}`, date, value, category }) as Transaction
@@ -37,6 +46,26 @@ describe('getShownFiles', () => {
   it('should keep the files as they are without deselected days', () => {
     const checkedFiles = [fileA, unparsed]
     expect(getShownFiles(checkedFiles, new Set()).checkedFiles).toBe(checkedFiles)
+  })
+})
+
+describe('getTransactionCounts', () => {
+  it('should count duplicates of earlier files in a later file', () => {
+    const overlapping = toFile('d', [
+      toTransaction('2026-01-02T00:00:00+00:00', '-5'),
+      toTransaction('2026-01-03T00:00:00+00:00', '7'),
+    ])
+    const transactions = overlapping.sections[0].transactions
+    const duplicates = getDuplicates([fileA, overlapping].flatMap((file) => file.sections[0].transactions))
+
+    // On its own, the file has no duplicates
+    expect(getTransactionCounts(transactions, new Set())).toEqual({ count: 2, dateExcludedCount: 0, duplicateCount: 0 })
+    expect(getTransactionCounts(transactions, new Set(), duplicates)).toEqual({
+      count: 1,
+      dateExcludedCount: 0,
+      duplicateCount: 1,
+    })
+    expect(getTransactionCounts(fileA.sections[0].transactions, new Set(), duplicates).duplicateCount).toBe(0)
   })
 })
 

@@ -4,9 +4,10 @@ import { Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
+import { getFileTransactions, isParsed } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
-import { filterFiles } from '../../actions'
+import { filterFiles, getDuplicates } from '../../actions'
 import { useShownFiles, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
 import { useTransactionFilter } from '../../useTransactionFilter'
@@ -32,6 +33,11 @@ const Component = () => {
   const { categoryFilter } = useTransactionFilter()
   const summaryFiles = useMemo(() => filterFiles(allParsedFiles, categoryFilter), [allParsedFiles, categoryFilter])
   const detailFiles = useMemo(() => filterFiles(checkedFiles, categoryFilter), [checkedFiles, categoryFilter])
+  // Across the checked files in their order, like the summary, so the per-file stats add up to it
+  const duplicates = useMemo(
+    () => getDuplicates(detailFiles.filter(isParsed).flatMap(getFileTransactions)),
+    [detailFiles],
+  )
 
   if (!checkedFiles.length) {
     return <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
@@ -55,7 +61,7 @@ const Component = () => {
       ) : null}
       <StatsCard>
         {detailFiles.map((file) => (
-          <FileDetails key={file.id} file={file} deselectedDays={deselectedDays} />
+          <FileDetails key={file.id} file={file} deselectedDays={deselectedDays} duplicates={duplicates} />
         ))}
       </StatsCard>
     </>
