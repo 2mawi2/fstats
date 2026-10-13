@@ -3,34 +3,33 @@
 import { DateRangeOutlined } from '@mui/icons-material'
 import type { ReactNode } from 'react'
 
-import { DateFormat } from '@/types-enums'
-import { useUserPreferences } from '@/hooks'
-import { getDateFormatSelectOptions, toDisplayDate } from '@/utils/Date'
+import type { DateFormat } from '@/types-enums'
+import type { OptionSwitcherTriggerProps } from '@/components'
+import { OptionSwitcher } from '@/components'
+import { useUserPreferences } from '@/m-user/service'
+import { getDateFormatSelectOptions } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
-import OptionSwitcher from '../OptionSwitcher'
-import type { OptionSwitcherTriggerProps } from '../OptionSwitcher'
-
 type DateFormatSwitcherProps = {
-  showLabel?: boolean
   renderTrigger?: (props: OptionSwitcherTriggerProps) => ReactNode
 }
 
-const Component = ({ showLabel = false, renderTrigger }: DateFormatSwitcherProps) => {
+const Component = ({ renderTrigger }: DateFormatSwitcherProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat, setDateFormat } = useUserPreferences()
+  // Today's date in each format
+  const options = getDateFormatSelectOptions(locale)
 
   return (
     <OptionSwitcher
-      title={t('COMPONENTS.DATE_FORMAT_SWITCHER.CHANGE_DATE_FORMAT')}
+      title={t('SETTINGS_PAGE.DATE_FORMAT_SWITCHER.CHANGE_DATE_FORMAT')}
       icon={<DateRangeOutlined color="secondary" sx={{ fontSize: 18 }} />}
-      label={toDisplayDate(new Date(), locale, { formatTo: dateFormat })}
-      showLabel={showLabel}
+      label={options.find((option) => option.value === dateFormat)?.label}
       renderTrigger={renderTrigger}
       fixedHeader
-      options={getDateFormatSelectOptions(locale).map((option) => ({
+      options={options.map((option) => ({
         value: option.value,
-        primary: toDisplayDate(new Date(), locale, { formatTo: option.value }),
+        primary: option.label,
         checked: option.value === dateFormat,
       }))}
       onSelect={(value: DateFormat) => setDateFormat(value)}

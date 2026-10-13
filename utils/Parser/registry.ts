@@ -1,7 +1,7 @@
 /**
  * Single source of truth for supported banks. IDs and zod schemas are derived from `BANKS`.
  *
- * Keep this module free of runtime imports besides bank definitions, it's used by `@/types`.
+ * Keep this module free of runtime imports besides `zod` and the bank definitions, it's used by `@/types`.
  */
 import { z } from 'zod'
 

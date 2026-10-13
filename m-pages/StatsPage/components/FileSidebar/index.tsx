@@ -1,15 +1,12 @@
 'use client'
 
-import { Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { useMemo } from 'react'
 
-import { getFileTransactions, isParsed } from '@/m-stats-file/service'
+import { getView, WorkspaceView } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
-import { filterFiles, getDuplicates } from '../../actions'
-import { useShownFiles, useWorkspaceFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
+import { useWorkspaceFiles } from '../../context'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import FileDetails from '../FileDetails'
 import StatsCard from '../StatsCard'
@@ -23,35 +20,30 @@ import { ui } from './styled'
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  // Before the date explorer, the counts include those on deselected days. Filtered by category below.
-  const { checkedFiles } = useWorkspaceFiles()
-  const { parsedFiles: checkedParsedFiles, allParsedFiles, deselectedDays } = useShownFiles()
+  const { checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
   // The summary is only a placeholder, the filters don't apply to the CSV view
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const csvTitle = t('STATS_PAGE.CSV_DISABLED')
   // The stats show money in and out side by side, so only the category filter applies
   const { categoryFilter } = useTransactionFilter()
-  const summaryFiles = useMemo(() => filterFiles(allParsedFiles, categoryFilter), [allParsedFiles, categoryFilter])
-  const detailFiles = useMemo(() => filterFiles(checkedFiles, categoryFilter), [checkedFiles, categoryFilter])
-  // Across the checked files in their order, like the summary, so the per-file stats add up to it
-  const duplicates = useMemo(
-    () => getDuplicates(detailFiles.filter(isParsed).flatMap(getFileTransactions)),
-    [detailFiles],
-  )
 
   if (!checkedFiles.length) {
-    return <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
+    return (
+      <Box sx={sx.sidebar}>
+        <StatsSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
+      </Box>
+    )
   }
 
   return (
-    <>
+    <Box sx={sx.sidebar}>
       {checkedParsedFiles.length ? (
         <>
           {isCsv ? (
             <StatsSkeleton title={csvTitle} />
           ) : (
             <StatsCard>
-              <TransactionsSummary files={summaryFiles} deselectedDays={deselectedDays} />
+              <TransactionsSummary filter={categoryFilter} />
             </StatsCard>
           )}
           <Typography component="h2" sx={sx.subheader}>
@@ -60,11 +52,11 @@ const Component = () => {
         </>
       ) : null}
       <StatsCard>
-        {detailFiles.map((file) => (
-          <FileDetails key={file.id} file={file} deselectedDays={deselectedDays} duplicates={duplicates} />
+        {checkedFiles.map((file) => (
+          <FileDetails key={file.id} file={file} filter={categoryFilter} />
         ))}
       </StatsCard>
-    </>
+    </Box>
   )
 }
 

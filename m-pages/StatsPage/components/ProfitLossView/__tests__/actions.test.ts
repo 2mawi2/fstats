@@ -5,7 +5,8 @@ import { Currency, StatsFileStatus } from '@/types-enums'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { BreakdownPeriod, getPeriodKey, getProfitLoss, splitTransfers } from '../actions'
+import { getCheckedTransactions } from '../../../actions'
+import { BreakdownPeriod, getAccountTransactions, getPeriodKey, getProfitLoss, splitTransfers } from '../actions'
 
 const toTransaction = (
   day: string,
@@ -23,6 +24,9 @@ const toTransaction = (
 
 const toFile = (id: string, sections: { parserId: string; transactions: Transaction[] }[]) =>
   ({ id, status: StatsFileStatus.PARSED, sections }) as unknown as ParsedStatsFile
+
+const toAccountTransactions = (files: ParsedStatsFile[]) =>
+  getAccountTransactions(files, getCheckedTransactions(files).unique)
 
 describe('getPeriodKey', () => {
   it('should group by month, quarter and year', () => {
@@ -86,10 +90,10 @@ describe('getProfitLoss', () => {
         { parserId: 'comdirect__credit_card__1', transactions: [fromGiro, restaurant] },
       ]),
       // Overlapping statement
-      toFile('b', [{ parserId: 'comdirect__current__1', transactions: [groceries, groceriesFeb] }]),
+      toFile('b', [{ parserId: 'comdirect__current__1', transactions: [{ ...groceries }, groceriesFeb] }]),
     ]
 
-    const [profitLoss] = getProfitLoss(files, BreakdownPeriod.MONTH, i18n.t)
+    const [profitLoss] = getProfitLoss(toAccountTransactions(files), BreakdownPeriod.MONTH, i18n.t)
 
     expect(profitLoss.periods).toEqual(['2026-01', '2026-02'])
     expect(profitLoss.income.rows.map((row) => [row.key, row.total])).toEqual([['INC', '3000']])
@@ -111,6 +115,34 @@ describe('getProfitLoss', () => {
     expect(profitLoss.transfers.net.total).toBe('0')
   })
 
+  it('should pair transfers before filtering', () => {
+    const outgoing = toTransaction('2026-01-01', '-500', 'FIN_02')
+    const incoming = toTransaction('2026-01-02', '500', 'TFI_02')
+    const groceries = toTransaction('2026-01-03', '-20', 'GRO_01')
+    const files = [
+      toFile('a', [
+        { parserId: 'comdirect__current__1', transactions: [outgoing, groceries] },
+        { parserId: 'comdirect__credit_card__1', transactions: [incoming] },
+      ]),
+    ]
+    const withoutIncoming = <T extends Transaction>(transactions: T[]) =>
+      transactions.filter((transaction) => transaction.id !== incoming.id)
+
+    const [profitLoss] = getProfitLoss(toAccountTransactions(files), BreakdownPeriod.MONTH, i18n.t, withoutIncoming)
+
+    expect(profitLoss.expenses.total.total).toBe('20')
+    expect(profitLoss.transfers.count).toBe(1)
+    expect(profitLoss.transfers.outgoing.total).toBe('-500')
+  })
+
+  it('should skip currencies without shown transactions', () => {
+    const files = [
+      toFile('a', [{ parserId: 'ing__current__1', transactions: [toTransaction('2026-01-01', '-1', 'GRO_01')] }]),
+    ]
+
+    expect(getProfitLoss(toAccountTransactions(files), BreakdownPeriod.YEAR, i18n.t, () => [])).toEqual([])
+  })
+
   it('should return one per currency', () => {
     const files = [
       toFile('a', [{ parserId: 'ing__current__1', transactions: [toTransaction('2026-01-01', '-1', 'GRO_01')] }]),
@@ -122,9 +154,10 @@ describe('getProfitLoss', () => {
       ]),
     ]
 
-    expect(getProfitLoss(files, BreakdownPeriod.YEAR, i18n.t).map((profitLoss) => profitLoss.currency)).toEqual([
-      Currency.EUR,
-      Currency.ZAR,
-    ])
+    expect(
+      getProfitLoss(toAccountTransactions(files), BreakdownPeriod.YEAR, i18n.t).map(
+        (profitLoss) => profitLoss.currency,
+      ),
+    ).toEqual([Currency.EUR, Currency.ZAR])
   })
 })

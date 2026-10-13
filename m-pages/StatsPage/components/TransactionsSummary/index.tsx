@@ -1,25 +1,25 @@
 'use client'
 
-import type { ParsedStatsFile } from '@/types'
+import { useMemo } from 'react'
+
 import { useTranslation } from '@/lib/i18n'
 
+import type { TransactionFilter } from '../../actions'
+import { useStatsTransactions } from '../../context'
 import StatsRow from '../StatsRow'
 import { getTransactionsByCurrency } from './actions'
 
 type TransactionsSummaryProps = {
-  /**
-   * Before the date explorer, see `useShownFiles`.
-   */
-  files: ParsedStatsFile[]
-  deselectedDays: Set<string>
+  filter: TransactionFilter
 }
 
 /**
- * Combined stats of all files, one row per currency.
+ * Combined stats of the checked files, one row per currency.
  */
-const Component = ({ files, deselectedDays }: TransactionsSummaryProps) => {
+const Component = ({ filter }: TransactionsSummaryProps) => {
   const { t } = useTranslation()
-  const groups = getTransactionsByCurrency(files, deselectedDays)
+  const stats = useStatsTransactions()
+  const groups = useMemo(() => getTransactionsByCurrency(stats, filter), [stats, filter])
 
   return groups.map(({ currency, transactions, counts }) => (
     <StatsRow

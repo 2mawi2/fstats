@@ -7,7 +7,7 @@ export const ROW_HEIGHT = 30 // px
 /**
  * Years are taller (with bigger text), as the larger grouping.
  */
-export const YEAR_ROW_HEIGHT = 38 // px
+const YEAR_ROW_HEIGHT = 38 // px
 
 export const getRowHeight = (row: Pick<DateRow, 'type'>) => {
   return row.type === 'year' ? YEAR_ROW_HEIGHT : ROW_HEIGHT

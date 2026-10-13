@@ -1,7 +1,8 @@
-import { eachDayOfInterval, format, isValid, parse, parseISO, startOfDay } from 'date-fns'
+import { format, isValid, parse, parseISO, startOfDay } from 'date-fns'
+import type { Locale } from 'date-fns'
 import { de, enGB } from 'date-fns/locale'
 
-import type { DateFnsLocale, DateRange, SelectOptionWithType, Transaction } from '@/types'
+import type { SelectOptionWithType, Transaction } from '@/types'
 import { DateFormat, SortOrder, UserLocale } from '@/types-enums'
 
 /**
@@ -15,12 +16,7 @@ export const toDisplayDate = (
     formatFrom?: string
   },
 ): string => {
-  if (!date) {
-    throw new Error('Must be Date or string')
-  }
-
-  const dateObject =
-    date instanceof Date ? date : options?.formatFrom ? parse(date, options.formatFrom, new Date()) : parseISO(date)
+  const dateObject = date instanceof Date ? date : toDate(date, options)
 
   if (!isValid(dateObject)) {
     throw new Error('Invalid date')
@@ -51,7 +47,7 @@ export const getDateFormatSelectOptions = (locale: UserLocale): SelectOptionWith
   })
 }
 
-const getDateFnsLocale = (locale: UserLocale): DateFnsLocale => {
+const getDateFnsLocale = (locale: UserLocale): Locale => {
   switch (locale) {
     // @locale-updates
     case UserLocale.EN:
@@ -64,7 +60,8 @@ const getDateFnsLocale = (locale: UserLocale): DateFnsLocale => {
 }
 
 /**
- * This method will take an array of dates and ensure that none of them have exactly the same timestamp.
+ * Spreads dates that share a timestamp (a day, for formats without time) one second apart, keeping their order.
+ * Dates from formats with seconds are returned unchanged, so duplicates there stay.
  */
 export const getUniqueTimestamps = ({
   dates,
@@ -81,61 +78,43 @@ export const getUniqueTimestamps = ({
     return dates
   }
 
-  if (!hasTime) {
-    return attachUniqueSecondsToDates({
-      dates,
-      sortOrder,
-      getGroupKey: (date) => startOfDay(date).getTime(),
-      getBaseTimestamp: (date) => startOfDay(date).getTime(),
-    })
-  }
-
   return attachUniqueSecondsToDates({
     dates,
     sortOrder,
-    getGroupKey: (date) => date.getTime(),
-    getBaseTimestamp: (date) => date.getTime(),
+    getBaseTimestamp: (date) => (hasTime ? date : startOfDay(date)).getTime(),
   })
 }
 
-// FIXME: Ensure error handling for invalid date ranges, e.g. picking start date after end date and vice versa
-export const getDaysInRange = ({ start, end }: DateRange): Date[] => {
-  const interval = { start, end }
-  return eachDayOfInterval(interval)
-}
-
-export const attachUniqueSecondsToDates = ({
+const attachUniqueSecondsToDates = ({
   dates,
   sortOrder,
-  getGroupKey,
   getBaseTimestamp,
 }: {
   dates: Date[]
   sortOrder: SortOrder
-  getGroupKey: (date: Date) => number
   getBaseTimestamp: (date: Date) => number
 }): Date[] => {
   const totalByGroup = new Map<number, number>()
   const seenByGroup = new Map<number, number>()
 
   dates.forEach((date) => {
-    const groupKey = getGroupKey(date)
+    const groupKey = getBaseTimestamp(date)
     totalByGroup.set(groupKey, (totalByGroup.get(groupKey) ?? 0) + 1)
   })
 
   return dates.map((date) => {
-    const groupKey = getGroupKey(date)
+    const groupKey = getBaseTimestamp(date)
     const seen = seenByGroup.get(groupKey) ?? 0
     const total = totalByGroup.get(groupKey) ?? 1
-    const secondOffset = sortOrder === 'asc' ? seen : total - seen - 1
+    const secondOffset = sortOrder === SortOrder.ASC ? seen : total - seen - 1
 
     seenByGroup.set(groupKey, seen + 1)
 
-    return new Date(getBaseTimestamp(date) + secondOffset * 1000)
+    return new Date(groupKey + secondOffset * 1000)
   })
 }
 
-export const getDateFormatPrecision = (
+const getDateFormatPrecision = (
   dateFormat: string,
 ): {
   hasTime: boolean

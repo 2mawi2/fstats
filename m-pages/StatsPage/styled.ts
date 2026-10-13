@@ -1,3 +1,30 @@
+/**
+ * Compact list row, e.g. the file rows of the left column and the stats rows of the right column.
+ */
+export const sxListRow = {
+  minHeight: 34,
+  py: 0,
+} as const
+
+/**
+ * Single line title of a list row, truncated.
+ */
+export const sxListRowTitle = {
+  flexGrow: 1,
+  minWidth: 0,
+  m: 0,
+  fontSize: 13,
+  lineHeight: 1.4,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+} as const
+
+export const sxSmallCheckbox = {
+  p: 0.5,
+  '& .MuiSvgIcon-root': { fontSize: 18 },
+} as const
+
 export const ui = () => {
   return {
     // Fills the viewport: the demo banner on top, the columns below it
@@ -13,10 +40,13 @@ export const ui = () => {
       minHeight: 0,
       width: '100%',
     },
+    // Each column has its own scroll container, below its toolbar if it has one
     column: {
+      display: 'flex',
+      flexDirection: 'column',
       minWidth: 0,
+      height: '100%',
       overflow: 'auto',
-      p: 2,
     },
     divider: {
       position: 'relative',
@@ -36,19 +66,6 @@ export const ui = () => {
         right: -3,
       },
       '&:hover::before, &:active::before': { bgcolor: 'action.hover' },
-    },
-    // With its own scroll container
-    fullHeightColumn: {
-      height: '100%',
-    },
-    // Toolbar on top, content scrolls below it
-    toolbarColumn: {
-      display: 'flex',
-      flexDirection: 'column',
-      p: 0,
-    },
-    rightColumn: {
-      p: 1.5,
     },
   }
 }

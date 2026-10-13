@@ -1,7 +1,7 @@
 import type { StatsFile } from '@/types'
 import { getFileBankAccounts, isParsed } from '@/m-stats-file/service'
 
-export type BankAccountOption = {
+type BankAccountOption = {
   value: string
   label: string
   fileIds: string[]

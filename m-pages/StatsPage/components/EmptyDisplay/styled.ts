@@ -4,7 +4,7 @@ export const ui = () => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      // Same position as before the clickable area was reduced to its content
+      // Distance of the content from the top, on top of its own padding
       pt: 13,
     },
     // Slightly padded, so the hover effect starts just before the pointer reaches the content

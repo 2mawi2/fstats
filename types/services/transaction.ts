@@ -4,7 +4,6 @@ import { zCurrency } from '@/types-enums'
 
 import { zDateTimeString, zIdString, zNumberString } from '../global'
 import type { _KeysCheck } from '../key-check'
-import { _zKeysCheck } from '../key-check'
 
 const zParentCategoryCode = z.string().regex(/^[A-Z]{3}$/)
 export const zCategoryCode = z.string().regex(/^[A-Z]{3}_\d{2}$/)
@@ -36,13 +35,16 @@ export const zTransaction = z.object({
   value: zNumberString,
   currency: zCurrency,
   category: zCategoryCode.nullable(),
+  /**
+   * Optional bank specific columns, see `extraColumns` in the bank definitions (`utils/Parser/banks/`).
+   */
   extra: z
     .object({
-      parentCategory: z.string().optional(), // Capitec (parentCategory)
-      category: z.string().optional(), // Capitec (category)
-      balance: zNumberString.optional(), // Capitec (balance), FNB (balance), ING (saldo), Lloyds (balance)
-      reference: z.string().optional(), // Comdirect Visa (referenz), ING (verwendungszweck)
-      transactionType: z.string().optional(), // Comdirect Giro & Visa (vorgang), ING (buchungstext)
+      parentCategory: z.string().optional(),
+      category: z.string().optional(),
+      balance: zNumberString.optional(),
+      reference: z.string().optional(),
+      transactionType: z.string().optional(),
     })
     .nullable(),
 })
@@ -55,5 +57,4 @@ export const zTransactionAtRest = z.object({
 })
 
 // Safety checks
-const assertKeys: _KeysCheck<Transaction, z.infer<typeof zTransactionAtRest>> = true
-_zKeysCheck(zTransaction, zTransactionAtRest, assertKeys)
+true satisfies _KeysCheck<Transaction, z.infer<typeof zTransactionAtRest>>

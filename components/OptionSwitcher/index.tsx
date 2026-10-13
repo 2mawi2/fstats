@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, IconButton, Tooltip, Typography } from '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 import type { SxProps, Theme } from '@mui/material/styles'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
@@ -10,8 +10,6 @@ import { useIsMobile } from '@/hooks'
 import SwipeableDrawer from '../SwipeableDrawer'
 import { OptionList } from './components'
 import type { Option } from './components/OptionList'
-
-export type { Option }
 
 export type OptionSwitcherTriggerProps = {
   icon: ReactNode
@@ -23,7 +21,6 @@ type OptionSwitcherProps<T extends string> = {
   title: string
   icon: ReactNode
   label: ReactNode
-  showLabel?: boolean
   fixedHeader?: boolean
   listSx?: SxProps<Theme>
   /**
@@ -38,7 +35,6 @@ const Component = <T extends string>({
   title,
   icon,
   label,
-  showLabel = false,
   fixedHeader = false,
   listSx,
   renderTrigger,
@@ -67,26 +63,9 @@ const Component = <T extends string>({
         renderTrigger({ icon, label, onOpen })
       ) : (
         <Tooltip title={title}>
-          {showLabel ? (
-            <Button
-              size={isMobile ? 'large' : 'small'}
-              color="secondary"
-              onClick={onOpen}
-              sx={{
-                minWidth: 0,
-                px: 1.5,
-                py: 1,
-                borderRadius: 1.5,
-              }}
-              startIcon={icon}
-            >
-              <Typography sx={{ fontSize: 14, lineHeight: 1.2 }}>{label}</Typography>
-            </Button>
-          ) : (
-            <IconButton size={isMobile ? 'large' : 'medium'} color="secondary" onClick={onOpen}>
-              {icon}
-            </IconButton>
-          )}
+          <IconButton size={isMobile ? 'large' : 'medium'} color="secondary" onClick={onOpen}>
+            {icon}
+          </IconButton>
         </Tooltip>
       )}
 

@@ -4,9 +4,11 @@ import { ChevronRight } from '@mui/icons-material'
 import { Box, ButtonBase, Typography } from '@mui/material'
 
 import type { OptionSwitcherTriggerProps } from '@/components'
-import { DateFormatSwitcher, LanguageSwitcher, ThemeSwitcher } from '@/components'
+import { ThemeSwitcher } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
+import DateFormatSwitcher from '../DateFormatSwitcher'
+import LanguageSwitcher from '../LanguageSwitcher'
 import SettingsCard from '../SettingsCard'
 import { ui } from './styled'
 
@@ -42,10 +44,10 @@ const Component = () => {
           renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.THEME_SWITCHER.THEME')} {...props} />}
         />
         <LanguageSwitcher
-          renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.LANGUAGE_SWITCHER.LANGUAGE')} {...props} />}
+          renderTrigger={(props) => <PreferenceTile title={t('SETTINGS_PAGE.LANGUAGE_SWITCHER.LANGUAGE')} {...props} />}
         />
         <DateFormatSwitcher
-          renderTrigger={(props) => <PreferenceTile title={t('COMPONENTS.DATE_FORMAT_SWITCHER.TITLE')} {...props} />}
+          renderTrigger={(props) => <PreferenceTile title={t('SETTINGS_PAGE.DATE_FORMAT_SWITCHER.TITLE')} {...props} />}
         />
       </Box>
     </SettingsCard>

@@ -31,7 +31,8 @@
     "ABOUT": "About",
     "GITHUB": "GitHub",
     "EXPAND_MENU": "Expand menu",
-    "COLLAPSE_MENU": "Collapse menu"
+    "COLLAPSE_MENU": "Collapse menu",
+    "MENU": "Menu"
   },
   "HOME_PAGE": {
     "HERO_TITLE": "Analyse bank statements <accent>privately</accent>",
@@ -108,11 +109,16 @@
       "PARSING": "Parsing…",
       "UNSUPPORTED_FORMAT": "Unsupported format"
     },
+    "NO_FILES": {
+      "TITLE": "No files"
+    },
     "NO_SELECTION": {
       "TITLE": "No file selected",
       "SUBTITLE": "Pick a file on the left to see its transactions."
     },
     "NO_TRANSACTIONS": {
+      "EMPTY_TITLE": "No transactions",
+      "EMPTY_SUBTITLE": "None of the selected files have transactions.",
       "NO_DATES_TITLE": "No dates selected",
       "NO_DATES_SUBTITLE": "Select dates on the left to see their transactions.",
       "NO_MATCHES_TITLE": "No transactions",
@@ -138,6 +144,8 @@
       "SHOW_DUPLICATES": "Show duplicates",
       "DUPLICATE_OF": "Duplicate, also in {{file}}",
       "DUPLICATE_TAG": "Duplicate",
+      "DATE_EXCLUDED_TAG": "Excluded",
+      "EXCLUDED_BY_DATE": "Excluded by date",
       "ALSO_IN": "Also in {{files}}",
       "ROW_COUNT_one": "{{count}} row",
       "ROW_COUNT_other": "{{count}} rows",
@@ -227,15 +235,24 @@
     },
     "PREFERENCES": {
       "TITLE": "Preferences"
+    },
+    "LANGUAGE_SWITCHER": {
+      "LANGUAGE": "Language",
+      "CHANGE_LANGUAGE": "Change language",
+      "LOCALE_EN_LANGUAGE_EN": "English",
+      "LOCALE_EN_LANGUAGE_DE": "Englisch",
+      "LOCALE_DE_LANGUAGE_EN": "German",
+      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
+    },
+    "DATE_FORMAT_SWITCHER": {
+      "TITLE": "Date format",
+      "CHANGE_DATE_FORMAT": "Change date format"
     }
   },
   "ABOUT_PAGE": {
     "TITLE": "About",
     "BLURB": "fstats is open source. Browse the code, report issues or contribute on GitHub.",
     "VIEW_ON_GITHUB": "View on GitHub"
-  },
-  "DATA_DISPLAY": {
-    "MENU": "Menu"
   },
   "PAGE_404": {
     "TITLE": "The URL in the address bar does not exist!",
@@ -252,31 +269,6 @@
       "THEME_LIGHT": "Light",
       "THEME_DARK": "Dark",
       "THEME_SYSTEM": "System"
-    },
-    "LANGUAGE_SWITCHER": {
-      "LANGUAGE": "Language",
-      "CHANGE_LANGUAGE": "Change language",
-      "LOCALE_EN_LANGUAGE_EN": "English",
-      "LOCALE_EN_LANGUAGE_DE": "Englisch",
-      "LOCALE_DE_LANGUAGE_EN": "German",
-      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
-    },
-    "DATE_FORMAT_SWITCHER": {
-      "TITLE": "Date format",
-      "CHANGE_DATE_FORMAT": "Change date format",
-      "DATE_FORMAT_OPTIONS": {
-        "DMY_LONG": "English - Long format",
-        "DMY_SHORT": "English - Short format",
-        "MDY_LONG": "American - Long format",
-        "MDY_SHORT": "American - Short format",
-        "DMY_SLASH": "DD/MM/YYYY",
-        "DMY_DOT": "DD.MM.YYYY",
-        "DMY_DASH": "DD-MM-YYYY",
-        "YMD_SLASH": "YYYY/MM/DD",
-        "YMD_DOT": "YYYY.MM.DD",
-        "YMD_DASH": "YYYY-MM-DD",
-        "YMD": "YYYYMMDD"
-      }
     }
   }
 }

@@ -3,11 +3,11 @@ import { Currency, UserLocale } from '@/types-enums'
 import { getCurrencySymbol, getMaxDecimalsForCurrency } from '@/utils/Currency'
 import { Big } from '@/lib/w-big'
 
-export const getDecimals = (value: NumberString): number => {
+const getDecimals = (value: NumberString): number => {
   return value.includes('.') ? value.split('.')[1].length : 0
 }
 
-export const getRoundedValue = (value: NumberString | '', round: number): NumberString => {
+const getRoundedValue = (value: NumberString | '', round: number): NumberString => {
   if (!value) {
     return '0'
   }

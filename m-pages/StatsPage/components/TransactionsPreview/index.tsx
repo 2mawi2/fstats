@@ -1,11 +1,12 @@
 'use client'
 
+import { uniq } from 'lodash'
 import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 
 import type { StatsFile } from '@/types'
 import { isParsed } from '@/m-stats-file/service'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { getTransactionDay } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
@@ -23,12 +24,11 @@ import {
   getSourceLabel,
   getTransactionCells,
   getTransactionColumns,
+  getTransactionTag,
 } from './actions'
 
-// On days deselected in the date explorer
-const DESELECTED_ROW_STYLE = { opacity: 0.4 }
-// Also struck through, the same transaction as one in an earlier file
-const DUPLICATE_ROW_STYLE = { opacity: 0.4, textDecoration: 'line-through' }
+// Duplicates and transactions on days deselected in the date explorer, not counted anywhere
+const EXCLUDED_ROW_STYLE = { opacity: 0.4, textDecoration: 'line-through' }
 
 type TransactionsPreviewProps = {
   files: StatsFile[]
@@ -96,7 +96,16 @@ const Component = ({
     () => (includeDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),
     [allTransactions, includeDuplicates],
   )
-  const counts = useMemo(() => getTransactionCounts(allTransactions, deselectedDays), [allTransactions, deselectedDays])
+  // Duplicates are already marked, no need to look for them again
+  const counts = useMemo(
+    () =>
+      getTransactionCounts(
+        allTransactions,
+        deselectedDays,
+        new Set(allTransactions.filter((transaction) => transaction.isDuplicate)),
+      ),
+    [allTransactions, deselectedDays],
+  )
   const dayTransactions = useMemo(
     () =>
       includeDateExcluded
@@ -121,19 +130,26 @@ const Component = ({
     () => filterBySearch(dayTransactions, searchTexts, search),
     [dayTransactions, searchTexts, search],
   )
-  const columns = useMemo(
+  const tags = useMemo(
     () =>
-      getTransactionColumns(
-        currency,
-        isCombined,
-        amountFilter,
-        t,
-        transactions.some((transaction) => transaction.isDuplicate)
-          ? (rowIndex) => transactions[rowIndex].isDuplicate
-          : undefined,
+      transactions.map((transaction) =>
+        getTransactionTag(transaction, deselectedDays.has(getTransactionDay(transaction))),
       ),
-    [currency, isCombined, amountFilter, t, transactions],
+    [transactions, deselectedDays],
   )
+  const columns = useMemo(() => {
+    const shownTags = uniq(tags.filter((tag) => tag !== null))
+
+    return getTransactionColumns(
+      currency,
+      isCombined,
+      amountFilter,
+      t,
+      shownTags.length ? { shown: shownTags, getTag: (rowIndex) => tags[rowIndex] } : undefined,
+    )
+  }, [currency, isCombined, amountFilter, t, tags])
+  // Same condition as the column in `getTransactionColumns`
+  const hasTagColumn = isCombined || tags.some((tag) => tag !== null)
 
   // Only tables with matches are shown, see `NoSearchResultsDisplay`
   if (parsedFiles.length && search && !transactions.length) {
@@ -164,17 +180,13 @@ const Component = ({
           rowCount={transactions.length}
           getCells={(index) => [
             ...getTransactionCells(transactions[index], cellOptions),
-            ...(isCombined ? [getSourceLabel(transactions[index], t)] : []),
+            ...(hasTagColumn
+              ? [getSourceLabel(transactions[index], { showSource: isCombined, tag: tags[index] }, t)]
+              : []),
           ]}
           highlight={search}
           stickyHeaderTop={isSticky ? STICKY_HEADER_OFFSET : undefined}
-          getRowStyle={(index) =>
-            transactions[index].isDuplicate
-              ? DUPLICATE_ROW_STYLE
-              : deselectedDays.has(getTransactionDay(transactions[index]))
-                ? DESELECTED_ROW_STYLE
-                : undefined
-          }
+          getRowStyle={(index) => (tags[index] ? EXCLUDED_ROW_STYLE : undefined)}
           scrollElement={scrollElement}
         />
       ) : (

@@ -7,7 +7,7 @@ import { getQueryClient } from '@/lib/tanstack-query'
 import { addUser, getUser, updateUser } from '../api'
 import { userKey } from './keys'
 
-export const getUserDefaults = (): User => ({
+const getUserDefaults = (): User => ({
   created: '',
   modified: '',
   id: '',

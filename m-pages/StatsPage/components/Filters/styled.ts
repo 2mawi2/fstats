@@ -23,7 +23,7 @@ export const ui = () => {
       '& > * + *': {
         borderLeft: { xs: 0, sm: 1 },
         borderTop: { xs: 1, sm: 0 },
-        borderColor: { xs: 'divider', sm: 'divider' },
+        borderColor: 'divider',
       },
     }),
     column: {

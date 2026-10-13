@@ -5,7 +5,7 @@ import { Box, ButtonBase, Typography } from '@mui/material'
 import { Fragment } from 'react'
 
 import { MISC } from '@/common'
-import { DataLayout, DEFAULT_DATA_COLUMN_WIDTHS, DEFAULT_DATA_EXPLORER_SPLIT, useDataLayout } from '@/hooks'
+import { DEFAULT_STATS_COLUMN_WIDTHS, DEFAULT_STATS_EXPLORER_SPLIT, StatsLayout, useStatsLayout } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import SettingsCard from '../SettingsCard'
@@ -73,29 +73,29 @@ const LayoutPreview = ({ title, columnWidths, explorerSplit, isSelected, onSelec
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  const { customColumnWidths, customExplorerSplit, activeLayout, setActiveLayout } = useDataLayout()
+  const { customColumnWidths, customExplorerSplit, activeLayout, setActiveLayout } = useStatsLayout()
   const isCustomSameAsDefault =
-    !isChanged(customExplorerSplit, DEFAULT_DATA_EXPLORER_SPLIT) &&
-    customColumnWidths.every((width, index) => !isChanged(width, DEFAULT_DATA_COLUMN_WIDTHS[index]))
+    !isChanged(customExplorerSplit, DEFAULT_STATS_EXPLORER_SPLIT) &&
+    customColumnWidths.every((width, index) => !isChanged(width, DEFAULT_STATS_COLUMN_WIDTHS[index]))
 
   return (
     <SettingsCard title={t('SETTINGS_PAGE.LAYOUT.TITLE')}>
       <Box sx={sx.tiles}>
         <LayoutPreview
           title={t('SETTINGS_PAGE.LAYOUT.DEFAULT')}
-          columnWidths={DEFAULT_DATA_COLUMN_WIDTHS}
-          explorerSplit={DEFAULT_DATA_EXPLORER_SPLIT}
-          isSelected={activeLayout === DataLayout.DEFAULT || isCustomSameAsDefault}
-          onSelect={() => setActiveLayout(DataLayout.DEFAULT)}
+          columnWidths={DEFAULT_STATS_COLUMN_WIDTHS}
+          explorerSplit={DEFAULT_STATS_EXPLORER_SPLIT}
+          isSelected={activeLayout === StatsLayout.DEFAULT || isCustomSameAsDefault}
+          onSelect={() => setActiveLayout(StatsLayout.DEFAULT)}
         />
         {isCustomSameAsDefault ? null : (
           <LayoutPreview
             title={t('SETTINGS_PAGE.LAYOUT.CUSTOM')}
             columnWidths={customColumnWidths}
             explorerSplit={customExplorerSplit}
-            isSelected={activeLayout === DataLayout.CUSTOM}
-            onSelect={() => setActiveLayout(DataLayout.CUSTOM)}
-            compareTo={{ columnWidths: DEFAULT_DATA_COLUMN_WIDTHS, explorerSplit: DEFAULT_DATA_EXPLORER_SPLIT }}
+            isSelected={activeLayout === StatsLayout.CUSTOM}
+            onSelect={() => setActiveLayout(StatsLayout.CUSTOM)}
+            compareTo={{ columnWidths: DEFAULT_STATS_COLUMN_WIDTHS, explorerSplit: DEFAULT_STATS_EXPLORER_SPLIT }}
           />
         )}
       </Box>

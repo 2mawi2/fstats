@@ -105,7 +105,6 @@ const Component = ({
     return () => observer.disconnect()
   }, [scrollElement, rowCount])
 
-  // Not compatible with React Compiler memoization, the compiler skips this component
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: rowCount,

@@ -2,18 +2,31 @@ import type { TFunction } from 'i18next'
 import { mapValues } from 'lodash'
 
 import type {
+  Category,
   CategoryCode,
-  CategoryWithTransactions,
   NumberString,
+  ParentCategory,
   ParentCategoryCode,
-  ParentCategoryWithTransactions,
   SortingPref,
   Transaction,
 } from '@/types'
 import { ALL_CATEGORIES } from '@/common'
+import { getCategoryLabel, getParentCategoryCode } from '@/utils/Category'
 import { sumValues } from '@/utils/Stats'
-import { getCategoryLabel, getParentCategoryCode } from '@/utils/TransactionParser'
 import { Big } from '@/lib/w-big'
+
+type CategoryWithTransactions = Category & {
+  label: string
+  transactions: Transaction[]
+  total: NumberString
+}
+
+export type ParentCategoryWithTransactions = Omit<ParentCategory, 'subcategories'> & {
+  label: string
+  subcategories: Record<CategoryCode, CategoryWithTransactions>
+  transactions: Transaction[]
+  total: NumberString
+}
 
 export const COL_SPACING = { xs: 1, sm: 2 }
 export const COL1 = [4.5, 3]
@@ -82,9 +95,7 @@ const sortByName = (a: string, b: string, dir: 'asc' | 'desc') => {
 }
 
 const sortByTotal = (a: NumberString, b: NumberString, dir: 'asc' | 'desc') => {
-  return dir === 'asc'
-    ? Big(Big(a).abs()).minus(Big(b).abs()).toNumber()
-    : Big(Big(b).abs()).minus(Big(a).abs()).toNumber()
+  return dir === 'asc' ? Big(a).abs().cmp(Big(b).abs()) : Big(b).abs().cmp(Big(a).abs())
 }
 
 export const getSortedCategories = <T extends ParentCategoryWithTransactions | CategoryWithTransactions>(

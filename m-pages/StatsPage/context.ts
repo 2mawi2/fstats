@@ -1,11 +1,12 @@
 'use client'
 
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext } from 'react'
 
-import { useFileHelper } from '@/hooks'
+import type { useFileHelper } from '@/hooks'
 
-import { getShownFiles } from './actions'
+import type { StatsTransactions } from './actions'
 import type { DayFilter } from './useDayFilter'
+import type { DemoState } from './useViewStorage'
 
 type WorkspaceContextValue = {
   /**
@@ -15,28 +16,34 @@ type WorkspaceContextValue = {
   onAddFiles: () => void
   onAddFolder: () => void
   dayFilter: DayFilter
+  demoState: DemoState
+  /**
+   * Shared, so all components get the same (memoized) values.
+   */
+  files: ReturnType<typeof useFileHelper>
+  stats: StatsTransactions
 }
 
 /**
- * Lets the views inside the workspace use its file picker. Synchronous UI state only.
+ * Lets the views inside the workspace use its file picker, files and transactions. Synchronous state only.
  */
-export const WorkspaceContext = createContext<WorkspaceContextValue>({
-  isDemoMode: false,
-  onAddFiles: () => {},
-  onAddFolder: () => {},
-  dayFilter: { deselectedDays: new Set(), setDeselectedDays: () => {} },
-})
+export const WorkspaceContext = createContext<WorkspaceContextValue | null>(null)
 
 export const useWorkspace = () => {
-  return useContext(WorkspaceContext)
+  const value = useContext(WorkspaceContext)
+
+  if (!value) {
+    throw new Error('useWorkspace must be used inside the workspace')
+  }
+
+  return value
 }
 
 /**
  * The files shown in the workspace, only the demo file in demo mode.
  */
 export const useWorkspaceFiles = () => {
-  const { isDemoMode } = useWorkspace()
-  return useFileHelper({ isDemoMode })
+  return useWorkspace().files
 }
 
 /**
@@ -47,11 +54,8 @@ export const useWorkspaceDayFilter = () => {
 }
 
 /**
- * The checked files as shown by the date explorer, the single source of the day filtered transactions, see
- * `getShownFiles`.
+ * Transactions of the checked parsed files, computed once for all components, see `getStatsTransactions`.
  */
-export const useShownFiles = () => {
-  const { checkedFiles } = useWorkspaceFiles()
-  const { deselectedDays } = useWorkspaceDayFilter()
-  return useMemo(() => getShownFiles(checkedFiles, deselectedDays), [checkedFiles, deselectedDays])
+export const useStatsTransactions = () => {
+  return useWorkspace().stats
 }

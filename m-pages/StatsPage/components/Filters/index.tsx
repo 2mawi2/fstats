@@ -8,16 +8,17 @@ import type { KeyboardEvent, ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 
 import type { Currency } from '@/types-enums'
+import { getView, WorkspaceView } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
-import { AmountFilter } from '../../actions'
-import { useShownFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
+import { AmountFilter, filterAmount, filterTransactions } from '../../actions'
+import { useStatsTransactions, useWorkspaceFiles } from '../../context'
 import type { SelectedCurrency } from '../../useCurrencySelect'
 import { ALL_CURRENCIES } from '../../useCurrencySelect'
+import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import OutlineCheckbox from '../OutlineCheckbox'
-import { getCategoryFilterTransactions, getCategoryGroups, getCheckState, toggleCategories } from './actions'
+import { getCategoryGroups, getCheckState, toggleCategories } from './actions'
 import { ui } from './styled'
 
 export type FilterOption = {
@@ -71,13 +72,27 @@ const Component = ({ options, currency }: FiltersProps) => {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const view = getView(useSearchParams())
-  const { checkedFiles, parsedFiles } = useShownFiles()
+  const { checkedFiles } = useWorkspaceFiles()
+  const { unique, shown } = useStatsTransactions()
+  const { includeDateExcluded } = useTableOptions()
   const { amountFilter, excludedCategories: excluded, setExcludedCategories } = useTransactionFilter()
   // The breakdown shows income and expenses, so the amount filter doesn't apply
   const amount = view === WorkspaceView.BREAKDOWN ? AmountFilter.ALL : amountFilter
-  const transactions = useMemo(() => getCategoryFilterTransactions(parsedFiles, amount), [parsedFiles, amount])
+  // The counted transactions (without duplicates, on selected days) matching the amount filter
+  const transactions = useMemo(() => filterAmount(shown, amount), [shown, amount])
   const groups = useMemo(() => getCategoryGroups(transactions, t), [transactions, t])
-  const currencyCounts = useMemo(() => countBy(transactions, (transaction) => transaction.currency), [transactions])
+  // Those the view shows, also with the category filter
+  const currencyCounts = useMemo(
+    () =>
+      countBy(
+        filterTransactions(view === WorkspaceView.TRANSACTIONS && includeDateExcluded ? unique : shown, {
+          amount,
+          excludedCategories: excluded,
+        }),
+        (transaction) => transaction.currency,
+      ),
+    [view, includeDateExcluded, unique, shown, amount, excluded],
+  )
   const disabled = !checkedFiles.length || view === WorkspaceView.CSV
   const currencies = currency?.currencies ?? []
   // Hidden with a single currency

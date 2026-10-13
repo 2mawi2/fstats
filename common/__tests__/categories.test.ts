@@ -13,13 +13,6 @@ describe('INCOME_CATEGORIES', () => {
 })
 
 describe('ALL_CATEGORIES', () => {
-  it('should have unique parent keys', () => {
-    const keys = Object.keys(ALL_CATEGORIES)
-    const uniqueKeys = new Set(keys)
-
-    expect(keys.length).toBe(uniqueKeys.size)
-  })
-
   it('should have a matching code for each parent key', () => {
     Object.entries(ALL_CATEGORIES).forEach(([key, category]) => {
       expect(category.code).toBe(key)

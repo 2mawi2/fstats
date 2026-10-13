@@ -4,7 +4,7 @@ import type { VirtualTableColumn } from '.'
 export const ROW_HEIGHT = 28 // px
 
 // Relative, columns without a width get an equal share
-export const DEFAULT_COLUMN_WIDTH = 100
+const DEFAULT_COLUMN_WIDTH = 100
 
 export const OVERSCAN = 20
 
@@ -37,7 +37,7 @@ const COMBINING_MARKS = /\p{M}/gu
 /**
  * Lowercase text without accents and "ß" as "ss", so e.g. "muller" finds "Müller" and "strasse" finds "Straße".
  */
-export const foldText = (text: string) => {
+const foldText = (text: string) => {
   return text.toLowerCase().normalize('NFD').replace(COMBINING_MARKS, '').replace(/ß/g, 'ss')
 }
 

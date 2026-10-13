@@ -5,9 +5,9 @@ import NextLink from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 
+import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
-import { getView, getViewChange, getWorkspaceHref, WorkspaceView } from '../../params'
 import type { CurrencyFilter, FilterOption } from '../Filters'
 import Filters from '../Filters'
 import RadioItem from '../RadioItem'

@@ -31,7 +31,8 @@
     "ABOUT": "Über",
     "GITHUB": "GitHub",
     "EXPAND_MENU": "Menü ausklappen",
-    "COLLAPSE_MENU": "Menü einklappen"
+    "COLLAPSE_MENU": "Menü einklappen",
+    "MENU": "Menü"
   },
   "HOME_PAGE": {
     "HERO_TITLE": "Kontoauszüge <accent>privat</accent> analysieren",
@@ -108,11 +109,16 @@
       "PARSING": "Wird ausgewertet…",
       "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format"
     },
+    "NO_FILES": {
+      "TITLE": "Keine Dateien"
+    },
     "NO_SELECTION": {
       "TITLE": "Keine Datei ausgewählt",
       "SUBTITLE": "Wähle links eine Datei aus, um ihre Umsätze zu sehen."
     },
     "NO_TRANSACTIONS": {
+      "EMPTY_TITLE": "Keine Umsätze",
+      "EMPTY_SUBTITLE": "Keine der ausgewählten Dateien enthält Umsätze.",
       "NO_DATES_TITLE": "Kein Datum ausgewählt",
       "NO_DATES_SUBTITLE": "Wähle links Daten aus, um ihre Umsätze zu sehen.",
       "NO_MATCHES_TITLE": "Keine Umsätze",
@@ -138,6 +144,8 @@
       "SHOW_DUPLICATES": "Duplikate anzeigen",
       "DUPLICATE_OF": "Duplikat, auch in {{file}}",
       "DUPLICATE_TAG": "Duplikat",
+      "DATE_EXCLUDED_TAG": "Ausgeschlossen",
+      "EXCLUDED_BY_DATE": "Durch Datum ausgeschlossen",
       "ALSO_IN": "Auch in {{files}}",
       "ROW_COUNT_one": "{{count}} Zeile",
       "ROW_COUNT_other": "{{count}} Zeilen",
@@ -227,15 +235,24 @@
     },
     "PREFERENCES": {
       "TITLE": "Präferenzen"
+    },
+    "LANGUAGE_SWITCHER": {
+      "LANGUAGE": "Sprache",
+      "CHANGE_LANGUAGE": "Sprache ändern",
+      "LOCALE_EN_LANGUAGE_EN": "English",
+      "LOCALE_EN_LANGUAGE_DE": "Englisch",
+      "LOCALE_DE_LANGUAGE_EN": "German",
+      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
+    },
+    "DATE_FORMAT_SWITCHER": {
+      "TITLE": "Datumsformat",
+      "CHANGE_DATE_FORMAT": "Datumsformat ändern"
     }
   },
   "ABOUT_PAGE": {
     "TITLE": "Über",
     "BLURB": "fstats ist Open Source. Sieh dir den Code an, melde Probleme oder trage auf GitHub bei.",
     "VIEW_ON_GITHUB": "Auf GitHub ansehen"
-  },
-  "DATA_DISPLAY": {
-    "MENU": "Menü"
   },
   "PAGE_404": {
     "TITLE": "Die URL in der Adresszeile existiert nicht!",
@@ -252,31 +269,6 @@
       "THEME_LIGHT": "Hell",
       "THEME_DARK": "Dunkel",
       "THEME_SYSTEM": "System"
-    },
-    "LANGUAGE_SWITCHER": {
-      "LANGUAGE": "Sprache",
-      "CHANGE_LANGUAGE": "Sprache ändern",
-      "LOCALE_EN_LANGUAGE_EN": "English",
-      "LOCALE_EN_LANGUAGE_DE": "Englisch",
-      "LOCALE_DE_LANGUAGE_EN": "German",
-      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
-    },
-    "DATE_FORMAT_SWITCHER": {
-      "TITLE": "Datumsformat",
-      "CHANGE_DATE_FORMAT": "Datumsformat ändern",
-      "DATE_FORMAT_OPTIONS": {
-        "DMY_LONG": "Englisch – Langformat",
-        "DMY_SHORT": "Englisch – Kurzformat",
-        "MDY_LONG": "Amerikanisch – Langformat",
-        "MDY_SHORT": "Amerikanisch – Kurzformat",
-        "DMY_SLASH": "TT/MM/JJJJ",
-        "DMY_DOT": "TT.MM.JJJJ",
-        "DMY_DASH": "TT-MM-JJJJ",
-        "YMD_SLASH": "JJJJ/MM/TT",
-        "YMD_DOT": "JJJJ.MM.TT",
-        "YMD_DASH": "JJJJ-MM-TT",
-        "YMD": "JJJJMMTT"
-      }
     }
   }
 }

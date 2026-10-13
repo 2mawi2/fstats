@@ -1,5 +1,3 @@
 export { default as MainMenu } from './MainMenu'
 export { default as MenuDrawer } from './MenuDrawer'
-export { default as MenuDrawerNavButton } from './MenuDrawerNavButton'
 export { default as Sidebar } from './Sidebar'
-export { default as SidebarNavButton } from './SidebarNavButton'

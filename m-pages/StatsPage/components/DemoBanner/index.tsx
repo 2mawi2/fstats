@@ -4,11 +4,11 @@ import { Close } from '@mui/icons-material'
 import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+import { getEndDemoHref } from '@/common'
 import { useIsMobile } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace } from '../../context'
-import { getEndDemoHref } from '../../params'
 import { ui } from './styled'
 
 const Component = () => {
