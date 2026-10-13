@@ -194,6 +194,7 @@
       "TOTAL_INCOME": "Total income",
       "TOTAL_EXPENSES": "Total expenses",
       "NET": "Net result",
+      "NET_MARGIN": "Net margin",
       "TRANSFERS": "Internal transfers",
       "TRANSFERS_NOTE_one": "{{count}} transaction between your accounts, not counted as income or expenses",
       "TRANSFERS_NOTE_other": "{{count}} transactions between your accounts, not counted as income or expenses",

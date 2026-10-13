@@ -8,6 +8,7 @@ const INDENT: Record<RowVariant, number> = {
   transaction: 3.5,
   total: 0,
   net: 0,
+  rate: 0,
 }
 
 const cell = {
@@ -47,7 +48,7 @@ export const ui = () => {
       // A solid rule above the net rows, like an income statement
       '& tr:has(+ tr[data-variant="net"]) > *': { borderBottomColor: 'text.primary' },
       // The internal transfers are apart from the income statement above them
-      '& tbody + tbody > tr:first-of-type > *': { pt: 4 },
+      '& tbody + tbody > tr:first-of-type > *': { pt: 3 },
     },
     header: {
       ...cell,
@@ -94,7 +95,10 @@ export const ui = () => {
       pl: 1 + INDENT[variant],
       fontWeight: variant === 'total' || variant === 'net' ? 700 : 400,
       fontSize: variant === 'subcategory' || variant === 'transaction' ? 12 : 13,
-      color: variant === 'subcategory' || variant === 'transaction' ? 'text.secondary' : 'text.primary',
+      color:
+        variant === 'subcategory' || variant === 'transaction' || variant === 'rate'
+          ? 'text.secondary'
+          : 'text.primary',
     }),
     labelContent: (variant: RowVariant) => ({
       // The cell's width without its padding (8px per spacing unit)

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { CategoryCode, ParsedStatsFile, Transaction } from '@/types'
 import { Currency, StatsFileStatus } from '@/types-enums'
+import { Big } from '@/lib/w-big'
 
 import { BreakdownPeriod, getPeriodKey, getProfitLoss, splitTransfers } from '../actions'
 
@@ -101,6 +102,10 @@ describe('getProfitLoss', () => {
     ])
     expect(profitLoss.expenses.total.total).toBe('410.5')
     expect(profitLoss.net.values).toEqual({ '2026-01': '2800', '2026-02': '-210.5' })
+    // Of the net result, none without income
+    expect(Object.keys(profitLoss.netMargin.values)).toEqual(['2026-01'])
+    expect(Big(profitLoss.netMargin.values['2026-01']).toFixed(2)).toBe('93.33')
+    expect(Big(profitLoss.netMargin.total!).toFixed(2)).toBe('86.32')
     expect(profitLoss.transfers.count).toBe(2)
     expect(profitLoss.transfers.net.total).toBe('0')
   })

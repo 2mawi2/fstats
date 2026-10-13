@@ -7,7 +7,7 @@ import { splitDuplicates } from '@/m-stats-file/service'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import type { BankAccountId } from '@/utils/Parser'
 import { getBankAccountId } from '@/utils/Parser'
-import { isExpense, isIncome, sumValues } from '@/utils/Stats'
+import { getPercentage, isExpense, isIncome, sumValues } from '@/utils/Stats'
 import { getParentCategoryCode } from '@/utils/TransactionParser'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
@@ -217,6 +217,13 @@ const getTransferRows = (transfers: Transaction[], period: BreakdownPeriod) => {
   }))
 }
 
+/**
+ * Net result as a percentage of the income, `undefined` without income.
+ */
+export const getNetMargin = (net: NumberString | undefined, income: NumberString | undefined) => {
+  return income === undefined || Big(income).eq(0) ? undefined : getPercentage(net ?? '0', income).toString()
+}
+
 export type ProfitLoss = {
   currency: Currency
   /**
@@ -226,6 +233,10 @@ export type ProfitLoss = {
   income: { rows: ProfitLossRow[]; total: ProfitLossRow }
   expenses: { rows: ProfitLossRow[]; total: ProfitLossRow }
   net: ProfitLossRow
+  /**
+   * Of the net result, per period (missing without income) and in total.
+   */
+  netMargin: { values: Record<string, NumberString>; total?: NumberString }
   transfers: { incoming: ProfitLossRow; outgoing: ProfitLossRow; net: ProfitLossRow; count: number }
 }
 
@@ -246,12 +257,19 @@ export const getProfitLoss = (files: ParsedStatsFile[], period: BreakdownPeriod)
       groupBy(currencyTransactions, (transaction) => getPeriodKey(transaction, period)),
     ).sort()
 
+    const incomeTotal = toRow('income', i18n.t('STATS_PAGE.PROFIT_LOSS.TOTAL_INCOME'), income, period)
+    const net = toRow('net', i18n.t('STATS_PAGE.PROFIT_LOSS.NET'), transactions, period)
+    const netMargins = periods.flatMap((periodKey) => {
+      const rate = getNetMargin(net.values[periodKey], incomeTotal.values[periodKey])
+      return rate === undefined ? [] : [[periodKey, rate]]
+    })
+
     return {
       currency: currency as Currency,
       periods,
       income: {
         rows: getCategoryRows(income, period, false),
-        total: toRow('income', i18n.t('STATS_PAGE.PROFIT_LOSS.TOTAL_INCOME'), income, period),
+        total: incomeTotal,
       },
       expenses: {
         rows: getCategoryRows(expenses, period, true),
@@ -259,7 +277,11 @@ export const getProfitLoss = (files: ParsedStatsFile[], period: BreakdownPeriod)
           negate: true,
         }),
       },
-      net: toRow('net', i18n.t('STATS_PAGE.PROFIT_LOSS.NET'), transactions, period),
+      net,
+      netMargin: {
+        values: Object.fromEntries(netMargins),
+        total: getNetMargin(net.total, incomeTotal.total),
+      },
       transfers: {
         incoming: toRow('transfersIn', i18n.t('STATS_PAGE.PROFIT_LOSS.TRANSFERS_IN'), incomingTransfers, period, {
           children: getTransferRows(incomingTransfers, period),

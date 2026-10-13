@@ -4,9 +4,9 @@ import { Box } from '@mui/material'
 import { ui } from './styled'
 
 // Between the strokes, and between the first one and the edge (px)
-const GAP = 3
+const GAP = 2
 // Where the strokes meet the line (px from the edge). At 45°, they reach the edge at the same distance from the line.
-const STROKES = [1, 2, 3].map((index) => ({ offset: index * GAP, length: index * GAP * Math.SQRT2 }))
+const STROKES = [2, 3.5, 5].map((index) => ({ offset: index * GAP, length: index * GAP * Math.SQRT2 }))
 
 type FletchingDividerProps = {
   sx?: SxProps<Theme>

@@ -10,7 +10,7 @@ import { MISC } from '@/common'
 import { useUserPreferences } from '@/hooks'
 import { getCurrencySymbol } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
-import { toFixedLocaleAmount } from '@/utils/Number'
+import { toFixedLocale, toFixedLocaleAmount } from '@/utils/Number'
 import { useTranslation } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
@@ -27,7 +27,7 @@ type ProfitLossTableProps = {
 // Periods without transactions
 const EMPTY_AMOUNT = '–'
 
-export type RowVariant = 'category' | 'subcategory' | 'transaction' | 'total' | 'net'
+export type RowVariant = 'category' | 'subcategory' | 'transaction' | 'total' | 'net' | 'rate'
 
 /**
  * Income statement with one column per period and the total, like a profit and loss sheet.
@@ -37,7 +37,7 @@ const Component = ({ profitLoss, period }: ProfitLossTableProps) => {
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set())
-  const { currency, periods, income, expenses, net, transfers } = profitLoss
+  const { currency, periods, income, expenses, net, netMargin, transfers } = profitLoss
   const columnCount = periods.length + 2
 
   const toggle = (key: string) => {
@@ -56,13 +56,17 @@ const Component = ({ profitLoss, period }: ProfitLossTableProps) => {
     return value === undefined || Big(value).eq(0) ? EMPTY_AMOUNT : toFixedLocaleAmount(value, currency, locale)
   }
 
+  const formatPercent = (value: NumberString | undefined) => {
+    return value === undefined ? EMPTY_AMOUNT : `${toFixedLocale(value, 1, locale)}%`
+  }
+
   const renderAmount = (value: NumberString | undefined, key: string, variant: RowVariant) => (
     <Box
       component="td"
       key={key}
       sx={{ ...sx.amount(variant), color: value ? getAmountColor(value) : 'text.disabled' }}
     >
-      {formatAmount(value)}
+      {variant === 'rate' ? formatPercent(value) : formatAmount(value)}
     </Box>
   )
 
@@ -143,6 +147,13 @@ const Component = ({ profitLoss, period }: ProfitLossTableProps) => {
           {renderRow(expenses.total, 'total')}
 
           {renderRow(net, 'net')}
+          <Box component="tr" sx={sx.row}>
+            <Box component="th" scope="row" sx={sx.labelCell('rate')}>
+              {t('STATS_PAGE.PROFIT_LOSS.NET_MARGIN')}
+            </Box>
+            {periods.map((periodKey) => renderAmount(netMargin.values[periodKey], periodKey, 'rate'))}
+            {renderAmount(netMargin.total, 'total', 'rate')}
+          </Box>
         </tbody>
         {transfers.count ? (
           <tbody>
