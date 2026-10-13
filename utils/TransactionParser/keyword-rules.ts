@@ -46,11 +46,9 @@ const RAW_EXPENSE_KEYWORD_RULES: KeywordRule[] = [
       'SOUTHERN CO-OP',
       'TESCO',
       'Checkers',
+      'BAECKER',
+      'BACKEREI',
     ],
-  },
-  {
-    category: 'GRO_01',
-    keywords: ['BAECKER', 'BACKEREI'],
   },
 
   {
@@ -129,12 +127,32 @@ const RAW_EXPENSE_KEYWORD_RULES: KeywordRule[] = [
   },
 ]
 
-const toLowercaseKeywordRules = (rules: KeywordRule[]): KeywordRule[] => {
+export type KeywordMatcher = {
+  category: KeywordRule['category']
+  keywords: { pattern: RegExp; length: number }[]
+}
+
+const WORD_CHAR = /[\p{L}\p{N}]/u
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
+ * Case-insensitive pattern that only matches whole words, e.g. 'OBI' doesn't match "mobile". Edges that aren't
+ * letters or digits (e.g. '#INT PYMT FEE') need no boundary.
+ */
+const toKeywordPattern = (keyword: string) => {
+  const start = WORD_CHAR.test(keyword.at(0) ?? '') ? '(?<![\\p{L}\\p{N}])' : ''
+  const end = WORD_CHAR.test(keyword.at(-1) ?? '') ? '(?![\\p{L}\\p{N}])' : ''
+
+  return new RegExp(`${start}${escapeRegExp(keyword)}${end}`, 'iu')
+}
+
+const toKeywordMatchers = (rules: KeywordRule[]): KeywordMatcher[] => {
   return rules.map((rule) => ({
-    ...rule,
-    keywords: rule.keywords.map((keyword) => keyword.toLowerCase()),
+    category: rule.category,
+    keywords: rule.keywords.map((keyword) => ({ pattern: toKeywordPattern(keyword), length: keyword.length })),
   }))
 }
 
-export const INCOME_KEYWORD_RULES = toLowercaseKeywordRules(RAW_INCOME_KEYWORD_RULES)
-export const EXPENSE_KEYWORD_RULES = toLowercaseKeywordRules(RAW_EXPENSE_KEYWORD_RULES)
+export const INCOME_KEYWORD_RULES = toKeywordMatchers(RAW_INCOME_KEYWORD_RULES)
+export const EXPENSE_KEYWORD_RULES = toKeywordMatchers(RAW_EXPENSE_KEYWORD_RULES)

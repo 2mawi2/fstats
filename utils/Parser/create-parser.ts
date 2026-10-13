@@ -15,9 +15,10 @@ import type { BankAccountId, ParserId } from './registry'
 const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
 
 /**
- * Bump when the parse output changes (e.g. how transaction IDs are generated), so stored files are re-parsed.
+ * Bump when the parse output changes (e.g. how transaction IDs are generated or transactions are categorised), so
+ * stored files are re-parsed.
  */
-export const PARSER_VERSION = 2
+export const PARSER_VERSION = 3
 
 type Row = {
   get: (header: string) => string

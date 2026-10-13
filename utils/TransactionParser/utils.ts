@@ -11,16 +11,15 @@ export const getCategoryCode = (row: Transaction): CategoryCode => {
   const isIncome = !isExpense(row)
   const keywordRules = isIncome ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
 
-  const description = row.description.toLowerCase()
   let matchedCategory: CategoryCode | null = null
   let matchedKeywordLength = -1
 
   for (const rule of keywordRules) {
-    for (const keyword of rule.keywords) {
+    for (const { pattern, length } of rule.keywords) {
       // Prefer the most specific (longest) matching keyword over shorter matches
-      if (description.includes(keyword) && keyword.length > matchedKeywordLength) {
+      if (length > matchedKeywordLength && pattern.test(row.description)) {
         matchedCategory = rule.category
-        matchedKeywordLength = keyword.length
+        matchedKeywordLength = length
       }
     }
   }
