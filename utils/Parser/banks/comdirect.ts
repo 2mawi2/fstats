@@ -21,7 +21,11 @@ export const comdirect = defineBank({
         amount: { type: 'signed', header: 'Umsatz in EUR' },
       },
       extraColumns: {
+        balance: null,
+        reference: null,
         transactionType: 'Vorgang',
+        category: null,
+        parentCategory: null,
       },
     },
     {
@@ -37,8 +41,11 @@ export const comdirect = defineBank({
         amount: { type: 'signed', header: 'Umsatz in EUR' },
       },
       extraColumns: {
-        transactionType: 'Vorgang',
+        balance: null,
         reference: 'Referenz',
+        transactionType: 'Vorgang',
+        category: null,
+        parentCategory: null,
       },
     },
   ],

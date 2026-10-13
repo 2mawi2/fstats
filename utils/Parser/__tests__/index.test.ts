@@ -97,7 +97,13 @@ describe('createParser', () => {
         numberFormat: 'de',
         headers: ['Datum', 'Text', 'Betrag', 'Saldo', 'Referenz'],
         columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
-        extraColumns: { balance: 'Saldo', reference: 'Referenz' },
+        extraColumns: {
+          balance: 'Saldo',
+          reference: 'Referenz',
+          transactionType: null,
+          category: null,
+          parentCategory: null,
+        },
       },
     ],
   })
@@ -137,6 +143,7 @@ describe('transaction IDs', () => {
           numberFormat: 'de',
           headers: header,
           columns: { date: 'Datum', description: 'Text', amount: { type: 'signed', header: 'Betrag' } },
+          extraColumns: { balance: null, reference: null, transactionType: null, category: null, parentCategory: null },
         },
       ],
     })

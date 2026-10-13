@@ -71,9 +71,13 @@ export const newBank = defineBank({
         // | { type: 'inOut', in: 'Haben', out: 'Soll' } (out is always negative)
         // | { type: 'firstOf', headers: ['In', 'Out', 'Fee'] } (first non-empty)
       },
+      // All fields required, `null` if the file has no such column
       extraColumns: {
         balance: 'Saldo',
         reference: 'Verwendungszweck',
+        transactionType: null,
+        category: null,
+        parentCategory: null,
       },
     },
   ],

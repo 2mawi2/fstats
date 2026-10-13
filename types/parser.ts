@@ -78,9 +78,9 @@ export type FormatDef<H extends string = string> = {
    */
   columns: { date: H; description: DescriptionColumnDef<H>; amount: AmountColumnDef<H> }
   /**
-   * Stored in `Transaction['extra']`, headers must be listed in `headers`.
+   * Stored in `Transaction['extra']`, headers must be listed in `headers`. `null` if the file has no such column.
    */
-  extraColumns?: Partial<Record<ExtraField, H>>
+  extraColumns: Record<ExtraField, H | null>
 }
 
 export type BankDef = {

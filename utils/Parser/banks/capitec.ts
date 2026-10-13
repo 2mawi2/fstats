@@ -34,9 +34,11 @@ export const capitec = defineBank({
         amount: { type: 'firstOf', headers: ['Money In', 'Money Out', 'Fee'] },
       },
       extraColumns: {
-        parentCategory: 'Parent Category',
-        category: 'Category',
         balance: 'Balance',
+        reference: null,
+        transactionType: null,
+        category: 'Category',
+        parentCategory: 'Parent Category',
       },
     },
     {
@@ -64,9 +66,11 @@ export const capitec = defineBank({
         amount: { type: 'inOut', in: 'Credit Amount', out: 'Debit Amount' },
       },
       extraColumns: {
-        parentCategory: 'Parent Category',
-        category: 'Sub-category',
         balance: 'Balance',
+        reference: null,
+        transactionType: null,
+        category: 'Sub-category',
+        parentCategory: 'Parent Category',
       },
     },
   ],

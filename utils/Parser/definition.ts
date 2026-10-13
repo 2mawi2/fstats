@@ -23,13 +23,13 @@ export const getFormatHeaders = ({ headers }: FormatDef) => {
 /**
  * Headers read by `columns` and `extraColumns`.
  */
-export const getReferencedHeaders = ({ columns, extraColumns = {} }: FormatDef) => {
+export const getReferencedHeaders = ({ columns, extraColumns }: FormatDef) => {
   return [
     ...new Set([
       columns.date,
       ...getDescriptionHeaders(columns.description),
       ...getAmountHeaders(columns.amount),
-      ...Object.values(extraColumns).filter((header) => !!header),
+      ...Object.values(extraColumns).filter((header) => header !== null),
     ]),
   ]
 }

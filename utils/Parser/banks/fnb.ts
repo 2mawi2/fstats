@@ -22,6 +22,10 @@ export const fnb = defineBank({
       },
       extraColumns: {
         balance: 'Balance',
+        reference: null,
+        transactionType: null,
+        category: null,
+        parentCategory: null,
       },
     },
   ],

@@ -33,6 +33,8 @@ export const ing = defineBank({
         balance: 'Saldo',
         reference: 'Verwendungszweck',
         transactionType: 'Buchungstext',
+        category: null,
+        parentCategory: null,
       },
     },
   ],

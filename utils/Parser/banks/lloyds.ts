@@ -31,7 +31,10 @@ export const lloyds = defineBank({
       },
       extraColumns: {
         balance: 'Balance',
+        reference: null,
         transactionType: 'Transaction Type',
+        category: null,
+        parentCategory: null,
       },
     },
   ],

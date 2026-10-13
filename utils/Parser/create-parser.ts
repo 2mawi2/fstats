@@ -54,11 +54,8 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
   }
 
   const getExtra = (row: Row): Transaction['extra'] => {
-    if (!extraColumns) {
-      return null
-    }
-
-    const fields = (Object.entries(extraColumns) as [ExtraField, string][])
+    const fields = (Object.entries(extraColumns) as [ExtraField, string | null][])
+      .filter((entry): entry is [ExtraField, string] => !!entry[1])
       .map(([field, header]): [ExtraField, string] => {
         const value = row.get(header)
         return [field, value && NUMERIC_EXTRA_FIELDS.includes(field) ? toNumber(value) : value]
