@@ -9,7 +9,7 @@ import { logger } from '@/utils/Logger'
 import { parseGermanNumber } from '@/utils/Number'
 import { Big } from '@/lib/w-big'
 
-import { getDescriptionHeaders, getFormatHeaders, toAccountId, toParserId } from './definition'
+import { getFormatHeaders, toAccountId, toParserId } from './definition'
 import type { BankAccountId, ParserId } from './registry'
 
 const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
@@ -18,7 +18,7 @@ const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
  * Bump when the parse output changes (e.g. how transaction IDs are generated or transactions are categorised), so
  * stored files are re-parsed.
  */
-export const PARSER_VERSION = 3
+export const PARSER_VERSION = 4
 
 type Row = {
   get: (header: string) => string
@@ -29,9 +29,8 @@ type Row = {
  * the next section (see `findSections`).
  */
 export const createParser = (bank: BankDef, format: FormatDef): Parser => {
-  const { columns, extraColumns, dateFormat, numberFormat = 'en' } = format
+  const { columns, extraColumns, dateFormat, numberFormat } = format
   const { amount } = columns
-  const descriptionHeaders = getDescriptionHeaders(columns.description)
   const { headers, required } = getFormatHeaders(format)
 
   const toNumber = (value: string) => (numberFormat === 'de' ? parseGermanNumber(value) : value)
@@ -54,11 +53,8 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
   }
 
   const getExtra = (row: Row): Transaction['extra'] => {
-    if (!extraColumns) {
-      return null
-    }
-
-    const fields = (Object.entries(extraColumns) as [ExtraField, string][])
+    const fields = (Object.entries(extraColumns) as [ExtraField, string | null][])
+      .filter((entry): entry is [ExtraField, string] => !!entry[1])
       .map(([field, header]): [ExtraField, string] => {
         const value = row.get(header)
         return [field, value && NUMERIC_EXTRA_FIELDS.includes(field) ? toNumber(value) : value]
@@ -127,7 +123,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 
       const parsedRows: Omit<Transaction, 'id'>[] = locateRows(section).rows.map((row) => ({
         date: formatISO(toDate(row.get(columns.date), { formatFrom: dateFormat })),
-        description: descriptionHeaders.map(row.get).filter(Boolean).join(' '),
+        description: row.get(columns.description),
         value: getValue(row) || '0',
         category: null,
         currency: bank.currency,

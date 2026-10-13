@@ -5,13 +5,14 @@ import { defineBank } from '../definition'
 export const ing = defineBank({
   id: 'ing',
   name: 'ING',
+  url: 'https://www.ing.de/',
   country: Country.DE,
   currency: Currency.EUR,
   formats: [
     {
       accountType: AccountType.CURRENT,
       accountName: 'Giro',
-      version: '1',
+      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: [
@@ -33,6 +34,8 @@ export const ing = defineBank({
         balance: 'Saldo',
         reference: 'Verwendungszweck',
         transactionType: 'Buchungstext',
+        category: null,
+        parentCategory: null,
       },
     },
   ],

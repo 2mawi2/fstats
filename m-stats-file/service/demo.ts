@@ -91,7 +91,7 @@ export const getDemoFile = (): ParsedStatsFile => {
     }),
     hash: DEMO_FILE_ID,
     status: StatsFileStatus.PARSED,
-    sections: [{ parserId: 'lloyds__current__1', transactions: DEMO_TRANSACTIONS }],
+    sections: [{ parserId: 'lloyds__current__default', transactions: DEMO_TRANSACTIONS }],
   }
 
   return demoFile

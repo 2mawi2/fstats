@@ -6,7 +6,12 @@ Start dev server on [localhost](http://localhost:3000/) with:
 pnpm dev
 ```
 
-See [AGENTS.md](AGENTS.md) for architecture and adding a new bank.
+See [AGENTS.md](AGENTS.md) for architecture.
+
+
+## Adding a bank
+
+Copy [utils/Parser/banks/_template.ts](utils/Parser/banks/_template.ts), it documents every field and the steps to register the bank. See [AGENTS.md](AGENTS.md#adding-a-new-bank--csv-format) for details.
 
 
 ## Environments
