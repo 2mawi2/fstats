@@ -1,10 +1,11 @@
 import type { ParsedStatsFile, StatsFile, Transaction } from '@/types'
 import { Currency, StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
+import { MISC } from '@/common'
 import { parseFiles } from '@/utils/FileParser'
 import type { BankAccountId } from '@/utils/Parser'
 import { getBankAccountId, getBankAccountName, getParserCurrency, PARSER_VERSION } from '@/utils/Parser'
 
-import { getFiles, updateFiles } from '../api'
+import { getFiles, removeAllFiles, updateFiles } from '../api'
 
 export const isParsed = (file: StatsFile): file is ParsedStatsFile => {
   return file.status === StatsFileStatus.PARSED
@@ -39,7 +40,7 @@ export const getFileCurrency = (file: ParsedStatsFile) => {
   return getParserCurrency(file.sections[0].parserId)
 }
 
-export type FileBankAccount = {
+type FileBankAccount = {
   bankAccountId: BankAccountId
   label: string
   currency: Currency
@@ -102,4 +103,12 @@ export const reparseOutdatedFiles = async () => {
   if (outdatedFiles.length) {
     await updateFiles(await parseFiles(outdatedFiles))
   }
+}
+
+/**
+ * Removes all stored files and the selected file IDs, e.g. at the start of a session when data isn't persisted.
+ */
+export const clearSessionFiles = async () => {
+  await removeAllFiles()
+  window.localStorage.removeItem(MISC.LS_SELECTED_FILE_IDS_KEY)
 }

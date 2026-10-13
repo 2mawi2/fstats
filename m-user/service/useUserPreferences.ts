@@ -2,7 +2,8 @@
 
 import type { UserPreferences } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
-import { useMutateUpdateUser, useUser } from '@/m-user/service'
+
+import { useMutateUpdateUser, useUser } from './hooks'
 
 export const useUserPreferences = (): UserPreferences & {
   setLocale: (locale: UserLocale) => void

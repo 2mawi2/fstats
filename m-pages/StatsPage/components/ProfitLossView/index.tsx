@@ -2,32 +2,30 @@
 
 import { ReceiptLongOutlined } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
-import { groupBy, mapValues } from 'lodash'
+import { mapValues } from 'lodash'
 import { useMemo } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC } from '@/common'
+import type { Currency } from '@/types-enums'
 import { FletchingDivider } from '@/components'
-import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import {
-  filterFiles,
+  EMPTY_REASON_TITLE_KEYS,
+  filterDays,
   filterTransactions,
   getEmptyReason,
-  getTransactionCounts,
   getTransactionCountText,
+  isMissingData,
 } from '../../actions'
-import { useShownFiles, useWorkspaceFiles } from '../../context'
+import { useStatsTransactions, useWorkspaceFiles } from '../../context'
+import { useBreakdownPeriod } from '../../useBreakdownPeriod'
 import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
-import DropZoneDisplay from '../DropZoneDisplay'
-import NoSelectionDisplay from '../NoSelectionDisplay'
-import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import PreviewSection from '../PreviewSection'
 import SegmentedToggle from '../SegmentedToggle'
+import ViewEmptyState from '../ViewEmptyState'
 import ViewToolbar from '../ViewToolbar'
-import { BreakdownPeriod, getBreakdownPeriodOptions, getProfitLoss } from './actions'
+import { getAccountTransactions, getBreakdownPeriodOptions, getProfitLoss } from './actions'
 import { ProfitLossTable } from './components'
 import { ui } from './styled'
 
@@ -37,32 +35,38 @@ import { ui } from './styled'
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  const { files } = useWorkspaceFiles()
-  const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays } = useShownFiles()
-  const [period, setPeriod] = useLocalStorage<BreakdownPeriod>(
-    MISC.LS_DATA_BREAKDOWN_PERIOD_KEY,
-    BreakdownPeriod.MONTH,
-    { initializeWithValue: false },
-  )
+  const { files, checkedFiles, selectedFiles } = useWorkspaceFiles()
+  const { all, unique, shown, byCurrency, deselectedDays, count } = useStatsTransactions()
+  const { period, setPeriod } = useBreakdownPeriod()
   // Income and expenses are both part of it, so the amount filter doesn't apply
   const { categoryFilter: filter } = useTransactionFilter()
-  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, filter)
-  const countsByCurrency = useMemo(
+  const emptyReason = useMemo(
     () =>
-      mapValues(
-        groupBy(
-          filterTransactions(allParsedFiles.flatMap(getFileTransactions), filter),
-          (transaction) => transaction.currency,
-        ),
-        (transactions) => getTransactionCounts(transactions, deselectedDays),
-      ),
-    [allParsedFiles, filter, deselectedDays],
+      getEmptyReason({
+        fileCount: files.length,
+        checkedCount: checkedFiles.length,
+        transactions: { all, shown, filter },
+      }),
+    [files.length, checkedFiles.length, all, shown, filter],
   )
+  const countsByCurrency = useMemo(
+    () => mapValues(byCurrency, (transactions) => count(filterTransactions(transactions!.all, filter))),
+    [byCurrency, count, filter],
+  )
+  // With the bank account of their section, only depends on the files
+  const accountTransactions = useMemo(() => getAccountTransactions(selectedFiles, unique), [selectedFiles, unique])
   const profitLosses = useMemo(
-    () => getProfitLoss(filterFiles(selectedFiles, filter), period, t),
-    [selectedFiles, filter, period, t],
+    () =>
+      getProfitLoss(accountTransactions, period, t, (transactions) =>
+        filterTransactions(filterDays(transactions, deselectedDays), filter),
+      ),
+    [accountTransactions, deselectedDays, filter, period, t],
   )
-  const currencies = profitLosses.map((profitLoss) => profitLoss.currency)
+  const getCaption = (currency: Currency) => {
+    const counts = countsByCurrency[currency]
+    return counts ? getTransactionCountText(counts) : undefined
+  }
+  const currencies = useMemo(() => profitLosses.map((profitLoss) => profitLoss.currency), [profitLosses])
   const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (
@@ -72,21 +76,20 @@ const Component = () => {
           value={period}
           options={getBreakdownPeriodOptions()}
           onChange={setPeriod}
-          disabled={!selectedFiles.length}
-          disabledTooltip={t('STATS_PAGE.NO_SELECTION.TITLE')}
+          disabled={isMissingData(emptyReason)}
+          disabledTooltip={emptyReason ? t(EMPTY_REASON_TITLE_KEYS[emptyReason]) : undefined}
         />
       </ViewToolbar>
       <Box sx={sx.scroll}>
-        {!files.length ? (
-          <DropZoneDisplay
-            icon={ReceiptLongOutlined}
-            title={t('STATS_PAGE.STATS_VIEW.NO_DATA')}
-            subtitleKey="STATS_PAGE.STATS_VIEW.NO_DATA_SELECT"
+        {emptyReason ? (
+          <ViewEmptyState
+            reason={emptyReason}
+            dropZone={{
+              icon: ReceiptLongOutlined,
+              title: t('STATS_PAGE.STATS_VIEW.NO_DATA'),
+              subtitleKey: 'STATS_PAGE.STATS_VIEW.NO_DATA_SELECT',
+            }}
           />
-        ) : !selectedFiles.length ? (
-          <NoSelectionDisplay />
-        ) : emptyReason ? (
-          <NoTransactionsDisplay reason={emptyReason} />
         ) : (
           // Sections like the transactions view, so the headings line up when switching. Padded per currency, so the
           // dividers between them go edge to edge.
@@ -98,11 +101,7 @@ const Component = () => {
                   <PreviewSection
                     title={t('STATS_PAGE.PROFIT_LOSS.TITLE')}
                     chip={currencies.length > 1 ? profitLoss.currency : undefined}
-                    caption={
-                      countsByCurrency[profitLoss.currency]
-                        ? getTransactionCountText(countsByCurrency[profitLoss.currency])
-                        : undefined
-                    }
+                    caption={getCaption(profitLoss.currency)}
                   >
                     <ProfitLossTable profitLoss={profitLoss} period={period} />
                   </PreviewSection>

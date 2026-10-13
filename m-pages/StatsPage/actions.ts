@@ -1,4 +1,4 @@
-import { groupBy, uniq } from 'lodash'
+import { groupBy, mapValues, uniq } from 'lodash'
 
 import type { NumberString, ParsedStatsFile, StatsFile, Transaction } from '@/types'
 import type { Currency } from '@/types-enums'
@@ -66,14 +66,14 @@ export const getAmountColor = (value: NumberString) => {
   return Big(value).lt(0) ? 'error.main' : undefined
 }
 
-export const MIN_COLUMN_WIDTH = 10 // %
+export const MIN_COLUMN_WIDTH_PERCENT = 10
 
 /**
  * Moves the divider between column `index` and `index + 1` by `delta` percent, respecting the minimum width.
  */
 export const resizeColumns = (widths: number[], index: number, delta: number) => {
   const total = widths[index] + widths[index + 1]
-  const left = Math.min(Math.max(widths[index] + delta, MIN_COLUMN_WIDTH), total - MIN_COLUMN_WIDTH)
+  const left = Math.min(Math.max(widths[index] + delta, MIN_COLUMN_WIDTH_PERCENT), total - MIN_COLUMN_WIDTH_PERCENT)
   const next = [...widths]
   next[index] = left
   next[index + 1] = total - left
@@ -225,84 +225,168 @@ export const filterDays = <T extends Transaction>(transactions: T[], deselectedD
     : transactions
 }
 
-const filterFile = (file: ParsedStatsFile, filter: (transactions: Transaction[]) => Transaction[]): ParsedStatsFile => {
-  return {
-    ...file,
-    sections: file.sections.map((section) => ({ ...section, transactions: filter(section.transactions) })),
-  }
+/**
+ * Transactions of the checked parsed files: all (before the date explorer, in file order), without duplicates and on
+ * the selected days of the date explorer. The single source of the transactions of the views and the sidebar, see
+ * `useStatsTransactions`. Each view applies its `TransactionFilter` itself.
+ */
+export type StatsTransactions = CurrencyTransactions & {
+  /**
+   * Transactions also in an earlier file (e.g. overlapping statements), by reference.
+   */
+  duplicates: Set<Transaction>
+  deselectedDays: Set<string>
+  /**
+   * Days with transactions that are deselected.
+   */
+  excludedDayCount: number
+  /**
+   * Per currency of the files, in file order. Also currencies of files without transactions.
+   */
+  byCurrency: Partial<Record<Currency, CurrencyTransactions>>
+  /**
+   * Counts of transactions out of `all` (e.g. filtered), see `getTransactionCounts`.
+   */
+  count: (transactions: Transaction[]) => TransactionCounts
+}
+
+export type CurrencyTransactions = {
+  /**
+   * Before the date explorer, with duplicates.
+   */
+  all: Transaction[]
+  unique: Transaction[]
+  /**
+   * Unique, on selected days.
+   */
+  shown: Transaction[]
 }
 
 /**
- * Parsed files with only their transactions matching the filter, the files as they are without one.
+ * The part of `StatsTransactions` that only depends on the files, so it is kept when (de)selecting days.
  */
-export const filterFiles = <T extends StatsFile>(files: T[], filter: TransactionFilter): T[] => {
-  if (filter.amount === AmountFilter.ALL && !filter.excludedCategories.size) {
-    return files
-  }
-
-  return files.map((file) =>
-    isParsed(file) ? (filterFile(file, (transactions) => filterTransactions(transactions, filter)) as T) : file,
-  )
+export type CheckedTransactions = {
+  all: Transaction[]
+  unique: Transaction[]
+  duplicates: Set<Transaction>
+  byCurrency: Partial<Record<Currency, { all: Transaction[]; unique: Transaction[] }>>
 }
 
-/**
- * The checked files as shown by the date explorer: parsed files only with their transactions on selected days, see
- * `useShownFiles`.
- */
-export const getShownFiles = (checkedFiles: StatsFile[], deselectedDays: Set<string>) => {
-  const allParsedFiles = checkedFiles.filter(isParsed)
-  const shownCheckedFiles = deselectedDays.size
-    ? checkedFiles.map((file) =>
-        isParsed(file) ? filterFile(file, (transactions) => filterDays(transactions, deselectedDays)) : file,
-      )
-    : checkedFiles
-  const days = new Set(allParsedFiles.flatMap(getFileTransactions).map(getTransactionDay))
+export const getCheckedTransactions = (files: ParsedStatsFile[]): CheckedTransactions => {
+  const all = files.flatMap(getFileTransactions)
+  const duplicates = getDuplicates(all)
 
   return {
-    /**
-     * Checked files, parsed ones without the transactions on deselected days.
-     */
-    checkedFiles: shownCheckedFiles,
-    parsedFiles: shownCheckedFiles.filter(isParsed),
-    /**
-     * The checked parsed files with all their transactions.
-     */
-    allParsedFiles,
+    all,
+    unique: withoutDuplicates(all, duplicates),
+    duplicates,
+    byCurrency: mapValues(groupFilesByCurrency(files), (currencyFiles) => {
+      const currencyAll = currencyFiles.flatMap(getFileTransactions)
+      return { all: currencyAll, unique: withoutDuplicates(currencyAll, duplicates) }
+    }),
+  }
+}
+
+export const getStatsTransactions = (
+  { all, unique, duplicates, byCurrency }: CheckedTransactions,
+  deselectedDays: Set<string>,
+): StatsTransactions => {
+  const days = new Set(all.map(getTransactionDay))
+
+  return {
+    all,
+    unique,
+    shown: filterDays(unique, deselectedDays),
+    duplicates,
     deselectedDays,
-    /**
-     * Days with transactions of the checked files that are deselected.
-     */
     excludedDayCount: [...days].filter((day) => deselectedDays.has(day)).length,
+    byCurrency: mapValues(byCurrency, (transactions) => ({
+      ...transactions!,
+      shown: filterDays(transactions!.unique, deselectedDays),
+    })),
+    count: (transactions) => getTransactionCounts(transactions, deselectedDays, duplicates),
   }
 }
 
 export const EmptyReason = {
+  NO_FILES: 'noFiles',
+  NO_SELECTION: 'noSelection',
+  NO_TRANSACTIONS: 'noTransactions',
   NO_DATES: 'noDates',
   NO_MATCHES: 'noMatches',
 } as const
 
 export type EmptyReason = (typeof EmptyReason)[keyof typeof EmptyReason]
 
-/**
- * Why the date explorer (`allFiles` vs `shownFiles`) or the filters leave no transactions, `null` if some are left (or
- * the files have none).
- */
-export const getEmptyReason = (
-  allFiles: ParsedStatsFile[],
-  shownFiles: ParsedStatsFile[],
-  filter: TransactionFilter,
-) => {
-  const shownTransactions = shownFiles.flatMap(getFileTransactions)
+export const EMPTY_REASON_TITLE_KEYS: Record<EmptyReason, string> = {
+  [EmptyReason.NO_FILES]: 'STATS_PAGE.NO_FILES.TITLE',
+  [EmptyReason.NO_SELECTION]: 'STATS_PAGE.NO_SELECTION.TITLE',
+  [EmptyReason.NO_TRANSACTIONS]: 'STATS_PAGE.NO_TRANSACTIONS.EMPTY_TITLE',
+  [EmptyReason.NO_DATES]: 'STATS_PAGE.NO_TRANSACTIONS.NO_DATES_TITLE',
+  [EmptyReason.NO_MATCHES]: 'STATS_PAGE.NO_TRANSACTIONS.NO_MATCHES_TITLE',
+}
 
-  if (!allFiles.some((file) => getFileTransactions(file).length)) {
+/**
+ * There's nothing the view's controls could change, unlike deselected days or filters without matches.
+ */
+export const isMissingData = (reason: EmptyReason | null) => {
+  return (
+    reason === EmptyReason.NO_FILES || reason === EmptyReason.NO_SELECTION || reason === EmptyReason.NO_TRANSACTIONS
+  )
+}
+
+type EmptyReasonInput = {
+  fileCount: number
+  checkedCount: number
+  /**
+   * Of the checked files, omitted for views that don't show transactions (the CSV view).
+   */
+  transactions?: {
+    all: Transaction[]
+    /**
+     * Without those on deselected days.
+     */
+    shown: Transaction[]
+    /**
+     * Omitted where the filters don't apply (the date explorer).
+     */
+    filter?: TransactionFilter
+    /**
+     * The view also shows files without transactions (e.g. the messages of unsupported files).
+     */
+    allowEmpty?: boolean
+  }
+}
+
+/**
+ * Why a view of the checked files is empty, in this order: no files, none checked, no transactions (e.g. only
+ * unsupported files), all days deselected in the date explorer, or the filters leave none. `null` if there's
+ * something to show.
+ */
+export const getEmptyReason = ({ fileCount, checkedCount, transactions }: EmptyReasonInput): EmptyReason | null => {
+  if (!fileCount) {
+    return EmptyReason.NO_FILES
+  }
+
+  if (!checkedCount) {
+    return EmptyReason.NO_SELECTION
+  }
+
+  if (!transactions) {
     return null
   }
 
-  if (!shownTransactions.length) {
+  const { all, shown, filter, allowEmpty = false } = transactions
+
+  if (!all.length) {
+    return allowEmpty ? null : EmptyReason.NO_TRANSACTIONS
+  }
+
+  if (!shown.length) {
     return EmptyReason.NO_DATES
   }
 
-  return filterTransactions(shownTransactions, filter).length ? null : EmptyReason.NO_MATCHES
+  return !filter || filterTransactions(shown, filter).length ? null : EmptyReason.NO_MATCHES
 }
 
 export type TransactionCounts = {
@@ -365,7 +449,8 @@ export const getTransactionCountText = ({ count, dateExcludedCount, duplicateCou
 }
 
 /**
- * Files per currency, as amounts in different currencies can't be summed up.
+ * Files per currency, as amounts in different currencies can't be summed up. Only for tables listing the source files,
+ * otherwise see `StatsTransactions.byCurrency`.
  */
 // TODO: Once we have currency conversion logic, convert files with different currencies
 export const groupFilesByCurrency = (files: ParsedStatsFile[]) => {
@@ -373,11 +458,8 @@ export const groupFilesByCurrency = (files: ParsedStatsFile[]) => {
 }
 
 /**
- * Currencies of the files with transactions matching the filter.
+ * Currencies of the transactions matching the filter, in order.
  */
-export const getFilteredCurrencies = (files: ParsedStatsFile[], filter: TransactionFilter) => {
-  const filesByCurrency = groupFilesByCurrency(files)
-  return (Object.keys(filesByCurrency) as Currency[]).filter(
-    (currency) => filterTransactions(filesByCurrency[currency].flatMap(getFileTransactions), filter).length,
-  )
+export const getFilteredCurrencies = (transactions: Transaction[], filter: TransactionFilter) => {
+  return uniq(filterTransactions(transactions, filter).map((transaction) => transaction.currency))
 }

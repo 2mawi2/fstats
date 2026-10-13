@@ -5,12 +5,12 @@ import { Box, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useMemo, useState } from 'react'
 
-import { getFileTransactions } from '@/m-stats-file/service'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
-import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
+import { EMPTY_REASON_TITLE_KEYS, getEmptyReason } from '../../actions'
+import { useStatsTransactions, useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
 import DateSkeleton from '../DateSkeleton'
 import OutlineCheckbox from '../OutlineCheckbox'
 import type { DateRow } from './actions'
@@ -35,23 +35,20 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
-  const { selectedFiles } = useWorkspaceFiles()
+  const { files, checkedFiles } = useWorkspaceFiles()
+  const { all } = useStatsTransactions()
   const { deselectedDays, setDeselectedDays } = useWorkspaceDayFilter()
   // `null` until the user expands or collapses a row, so the default follows the files
   const [expandedKeys, setExpandedKeys] = useState<Set<string> | null>(null)
   // State rather than a ref, so the list re-renders once the scroll element exists
   const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null)
-  const tree = useMemo(
-    () => getDateTree(selectedFiles.flatMap(getFileTransactions).map(getTransactionDay)),
-    [selectedFiles],
-  )
-  // Memoized by hand, the virtualizer re-renders on scroll and the compiler skips this component
+  const tree = useMemo(() => getDateTree(all.map(getTransactionDay)), [all])
+  // Memoized, the virtualizer re-renders on scroll
   const defaultExpanded = useMemo(() => getDefaultExpanded(tree), [tree])
   const expanded = expandedKeys ?? defaultExpanded
   const rows = useMemo(() => getVisibleRows(tree, expanded), [tree, expanded])
   const deselectedCounts = useMemo(() => getDeselectedCounts(tree, deselectedDays), [tree, deselectedDays])
 
-  // Not compatible with React Compiler memoization, the compiler skips this component
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -91,9 +88,15 @@ const Component = () => {
     )
   }
 
-  // No files, or none checked
-  if (!tree.length) {
-    return <DateSkeleton title={t('STATS_PAGE.NO_SELECTION.TITLE')} />
+  // The days are those of all transactions, deselected ones included
+  const emptyReason = getEmptyReason({
+    fileCount: files.length,
+    checkedCount: checkedFiles.length,
+    transactions: { all, shown: all },
+  })
+
+  if (emptyReason) {
+    return <DateSkeleton title={t(EMPTY_REASON_TITLE_KEYS[emptyReason])} />
   }
 
   return (

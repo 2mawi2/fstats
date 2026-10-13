@@ -86,6 +86,9 @@ export const ui = () => {
     row: {
       '&:hover > *': { bgcolor: 'action.hover' },
     },
+    expandable: {
+      cursor: 'pointer',
+    },
     labelCell: (variant: RowVariant) => ({
       ...cell,
       ...stickyLabel,

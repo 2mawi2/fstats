@@ -5,11 +5,11 @@ import { Box, Checkbox, Divider, IconButton, Tooltip, Typography } from '@mui/ma
 import { useState } from 'react'
 
 import { MISC } from '@/common'
-import { DropdownMenu, DropdownMenuDivider, DropdownMenuItem, DropdownMenuSubheader } from '@/components'
 import { isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace, useWorkspaceFiles } from '../../context'
+import DropdownMenu, { DropdownMenuDivider, DropdownMenuItem, DropdownMenuSubheader } from '../DropdownMenu'
 import { getBankAccountOptions, isSameSelection, toggleFileIds } from './actions'
 import { ui } from './styled'
 
@@ -91,7 +91,7 @@ const Component = () => {
               // Without files, an option would match an empty selection
               selected={!isDisabled && isActive(option.fileIds)}
               label={option.label}
-              count={option.id === 'none' ? null : option.fileIds.length}
+              count={option.id === 'none' ? undefined : option.fileIds.length}
               sx={'color' in option ? { color: option.color } : undefined}
             />
           )

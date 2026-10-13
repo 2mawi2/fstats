@@ -4,12 +4,11 @@ import { groupBy, sortBy } from 'lodash'
 import type { CategoryCode, NumberString, ParsedStatsFile, Transaction } from '@/types'
 import type { Currency, UserLocale } from '@/types-enums'
 import { EXPENSE_CATEGORIES } from '@/common'
-import { splitDuplicates } from '@/m-stats-file/service'
+import { getCategoryLabel, getParentCategoryCode } from '@/utils/Category'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import type { BankAccountId } from '@/utils/Parser'
 import { getBankAccountId } from '@/utils/Parser'
 import { getPercentage, isExpense, isIncome, sumValues } from '@/utils/Stats'
-import { getCategoryLabel, getParentCategoryCode } from '@/utils/TransactionParser'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
@@ -37,26 +36,25 @@ const UNCATEGORISED_CATEGORIES: CategoryCode[] = ['TFI_02', 'TFO_02']
 /**
  * Bank transfers can take a few days, e.g. over a weekend.
  */
-export const TRANSFER_MAX_DAYS = 3
+const TRANSFER_MAX_DAYS = 3
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-export type AccountTransaction = Transaction & { bankAccountId: BankAccountId }
+type AccountTransaction = Transaction & { bankAccountId: BankAccountId }
 
 /**
- * Transactions of the files without duplicates, with the bank account of their section.
+ * The transactions (e.g. `StatsTransactions.unique`) with the bank account of their section in the files.
  */
-export const getAccountTransactions = (files: ParsedStatsFile[]): AccountTransaction[] => {
-  const transactions = files.flatMap((file) =>
-    file.sections.flatMap((section) =>
-      section.transactions.map((transaction) => ({
-        ...transaction,
-        bankAccountId: getBankAccountId(section.parserId),
-      })),
+export const getAccountTransactions = (files: ParsedStatsFile[], transactions: Transaction[]): AccountTransaction[] => {
+  const bankAccountIds = new Map(
+    files.flatMap((file) =>
+      file.sections.flatMap((section) =>
+        section.transactions.map((transaction) => [transaction, getBankAccountId(section.parserId)] as const),
+      ),
     ),
   )
 
-  return splitDuplicates(transactions).unique
+  return transactions.map((transaction) => ({ ...transaction, bankAccountId: bankAccountIds.get(transaction)! }))
 }
 
 const getDayDiff = (a: Transaction, b: Transaction) => {
@@ -220,7 +218,7 @@ const getTransferRows = (transfers: Transaction[], period: BreakdownPeriod) => {
 /**
  * Net result as a percentage of the income, `undefined` without income.
  */
-export const getNetMargin = (net: NumberString | undefined, income: NumberString | undefined) => {
+const getNetMargin = (net: NumberString | undefined, income: NumberString | undefined) => {
   return income === undefined || Big(income).eq(0) ? undefined : getPercentage(net ?? '0', income).toString()
 }
 
@@ -241,14 +239,30 @@ export type ProfitLoss = {
 }
 
 /**
- * Income statement of the files' transactions per period, one per currency as amounts in different currencies can't
- * be summed up. Transfers between own accounts are excluded from it, but listed separately.
+ * Income statement of the transactions (without duplicates, e.g. `StatsTransactions.unique`) per period, one per currency
+ * as amounts in different currencies can't be summed up. Transfers between own accounts are excluded from it, but
+ * listed separately. Transfers are paired before `filter` (e.g. the category and day filters) is applied, so excluding
+ * one side of a transfer doesn't turn the other side into income or an expense.
  */
-export const getProfitLoss = (files: ParsedStatsFile[], period: BreakdownPeriod, t: TFunction): ProfitLoss[] => {
-  const byCurrency = groupBy(getAccountTransactions(files), (transaction) => transaction.currency)
+export const getProfitLoss = (
+  accountTransactions: AccountTransaction[],
+  period: BreakdownPeriod,
+  t: TFunction,
+  filter: (transactions: AccountTransaction[]) => AccountTransaction[] = (transactions) => transactions,
+): ProfitLoss[] => {
+  const byCurrency = groupBy(accountTransactions, (transaction) => transaction.currency)
 
-  return Object.entries(byCurrency).map(([currency, currencyTransactions]) => {
-    const { transactions, transfers } = splitTransfers(currencyTransactions)
+  return Object.entries(byCurrency).flatMap(([currency, allCurrencyTransactions]) => {
+    const currencyTransactions = filter(allCurrencyTransactions)
+
+    if (!currencyTransactions.length) {
+      return []
+    }
+
+    const shown = new Set(currencyTransactions)
+    const split = splitTransfers(allCurrencyTransactions)
+    const transactions = split.transactions.filter((transaction) => shown.has(transaction))
+    const transfers = split.transfers.filter((transaction) => shown.has(transaction))
     const expenses = transactions.filter(isExpenseCategory)
     const income = transactions.filter((transaction) => !isExpenseCategory(transaction))
     const incomingTransfers = transfers.filter(isIncome)

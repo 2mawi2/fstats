@@ -23,7 +23,7 @@ type DropdownMenuItemProps = Omit<MenuItemProps, 'children'> & {
   /**
    * Shown on the right, e.g. the number of files.
    */
-  count?: number | null
+  count?: number
 }
 
 export const DropdownMenuItem = ({ start, label, count, sx: itemSx, ...props }: DropdownMenuItemProps) => {
@@ -35,7 +35,7 @@ export const DropdownMenuItem = ({ start, label, count, sx: itemSx, ...props }: 
       <Box component="span" sx={sx.label}>
         {label}
       </Box>
-      {count !== undefined && count !== null ? (
+      {count !== undefined ? (
         <Box component="span" sx={sx.count}>
           {count}
         </Box>

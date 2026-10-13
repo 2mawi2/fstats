@@ -2,40 +2,50 @@
 
 import { AccountBalanceOutlined, CreditCardOutlined } from '@mui/icons-material'
 import { Box, Chip } from '@mui/material'
+import { useMemo } from 'react'
 
-import type { StatsFile, Transaction } from '@/types'
+import type { StatsFile } from '@/types'
 import { MISC } from '@/common'
 import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/service'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 
+import type { TransactionFilter } from '../../actions'
 import {
   filterDays,
+  filterTransactions,
   getFileAccount,
   getFileFormat,
   getFileNameColor,
-  getTransactionCounts,
   withoutDuplicates,
 } from '../../actions'
+import { useStatsTransactions } from '../../context'
 import StatsRow from '../StatsRow'
 import { ui } from './styled'
 
 type FileDetailsProps = {
-  /**
-   * Before the date explorer.
-   */
   file: StatsFile
-  deselectedDays: Set<string>
-  /**
-   * Duplicates across all checked files, see `getDuplicates`.
-   */
-  duplicates: Set<Transaction>
+  filter: TransactionFilter
 }
 
-const Component = ({ file, deselectedDays, duplicates }: FileDetailsProps) => {
+const Component = ({ file, filter }: FileDetailsProps) => {
   const sx = ui()
   const { locale } = useUserPreferences()
+  // Duplicates across all checked files in their order, so the per-file stats add up to the summary
+  const { duplicates, deselectedDays, count } = useStatsTransactions()
+  const stats = useMemo(() => {
+    if (!isParsed(file)) {
+      return null
+    }
+
+    const transactions = filterTransactions(getFileTransactions(file), filter)
+    return {
+      transactions: filterDays(withoutDuplicates(transactions, duplicates), deselectedDays),
+      currency: getFileCurrency(file),
+      counts: count(transactions),
+    }
+  }, [file, filter, duplicates, deselectedDays, count])
 
   const renderAccount = () => {
     if (!isParsed(file)) {
@@ -71,15 +81,8 @@ const Component = ({ file, deselectedDays, duplicates }: FileDetailsProps) => {
     <StatsRow
       title={file.file.name}
       titleColor={getFileNameColor(file)}
-      stats={
-        isParsed(file)
-          ? {
-              transactions: filterDays(withoutDuplicates(getFileTransactions(file), duplicates), deselectedDays),
-              currency: getFileCurrency(file),
-            }
-          : null
-      }
-      counts={isParsed(file) ? getTransactionCounts(getFileTransactions(file), deselectedDays, duplicates) : undefined}
+      stats={stats && { transactions: stats.transactions, currency: stats.currency }}
+      counts={stats?.counts}
     >
       <Box sx={sx.info}>
         {renderAccount()}

@@ -4,7 +4,8 @@ import { InfoOutlined } from '@mui/icons-material'
 import { Box, FormControlLabel, Switch, Typography } from '@mui/material'
 import type { ChangeEvent } from 'react'
 
-import { useIsMobile, useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
+import { useIsMobile } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import SettingsCard from '../SettingsCard'

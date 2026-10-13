@@ -2,8 +2,9 @@
 
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
+import type { FileRejection } from 'react-dropzone'
 
-import type { NewStatsFile, RDZFileRejection, RDZFileWithPath } from '@/types'
+import type { NewStatsFile, RDZFileWithPath } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
 import { isParsed, useMutateAddFiles, useMutateUpdateFiles } from '@/m-stats-file/service'
@@ -21,7 +22,7 @@ export const useFileDropzone = ({ onAdded }: { onAdded?: () => void } = {}) => {
   const { setSelectedFileIds } = useFileHelper()
 
   const onDrop = useCallback(
-    async (acceptedFiles: File[], fileRejections: RDZFileRejection[]) => {
+    async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       const newFiles: NewStatsFile[] = [
         ...acceptedFiles.map((file) => ({ file: file as RDZFileWithPath })),
         ...fileRejections.map(({ file, errors }) => ({ file, rejection: errors.map((e) => e.message).join(', ') })),

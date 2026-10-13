@@ -1,8 +1,14 @@
 import type { Theme } from '@mui/material/styles'
 
-import { accentColor, ctaButton } from '../../styled'
+import { accentColor, ctaButton, darkStyles } from '../../styled'
 
 export const ui = (theme: Theme, isMobile: boolean) => {
+  const logo = {
+    width: isMobile ? 96 : 128,
+    height: 'auto',
+    mb: 3,
+  }
+
   return {
     hero: {
       display: 'flex',
@@ -14,9 +20,14 @@ export const ui = (theme: Theme, isMobile: boolean) => {
     },
 
     logo: {
-      width: isMobile ? 96 : 128,
-      height: 'auto',
-      mb: 3,
+      ...logo,
+      ...darkStyles(theme, { display: 'none' }),
+    },
+
+    logoDark: {
+      ...logo,
+      display: 'none',
+      ...darkStyles(theme, { display: 'block' }),
     },
 
     title: {

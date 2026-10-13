@@ -5,7 +5,7 @@ import { Color } from '@/styles/colors'
 /**
  * Styles applied only in dark mode (via CSS, so there's no flash before the colour scheme is known).
  */
-const darkStyles = (theme: Theme, styles: Record<string, string>) =>
+export const darkStyles = (theme: Theme, styles: Record<string, string>) =>
   theme.applyStyles('dark', styles) as Record<string, typeof styles>
 
 /**

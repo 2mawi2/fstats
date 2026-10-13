@@ -4,7 +4,6 @@ import { useTheme } from '@mui/material/styles'
 import { usePathname } from 'next/navigation'
 
 import { LAYOUT } from '@/common'
-import { useIsDarkMode } from '@/hooks'
 
 import ThemeSwitcher from '../../../ThemeSwitcher'
 import { getActiveRouteLabel } from './actions'
@@ -17,8 +16,7 @@ type MainMenuProps = {
 const Component = ({ onMenuClick }: MainMenuProps) => {
   const pathname = usePathname()
   const theme = useTheme()
-  const isDarkMode = useIsDarkMode()
-  const sx = ui(theme, isDarkMode, true)
+  const sx = ui(theme)
   const activeLabel = getActiveRouteLabel(pathname)
 
   return (
@@ -35,7 +33,7 @@ const Component = ({ onMenuClick }: MainMenuProps) => {
           </Box>
 
           <Box sx={sx.iconMenu}>
-            <ThemeSwitcher showLabel={false} />
+            <ThemeSwitcher />
           </Box>
         </Box>
       </Container>

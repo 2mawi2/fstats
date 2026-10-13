@@ -6,21 +6,17 @@ import type {} from '@mui/material/themeCssVarsAugmentation'
 
 // -------------------------------------------------------
 
-export const zNonEmptyString = z.string().trim().nonempty({ error: 'ERRORS:REQUIRED' })
-
 /**
- * The NonEmptyString ensures that there is a string value after being trimmed.
+ * Ensures that there is a string value after being trimmed.
  */
-export type NonEmptyString = z.infer<typeof zNonEmptyString>
+export const zNonEmptyString = z.string().trim().nonempty({ error: 'ERRORS:REQUIRED' })
 
 // -------------------------------------------------------
 
-export const zIdString = zNonEmptyString
-
 /**
- * The IdString is a short-hand/proxy for readability purposes only.
+ * Short-hand/proxy for readability purposes only.
  */
-export type IdString = z.infer<typeof zIdString>
+export const zIdString = zNonEmptyString
 
 // -------------------------------------------------------
 
@@ -33,15 +29,12 @@ export type DateRange = z.infer<typeof zDateRange>
 
 // -------------------------------------------------------
 
-export const zDateTimeString = z.iso.datetime({ offset: true, error: 'ERRORS:INVALID_DATETIME' })
-
 /**
- * The DateTimeString must be a string in the ISO date format,
- * i.e. "2020-01-01T00:00:00+02:00".
+ * A string in the ISO date format, i.e. "2020-01-01T00:00:00+02:00".
  *
  * For more info see: https://github.com/colinhacks/zod?tab=readme-ov-file#datetimes
  */
-export type DateTimeString = z.infer<typeof zDateTimeString>
+export const zDateTimeString = z.iso.datetime({ offset: true, error: 'ERRORS:INVALID_DATETIME' })
 
 // -------------------------------------------------------
 

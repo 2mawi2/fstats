@@ -1,3 +1,5 @@
+import { sxListRow, sxListRowTitle } from '../../styled'
+
 export const ui = () => {
   return {
     item: {
@@ -7,9 +9,8 @@ export const ui = () => {
       '&:last-of-type .details': { pb: 1.25 },
     },
     row: {
+      ...sxListRow,
       gap: 1,
-      minHeight: 34,
-      py: 0,
       pl: 1.5,
       pr: 1,
     },
@@ -17,16 +18,7 @@ export const ui = () => {
     chip: {
       mr: 'auto',
     },
-    title: {
-      flexGrow: 1,
-      minWidth: 0,
-      m: 0,
-      fontSize: 13,
-      lineHeight: 1.4,
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap',
-    },
+    title: sxListRowTitle,
     // Greyed out like the transactions on deselected days in the table
     dateFiltered: {
       flexShrink: 0,

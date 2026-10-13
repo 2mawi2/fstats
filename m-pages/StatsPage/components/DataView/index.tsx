@@ -2,37 +2,32 @@
 
 import { Box } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
-import { useDeferredValue, useState } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
+import { useDeferredValue, useMemo, useState } from 'react'
 
-import { MISC } from '@/common'
+import { getView, WorkspaceView } from '@/common'
 import { FletchingDivider } from '@/components'
-import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import {
+  EMPTY_REASON_TITLE_KEYS,
   filterTransactions,
   getAmountFilterOptions,
   getEmptyReason,
   getFilteredCurrencies,
-  getTransactionCounts,
   getTransactionsLayoutOptions,
   groupFilesByCurrency,
   TransactionsLayout,
 } from '../../actions'
-import { useShownFiles, useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
-import { useCurrencySelect } from '../../useCurrencySelect'
+import { useStatsTransactions, useWorkspaceFiles } from '../../context'
+import { ALL_CURRENCIES, useCurrencySelect } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import CsvPreview from '../CsvPreview'
-import DropZoneDisplay from '../DropZoneDisplay'
 import NoSearchResultsDisplay from '../NoSearchResultsDisplay'
-import NoSelectionDisplay from '../NoSelectionDisplay'
-import NoTransactionsDisplay from '../NoTransactionsDisplay'
 import SearchField from '../SearchField'
 import SegmentedToggle from '../SegmentedToggle'
 import TransactionsPreview from '../TransactionsPreview'
+import ViewEmptyState from '../ViewEmptyState'
 import ViewToolbar from '../ViewToolbar'
 import { toSearchQuery } from '../VirtualTable/actions'
 import { ui } from './styled'
@@ -46,32 +41,44 @@ const Component = () => {
   // State rather than a ref, so the previews re-render once the scroll element exists
   const [middleColumn, setMiddleColumn] = useState<HTMLDivElement | null>(null)
   const isTransactions = getView(useSearchParams()) === WorkspaceView.TRANSACTIONS
-  const [transactionsLayout, setTransactionsLayout] = useLocalStorage<TransactionsLayout>(
-    MISC.LS_DATA_TRANSACTIONS_LAYOUT_KEY,
-    TransactionsLayout.COMBINED,
-    { initializeWithValue: false },
-  )
   // Kept when switching between the CSV and transactions views. Deferred, so typing stays responsive with many rows.
   const [search, setSearch] = useState('')
   const searchQuery = toSearchQuery(useDeferredValue(search))
-  const { includeDuplicates, setIncludeDuplicates, includeDateExcluded, setIncludeDateExcluded } = useTableOptions()
+  const {
+    transactionsLayout,
+    setTransactionsLayout,
+    includeDuplicates,
+    setIncludeDuplicates,
+    includeDateExcluded,
+    setIncludeDateExcluded,
+  } = useTableOptions()
   const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
-  const { deselectedDays } = useWorkspaceDayFilter()
-  const { parsedFiles: shownParsedFiles } = useShownFiles()
+  const { all, unique, shown, count } = useStatsTransactions()
   // All transactions, those on days deselected in the date explorer are greyed out or hidden
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
-  const visibleParsedFiles = includeDateExcluded ? checkedParsedFiles : shownParsedFiles
-  // The filters don't apply to the CSV view
-  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, visibleParsedFiles, filter) : null
-  const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
+  const visible = includeDateExcluded ? unique : shown
+  // The transactions and filters don't apply to the CSV view. The transactions view also shows the messages of files
+  // without transactions. Memoized, the view re-renders on each search keystroke.
+  const emptyReason = useMemo(
+    () =>
+      getEmptyReason({
+        fileCount: files.length,
+        checkedCount: checkedFiles.length,
+        transactions: isTransactions ? { all, shown: visible, filter, allowEmpty: true } : undefined,
+      }),
+    [files.length, checkedFiles.length, isTransactions, all, visible, filter],
+  )
+  const isEmpty = !!emptyReason
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && isTransactions
   // Multiple parsed files are shown as one, with combined stats above the stats per file
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // The combined table can be shown per currency, like the breakdown and stats views
-  const filesByCurrency = groupFilesByCurrency(checkedParsedFiles)
-  const currencies = getFilteredCurrencies(visibleParsedFiles, filter)
+  const filesByCurrency = useMemo(() => groupFilesByCurrency(checkedParsedFiles), [checkedParsedFiles])
+  const currencies = useMemo(() => getFilteredCurrencies(visible, filter), [visible, filter])
+  // Stable arrays per file for the split tables, as `TransactionsPreview` memoizes on `files`
+  const splitFiles = useMemo(() => checkedFiles.map((file) => [file]), [checkedFiles])
   const {
     selected: selectedCurrency,
     setSelected: setSelectedCurrency,
@@ -86,9 +93,17 @@ const Component = () => {
     scrollElement: middleColumn,
     search: searchQuery,
   }
-  const counts = getTransactionCounts(
-    filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter),
-    deselectedDays,
+  // Of the selected currency only, when one table per currency is shown
+  const countedCurrency = isPerCurrency && selectedCurrency !== ALL_CURRENCIES ? selectedCurrency : null
+  const counts = useMemo(
+    () =>
+      count(
+        filterTransactions(
+          countedCurrency ? all.filter((transaction) => transaction.currency === countedCurrency) : all,
+          filter,
+        ),
+      ),
+    [count, all, filter, countedCurrency],
   )
   // Only the combined table has duplicates
   const duplicateCount = isCombined && !isTransactionsSplit ? counts.duplicateCount : 0
@@ -137,8 +152,8 @@ const Component = () => {
           onChange={setAmountFilter}
           disabled={!isTransactionsView}
           disabledTooltip={
-            !checkedFiles.length
-              ? t('STATS_PAGE.NO_SELECTION.TITLE')
+            !checkedFiles.length && emptyReason
+              ? t(EMPTY_REASON_TITLE_KEYS[emptyReason])
               : !isTransactions
                 ? t('STATS_PAGE.CSV_DISABLED')
                 : undefined
@@ -155,16 +170,12 @@ const Component = () => {
       <Box ref={setMiddleColumn} sx={sx.middleScroll(isEmpty)}>
         {/* Single child, observed by the tables for layout changes above them */}
         <Box sx={sx.tables}>
-          {!files.length ? (
-            <DropZoneDisplay />
-          ) : !checkedFiles.length ? (
-            <NoSelectionDisplay />
-          ) : emptyReason ? (
-            <NoTransactionsDisplay reason={emptyReason} />
+          {emptyReason ? (
+            <ViewEmptyState reason={emptyReason} />
           ) : isTransactions ? (
             isTransactionsSplit ? (
-              checkedFiles.map((file) => (
-                <TransactionsPreview key={file.id} files={[file]} showFileName {...previewProps} />
+              splitFiles.map((fileGroup) => (
+                <TransactionsPreview key={fileGroup[0].id} files={fileGroup} showFileName {...previewProps} />
               ))
             ) : isPerCurrency ? (
               shownCurrencies.map((currency) => (

@@ -1,3 +1,5 @@
+import { sxSmallCheckbox } from '../../styled'
+
 export const ui = () => {
   return {
     toolbar: {
@@ -18,16 +20,13 @@ export const ui = () => {
       display: 'flex',
       alignItems: 'center',
     },
-    checkbox: {
-      p: 0.5,
-      '& .MuiSvgIcon-root': { fontSize: 18 },
-    },
+    checkbox: sxSmallCheckbox,
     // The item handles the click
     menuCheckbox: {
+      ...sxSmallCheckbox,
       p: 0,
       ml: -0.25,
       pointerEvents: 'none',
-      '& .MuiSvgIcon-root': { fontSize: 18 },
     },
     selectMenuButton: {
       p: 0,

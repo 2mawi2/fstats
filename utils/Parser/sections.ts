@@ -4,7 +4,7 @@ import type { Parser, RowData } from '@/types'
 
 import { AVAILABLE_PARSERS } from './lookup'
 
-export type Section = {
+type Section = {
   parser: Parser
   /**
    * Header row followed by the rows up to the next section.

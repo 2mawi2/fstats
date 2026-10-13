@@ -18,22 +18,18 @@ type SwipeableDrawerProps = {
   onOpen: VoidFunction
   mainMenu?: boolean
   children: ReactNode
-  drawerSx?: SxProps<Theme>
-  paperSx?: SxProps<Theme>
   headerSx?: SxProps<Theme>
   fixedHeader?: boolean
 }
 
 const Component = ({
   title,
-  anchor = 'bottom',
+  anchor,
   open,
   onClose,
   onOpen,
   mainMenu = false,
   children,
-  drawerSx = {},
-  paperSx = {},
   headerSx = {},
   fixedHeader = false,
 }: SwipeableDrawerProps) => {
@@ -51,13 +47,10 @@ const Component = ({
       elevation={0}
       disableSwipeToOpen
       slotProps={{
-        paper: { sx: { ...sx.drawer(mainMenu), ...paperSx } },
+        paper: { sx: sx.drawer(mainMenu) },
         backdrop: { sx: sx.backdrop },
       }}
-      sx={{
-        zIndex: mainMenu ? theme.zIndex.drawer + 1 : theme.zIndex.drawer + 1,
-        ...drawerSx,
-      }}
+      sx={{ zIndex: theme.zIndex.drawer + 1 }}
     >
       <Box role="presentation">
         <Box sx={sx.subheaderWrapper(fixedHeader)}>

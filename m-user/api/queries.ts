@@ -11,10 +11,6 @@ export const getUser = async (): Promise<User | null> => {
 }
 
 export const addUser = async (data: User): Promise<User> => {
-  if (!data) {
-    throw new Error('No data provided!')
-  }
-
   const modified = formatISO(new Date())
   const updatedUser: User = {
     ...data,

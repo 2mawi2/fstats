@@ -22,7 +22,7 @@ const NO_DAYS = new Set<string>()
  * view, where the date explorer doesn't apply).
  */
 export const useDayFilter = ({ isDemoMode, isDisabled }: { isDemoMode: boolean; isDisabled: boolean }): DayFilter => {
-  const [storedDays, setStoredDays] = useLocalStorage<string[]>(MISC.LS_DATA_DESELECTED_DAYS_KEY, [], {
+  const [storedDays, setStoredDays] = useLocalStorage<string[]>(MISC.LS_STATS_DESELECTED_DAYS_KEY, [], {
     initializeWithValue: false,
   })
   const storedDeselectedDays = useMemo(() => new Set(storedDays), [storedDays])

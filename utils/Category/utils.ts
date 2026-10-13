@@ -1,26 +1,24 @@
 import type { TFunction } from 'i18next'
 
-import type { CategoryCode, GradientColorsLightDark, ParentCategoryCode, Transaction } from '@/types'
-import { PARENT_CATEGORY_COLORS } from '@/common'
+import type { CategoryCode, ParentCategoryCode, Transaction } from '@/types'
 import { isExpense } from '@/utils/Stats'
 
 import { EXPENSE_KEYWORD_RULES, INCOME_KEYWORD_RULES } from './keyword-rules'
 
-export const getCategoryCode = (row: Transaction): CategoryCode => {
+export const getCategoryCode = (row: Pick<Transaction, 'description' | 'value'>): CategoryCode => {
   // Zero amounts are categorised as income
-  const isIncome = !isExpense(row)
-  const keywordRules = isIncome ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
+  const isIncomeOrZero = !isExpense(row)
+  const keywordRules = isIncomeOrZero ? INCOME_KEYWORD_RULES : EXPENSE_KEYWORD_RULES
 
-  const description = row.description.toLowerCase()
   let matchedCategory: CategoryCode | null = null
   let matchedKeywordLength = -1
 
   for (const rule of keywordRules) {
-    for (const keyword of rule.keywords) {
+    for (const { pattern, length } of rule.keywords) {
       // Prefer the most specific (longest) matching keyword over shorter matches
-      if (description.includes(keyword) && keyword.length > matchedKeywordLength) {
+      if (length > matchedKeywordLength && pattern.test(row.description)) {
         matchedCategory = rule.category
-        matchedKeywordLength = keyword.length
+        matchedKeywordLength = length
       }
     }
   }
@@ -30,7 +28,7 @@ export const getCategoryCode = (row: Transaction): CategoryCode => {
   }
 
   // Uncategorised
-  return isIncome ? 'TFI_02' : 'TFO_02'
+  return isIncomeOrZero ? 'TFI_02' : 'TFO_02'
 }
 
 /**
@@ -45,12 +43,4 @@ export const getCategoryLabel = (code: CategoryCode | ParentCategoryCode | null,
  */
 export const getParentCategoryCode = (code: CategoryCode): ParentCategoryCode => {
   return code.split('_')[0]
-}
-
-export const getCategoryColor = (code: CategoryCode | null): GradientColorsLightDark | undefined => {
-  if (!code) {
-    return
-  }
-
-  return PARENT_CATEGORY_COLORS[getParentCategoryCode(code)]
 }

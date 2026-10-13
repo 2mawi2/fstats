@@ -3,9 +3,9 @@ import { styled } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 
 import { ColorMode } from '@/types-enums'
-import { MISC } from '@/common'
+import { sxGlass } from '@/styles/styled'
 
-export const sxHideScrollbar = {
+const sxHideScrollbar = {
   overflow: 'auto',
   scrollbarWidth: 'none', // Firefox
   msOverflowStyle: 'none', // IE 10+
@@ -19,10 +19,8 @@ const PULLER_HEIGHT = 4
 const PULLER_WIDTH = 30
 const PULLER_WRAPPER_HEIGHT = PULLER_OFFSET_TOP + PULLER_HEIGHT
 
-export const PullerWrapper = styled('div')(({ theme }) => {
-  return {
-    height: PULLER_WRAPPER_HEIGHT,
-  }
+export const PullerWrapper = styled('div')({
+  height: PULLER_WRAPPER_HEIGHT,
 })
 
 export const Puller = styled('div')(({ theme }) => ({
@@ -57,11 +55,7 @@ export const ui = (anchor: 'left' | 'bottom', theme: Theme, isMobile = false) =>
 
       return {
         ...sxHideScrollbar,
-        background: `rgba(255, 255, 255, ${MISC.GLASS_EFFECT})`,
-        [theme.getColorSchemeSelector(ColorMode.DARK)]: {
-          background: `rgba(42, 46, 54, ${MISC.GLASS_EFFECT})`,
-        },
-        backdropFilter: 'blur(10px)',
+        ...sxGlass(theme),
         m: padding,
         width: mainMenu ? 300 : `calc(100% - (2 * ${paddingX}))`,
         maxWidth: mainMenu ? '70%' : '100%',
@@ -75,12 +69,10 @@ export const ui = (anchor: 'left' | 'bottom', theme: Theme, isMobile = false) =>
       position: 'sticky',
       top: 0,
       zIndex: 1,
-      background: fixedHeader ? `rgba(255, 255, 255, 0.9)` : 'transparent',
-      [theme.getColorSchemeSelector(ColorMode.DARK)]: {
-        background: fixedHeader ? `rgba(42, 46, 54, 0.9)` : 'transparent',
-      },
-      backdropFilter: fixedHeader ? 'blur(10px)' : 'none',
-      borderBottom: fixedHeader ? `1px solid ${theme.vars.palette.divider}` : 'none',
+      ...(fixedHeader && {
+        ...sxGlass(theme, 0.9),
+        borderBottom: `1px solid ${theme.vars.palette.divider}`,
+      }),
     }),
   }
 }
