@@ -5,12 +5,11 @@ import { Box, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useMemo, useState } from 'react'
 
-import { getFileTransactions } from '@/m-stats-file/service'
 import { useUserPreferences } from '@/hooks'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 
-import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
+import { useStatsTransactions, useWorkspaceDayFilter } from '../../context'
 import DateSkeleton from '../DateSkeleton'
 import OutlineCheckbox from '../OutlineCheckbox'
 import type { DateRow } from './actions'
@@ -35,16 +34,13 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
-  const { selectedFiles } = useWorkspaceFiles()
+  const { all } = useStatsTransactions()
   const { deselectedDays, setDeselectedDays } = useWorkspaceDayFilter()
   // `null` until the user expands or collapses a row, so the default follows the files
   const [expandedKeys, setExpandedKeys] = useState<Set<string> | null>(null)
   // State rather than a ref, so the list re-renders once the scroll element exists
   const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null)
-  const tree = useMemo(
-    () => getDateTree(selectedFiles.flatMap(getFileTransactions).map(getTransactionDay)),
-    [selectedFiles],
-  )
+  const tree = useMemo(() => getDateTree(all.map(getTransactionDay)), [all])
   // Memoized, the virtualizer re-renders on scroll
   const defaultExpanded = useMemo(() => getDefaultExpanded(tree), [tree])
   const expanded = expandedKeys ?? defaultExpanded

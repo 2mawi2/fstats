@@ -3,13 +3,12 @@
 import { Box, Divider, Stack } from '@mui/material'
 import { useMemo } from 'react'
 
-import type { ParsedStatsFile } from '@/types'
 import type { Currency } from '@/types-enums'
-import { getFileTransactions } from '@/m-stats-file/service'
 import { getTransactionHelper, useUserPreferences } from '@/hooks'
 
-import { filterTransactions, getTransactionCounts } from '../../../../actions'
-import { useShownFiles } from '../../../../context'
+import type { CurrencyTransactions } from '../../../../actions'
+import { filterTransactions } from '../../../../actions'
+import { useStatsTransactions } from '../../../../context'
 import { useTransactionFilter } from '../../../../useTransactionFilter'
 import BalanceChart from '../../../BalanceChart'
 import CategoryBreakdown from '../../../CategoryBreakdown'
@@ -20,13 +19,9 @@ import { ui } from './styled'
 type CurrencyStatsProps = {
   currency: Currency
   /**
-   * Of the currency, as shown by the date explorer.
+   * Of the currency, see `StatsTransactions.byCurrency`.
    */
-  files: ParsedStatsFile[]
-  /**
-   * Of the currency, before the date explorer.
-   */
-  allFiles: ParsedStatsFile[]
+  transactions: CurrencyTransactions
   /**
    * In the chart titles, when several currencies are shown.
    */
@@ -34,28 +29,24 @@ type CurrencyStatsProps = {
 }
 
 /**
- * Charts and category breakdown of the files of one currency.
+ * Charts and category breakdown of the transactions of one currency.
  */
-const Component = ({ currency, files, allFiles, chip }: CurrencyStatsProps) => {
+const Component = ({ currency, transactions: { all, shown }, chip }: CurrencyStatsProps) => {
   const sx = ui()
   const { locale, dateFormat } = useUserPreferences()
-  const { deselectedDays, excludedDayCount } = useShownFiles()
+  const { deselectedDays, excludedDayCount, count } = useStatsTransactions()
   const { filter, amountFilter } = useTransactionFilter()
   const { transactions, transactionRangeItems } = useMemo(
     () =>
       getTransactionHelper({
-        files,
+        transactions: filterTransactions(shown, filter),
         locale,
         dateFormat,
-        filterTransactions: (unique) => filterTransactions(unique, filter),
         excludedDays: deselectedDays,
       }),
-    [files, locale, dateFormat, filter, deselectedDays],
+    [shown, locale, dateFormat, filter, deselectedDays],
   )
-  const counts = useMemo(
-    () => getTransactionCounts(filterTransactions(allFiles.flatMap(getFileTransactions), filter), deselectedDays),
-    [allFiles, filter, deselectedDays],
-  )
+  const counts = useMemo(() => count(filterTransactions(all, filter)), [count, all, filter])
 
   return (
     <Stack divider={<Divider flexItem />}>

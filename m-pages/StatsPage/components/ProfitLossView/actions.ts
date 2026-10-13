@@ -241,11 +241,16 @@ export type ProfitLoss = {
 }
 
 /**
- * Income statement of the files' transactions per period, one per currency as amounts in different currencies can't
- * be summed up. Transfers between own accounts are excluded from it, but listed separately.
+ * Income statement of the transactions (without duplicates, see `getAccountTransactions`) per period, one per currency
+ * as amounts in different currencies can't be summed up. Transfers between own accounts are excluded from it, but
+ * listed separately.
  */
-export const getProfitLoss = (files: ParsedStatsFile[], period: BreakdownPeriod, t: TFunction): ProfitLoss[] => {
-  const byCurrency = groupBy(getAccountTransactions(files), (transaction) => transaction.currency)
+export const getProfitLoss = (
+  accountTransactions: AccountTransaction[],
+  period: BreakdownPeriod,
+  t: TFunction,
+): ProfitLoss[] => {
+  const byCurrency = groupBy(accountTransactions, (transaction) => transaction.currency)
 
   return Object.entries(byCurrency).map(([currency, currencyTransactions]) => {
     const { transactions, transfers } = splitTransfers(currencyTransactions)

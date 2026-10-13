@@ -1,10 +1,12 @@
 'use client'
 
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext } from 'react'
 
+import type { ParsedStatsFile } from '@/types'
 import { useFileHelper } from '@/hooks'
 
-import { getShownFiles } from './actions'
+import type { CheckedTransactions, StatsTransactions } from './actions'
+import { getCheckedTransactions, getStatsTransactions } from './actions'
 import type { DayFilter } from './useDayFilter'
 
 type WorkspaceContextValue = {
@@ -46,12 +48,32 @@ export const useWorkspaceDayFilter = () => {
   return useWorkspace().dayFilter
 }
 
+// Per checked files and deselected days (both memoized), so all components share one computation. The part that
+// only depends on the files is kept when (de)selecting days.
+const cache = new WeakMap<
+  ParsedStatsFile[],
+  { files: CheckedTransactions; byDays: WeakMap<Set<string>, StatsTransactions> }
+>()
+
 /**
- * The checked files as shown by the date explorer, the single source of the day filtered transactions, see
- * `getShownFiles`.
+ * Transactions of the checked parsed files, computed once for all components, see `getStatsTransactions`.
  */
-export const useShownFiles = () => {
-  const { checkedFiles } = useWorkspaceFiles()
+export const useStatsTransactions = () => {
+  const { selectedFiles } = useWorkspaceFiles()
   const { deselectedDays } = useWorkspaceDayFilter()
-  return useMemo(() => getShownFiles(checkedFiles, deselectedDays), [checkedFiles, deselectedDays])
+  let entry = cache.get(selectedFiles)
+
+  if (!entry) {
+    entry = { files: getCheckedTransactions(selectedFiles), byDays: new WeakMap() }
+    cache.set(selectedFiles, entry)
+  }
+
+  let stats = entry.byDays.get(deselectedDays)
+
+  if (!stats) {
+    stats = getStatsTransactions(entry.files, deselectedDays)
+    entry.byDays.set(deselectedDays, stats)
+  }
+
+  return stats
 }

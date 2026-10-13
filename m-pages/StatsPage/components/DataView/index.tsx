@@ -7,7 +7,6 @@ import { useLocalStorage } from 'usehooks-ts'
 
 import { MISC } from '@/common'
 import { FletchingDivider } from '@/components'
-import { getFileTransactions } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import {
@@ -15,14 +14,13 @@ import {
   getAmountFilterOptions,
   getEmptyReason,
   getFilteredCurrencies,
-  getTransactionCounts,
   getTransactionsLayoutOptions,
   groupFilesByCurrency,
   TransactionsLayout,
 } from '../../actions'
-import { useShownFiles, useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
+import { useStatsTransactions, useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
-import { useCurrencySelect } from '../../useCurrencySelect'
+import { ALL_CURRENCIES, useCurrencySelect } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import CsvPreview from '../CsvPreview'
@@ -56,16 +54,15 @@ const Component = () => {
   const searchQuery = toSearchQuery(useDeferredValue(search))
   const { includeDuplicates, setIncludeDuplicates, includeDateExcluded, setIncludeDateExcluded } = useTableOptions()
   const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
-  const { deselectedDays } = useWorkspaceDayFilter()
-  const { parsedFiles: shownParsedFiles } = useShownFiles()
+  const { all, unique, shown, count } = useStatsTransactions()
   // All transactions, those on days deselected in the date explorer are greyed out or hidden
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
-  const visibleParsedFiles = includeDateExcluded ? checkedParsedFiles : shownParsedFiles
+  const visible = includeDateExcluded ? unique : shown
   // The filters don't apply to the CSV view
   // Memoized, the view re-renders on each search keystroke
   const emptyReason = useMemo(
-    () => (isTransactions ? getEmptyReason(checkedParsedFiles, visibleParsedFiles, filter) : null),
-    [isTransactions, checkedParsedFiles, visibleParsedFiles, filter],
+    () => (isTransactions ? getEmptyReason(all, visible, filter) : null),
+    [isTransactions, all, visible, filter],
   )
   const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
   // The view's controls only apply to checked files
@@ -75,7 +72,7 @@ const Component = () => {
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // The combined table can be shown per currency, like the breakdown and stats views
   const filesByCurrency = useMemo(() => groupFilesByCurrency(checkedParsedFiles), [checkedParsedFiles])
-  const currencies = useMemo(() => getFilteredCurrencies(visibleParsedFiles, filter), [visibleParsedFiles, filter])
+  const currencies = useMemo(() => getFilteredCurrencies(visible, filter), [visible, filter])
   // Stable arrays per file for the split tables, as `TransactionsPreview` memoizes on `files`
   const splitFiles = useMemo(() => checkedFiles.map((file) => [file]), [checkedFiles])
   const {
@@ -92,10 +89,17 @@ const Component = () => {
     scrollElement: middleColumn,
     search: searchQuery,
   }
+  // Of the selected currency only, when one table per currency is shown
+  const countedCurrency = isPerCurrency && selectedCurrency !== ALL_CURRENCIES ? selectedCurrency : null
   const counts = useMemo(
     () =>
-      getTransactionCounts(filterTransactions(checkedParsedFiles.flatMap(getFileTransactions), filter), deselectedDays),
-    [checkedParsedFiles, filter, deselectedDays],
+      count(
+        filterTransactions(
+          countedCurrency ? all.filter((transaction) => transaction.currency === countedCurrency) : all,
+          filter,
+        ),
+      ),
+    [count, all, filter, countedCurrency],
   )
   // Only the combined table has duplicates
   const duplicateCount = isCombined && !isTransactionsSplit ? counts.duplicateCount : 0

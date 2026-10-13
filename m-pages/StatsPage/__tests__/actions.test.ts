@@ -1,21 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ParsedStatsFile, StatsFile, Transaction } from '@/types'
+import type { ParsedStatsFile, Transaction } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
 
 import {
   AmountFilter,
   EmptyReason,
   filterTransactions,
+  getCheckedTransactions,
   getDuplicates,
   getEmptyReason,
-  getShownFiles,
+  getStatsTransactions,
   getTransactionCounts,
   NO_CATEGORY,
 } from '../actions'
 
 const toTransaction = (date: string, value: string, category: string | null = null) =>
-  ({ id: `${date}-${value}`, date, value, category }) as Transaction
+  ({ id: `${date}-${value}`, date, value, category, currency: 'EUR' }) as Transaction
 
 const toFilter = (amount: AmountFilter, excludedCategories: string[] = []) => ({
   amount,
@@ -23,29 +24,36 @@ const toFilter = (amount: AmountFilter, excludedCategories: string[] = []) => ({
 })
 
 const toFile = (id: string, transactions: Transaction[]) =>
-  ({ id, status: StatsFileStatus.PARSED, sections: [{ transactions }] }) as unknown as ParsedStatsFile
+  ({
+    id,
+    status: StatsFileStatus.PARSED,
+    sections: [{ parserId: 'ing__current__1', transactions }],
+  }) as unknown as ParsedStatsFile
 
 const fileA = toFile('a', [
   toTransaction('2026-01-01T00:00:00+00:00', '10'),
   toTransaction('2026-01-02T00:00:00+00:00', '-5'),
 ])
 const fileB = toFile('b', [toTransaction('2026-01-02T00:00:00+00:00', '-3')])
-const unparsed = { id: 'c', status: StatsFileStatus.ERROR } as unknown as StatsFile
+describe('getStatsTransactions', () => {
+  it('should remove duplicates and the transactions on deselected days and count them', () => {
+    const overlapping = toFile('d', [toTransaction('2026-01-02T00:00:00+00:00', '-5')])
+    const checked = getCheckedTransactions([fileA, fileB, overlapping])
+    const stats = getStatsTransactions(checked, new Set(['2026-01-02', '2025-12-31']))
 
-describe('getShownFiles', () => {
-  it('should remove the transactions on deselected days and count them', () => {
-    const shown = getShownFiles([fileA, fileB, unparsed], new Set(['2026-01-02', '2025-12-31']))
-
-    expect(shown.checkedFiles).toHaveLength(3)
-    expect(shown.parsedFiles.map((file) => file.sections[0].transactions.length)).toEqual([1, 0])
-    expect(shown.allParsedFiles).toEqual([fileA, fileB])
+    expect(stats.all).toHaveLength(4)
+    expect(stats.unique).toHaveLength(3)
+    expect(stats.duplicates).toEqual(new Set(overlapping.sections[0].transactions))
+    expect(stats.shown).toEqual([fileA.sections[0].transactions[0]])
     // Only days of the files count, not stale ones
-    expect(shown.excludedDayCount).toBe(1)
+    expect(stats.excludedDayCount).toBe(1)
+    expect(stats.byCurrency.EUR?.shown).toEqual(stats.shown)
+    expect(stats.count(stats.all)).toEqual({ count: 1, dateExcludedCount: 2, duplicateCount: 0 })
   })
 
-  it('should keep the files as they are without deselected days', () => {
-    const checkedFiles = [fileA, unparsed]
-    expect(getShownFiles(checkedFiles, new Set()).checkedFiles).toBe(checkedFiles)
+  it('should keep the transactions as they are without deselected days', () => {
+    const checked = getCheckedTransactions([fileA])
+    expect(getStatsTransactions(checked, new Set()).shown).toBe(checked.unique)
   })
 })
 
@@ -71,17 +79,13 @@ describe('getTransactionCounts', () => {
 
 describe('getEmptyReason', () => {
   it('should tell deselected days from filters without matches', () => {
-    const noDates = getShownFiles([fileB], new Set(['2026-01-02']))
-    const all = getShownFiles([fileB], new Set())
+    const all = fileB.sections[0].transactions
 
-    expect(getEmptyReason(noDates.allParsedFiles, noDates.parsedFiles, toFilter(AmountFilter.ALL))).toBe(
-      EmptyReason.NO_DATES,
-    )
-    expect(getEmptyReason(all.allParsedFiles, all.parsedFiles, toFilter(AmountFilter.IN))).toBe(EmptyReason.NO_MATCHES)
-    expect(getEmptyReason(all.allParsedFiles, all.parsedFiles, toFilter(AmountFilter.OUT))).toBeNull()
-    expect(getEmptyReason(all.allParsedFiles, all.parsedFiles, toFilter(AmountFilter.OUT, [NO_CATEGORY]))).toBe(
-      EmptyReason.NO_MATCHES,
-    )
+    expect(getEmptyReason(all, [], toFilter(AmountFilter.ALL))).toBe(EmptyReason.NO_DATES)
+    expect(getEmptyReason(all, all, toFilter(AmountFilter.IN))).toBe(EmptyReason.NO_MATCHES)
+    expect(getEmptyReason(all, all, toFilter(AmountFilter.OUT))).toBeNull()
+    expect(getEmptyReason(all, all, toFilter(AmountFilter.OUT, [NO_CATEGORY]))).toBe(EmptyReason.NO_MATCHES)
+    expect(getEmptyReason([], [], toFilter(AmountFilter.ALL))).toBeNull()
   })
 })
 

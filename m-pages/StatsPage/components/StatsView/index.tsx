@@ -7,8 +7,8 @@ import { useMemo } from 'react'
 import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
-import { getAmountFilterOptions, getEmptyReason, getFilteredCurrencies, groupFilesByCurrency } from '../../actions'
-import { useShownFiles, useWorkspaceFiles } from '../../context'
+import { getAmountFilterOptions, getEmptyReason, getFilteredCurrencies } from '../../actions'
+import { useStatsTransactions, useWorkspaceFiles } from '../../context'
 import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import DropZoneDisplay from '../DropZoneDisplay'
@@ -25,17 +25,12 @@ import { ui } from './styled'
 const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
-  const { files } = useWorkspaceFiles()
-  const { parsedFiles: selectedFiles, allParsedFiles } = useShownFiles()
+  const { files, selectedFiles } = useWorkspaceFiles()
+  const { all, shown, byCurrency } = useStatsTransactions()
   const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
-  const emptyReason = useMemo(
-    () => getEmptyReason(allParsedFiles, selectedFiles, filter),
-    [allParsedFiles, selectedFiles, filter],
-  )
-  const filesByCurrency = useMemo(() => groupFilesByCurrency(selectedFiles), [selectedFiles])
-  const allFilesByCurrency = useMemo(() => groupFilesByCurrency(allParsedFiles), [allParsedFiles])
+  const emptyReason = useMemo(() => getEmptyReason(all, shown, filter), [all, shown, filter])
   // Only those with transactions left by the filters
-  const currencies = useMemo(() => getFilteredCurrencies(selectedFiles, filter), [selectedFiles, filter])
+  const currencies = useMemo(() => getFilteredCurrencies(shown, filter), [shown, filter])
   const { selected, setSelected, shownCurrencies } = useCurrencySelect(currencies)
 
   return (
@@ -67,8 +62,7 @@ const Component = () => {
               <CurrencyStats
                 key={currency}
                 currency={currency}
-                files={filesByCurrency[currency]}
-                allFiles={allFilesByCurrency[currency]}
+                transactions={byCurrency[currency]!}
                 chip={currencies.length > 1 ? currency : undefined}
               />
             ))}

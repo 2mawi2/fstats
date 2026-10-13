@@ -1,13 +1,11 @@
 import type { TFunction } from 'i18next'
 import { countBy, sumBy } from 'lodash'
 
-import type { ParentCategory, ParentCategoryCode, ParsedStatsFile, Transaction } from '@/types'
+import type { ParentCategory, ParentCategoryCode, Transaction } from '@/types'
 import { ALL_CATEGORIES, EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/common'
-import { getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 import { getCategoryLabel } from '@/utils/TransactionParser'
 
-import type { AmountFilter } from '../../actions'
-import { filterAmount, getCategoryKey, NO_CATEGORY } from '../../actions'
+import { getCategoryKey, NO_CATEGORY } from '../../actions'
 
 export type CategoryOption = {
   key: string
@@ -30,14 +28,6 @@ export type CategoryGroup = {
 }
 
 const KNOWN_KEYS = new Set(Object.values(ALL_CATEGORIES).flatMap((parent) => Object.keys(parent.subcategories)))
-
-/**
- * Transactions whose categories are offered: the counted ones (without duplicates, on selected days) of the shown
- * files, matching the amount filter.
- */
-export const getCategoryFilterTransactions = (shownFiles: ParsedStatsFile[], amount: AmountFilter) => {
-  return filterAmount(splitDuplicates(shownFiles.flatMap(getFileTransactions)).unique, amount)
-}
 
 const toParentOptions = (
   categories: Record<ParentCategoryCode, ParentCategory>,

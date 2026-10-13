@@ -5,7 +5,7 @@ import { Currency, StatsFileStatus } from '@/types-enums'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
 
-import { BreakdownPeriod, getPeriodKey, getProfitLoss, splitTransfers } from '../actions'
+import { BreakdownPeriod, getAccountTransactions, getPeriodKey, getProfitLoss, splitTransfers } from '../actions'
 
 const toTransaction = (
   day: string,
@@ -89,7 +89,7 @@ describe('getProfitLoss', () => {
       toFile('b', [{ parserId: 'comdirect__current__1', transactions: [groceries, groceriesFeb] }]),
     ]
 
-    const [profitLoss] = getProfitLoss(files, BreakdownPeriod.MONTH, i18n.t)
+    const [profitLoss] = getProfitLoss(getAccountTransactions(files), BreakdownPeriod.MONTH, i18n.t)
 
     expect(profitLoss.periods).toEqual(['2026-01', '2026-02'])
     expect(profitLoss.income.rows.map((row) => [row.key, row.total])).toEqual([['INC', '3000']])
@@ -122,9 +122,10 @@ describe('getProfitLoss', () => {
       ]),
     ]
 
-    expect(getProfitLoss(files, BreakdownPeriod.YEAR, i18n.t).map((profitLoss) => profitLoss.currency)).toEqual([
-      Currency.EUR,
-      Currency.ZAR,
-    ])
+    expect(
+      getProfitLoss(getAccountTransactions(files), BreakdownPeriod.YEAR, i18n.t).map(
+        (profitLoss) => profitLoss.currency,
+      ),
+    ).toEqual([Currency.EUR, Currency.ZAR])
   })
 })

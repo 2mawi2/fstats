@@ -1,21 +1,16 @@
-import type { ParsedStatsFile } from '@/types'
 import type { Currency } from '@/types-enums'
-import { getFileTransactions, splitDuplicates } from '@/m-stats-file/service'
 
-import { filterDays, getTransactionCounts, groupFilesByCurrency } from '../../actions'
+import type { StatsTransactions, TransactionFilter } from '../../actions'
+import { filterTransactions } from '../../actions'
 
 /**
- * Transactions of the files (before the date explorer) without duplicates and those on deselected days, grouped by
+ * Transactions matching the filter (without duplicates and those on deselected days) and their counts, grouped by
  * currency, as amounts in different currencies can't be summed up.
  */
-export const getTransactionsByCurrency = (files: ParsedStatsFile[], deselectedDays: Set<string>) => {
-  return Object.entries(groupFilesByCurrency(files)).map(([currency, currencyFiles]) => {
-    const transactions = currencyFiles.flatMap(getFileTransactions)
-
-    return {
-      currency: currency as Currency,
-      transactions: filterDays(splitDuplicates(transactions).unique, deselectedDays),
-      counts: getTransactionCounts(transactions, deselectedDays),
-    }
-  })
+export const getTransactionsByCurrency = ({ byCurrency, count }: StatsTransactions, filter: TransactionFilter) => {
+  return Object.entries(byCurrency).map(([currency, { all, shown }]) => ({
+    currency: currency as Currency,
+    transactions: filterTransactions(shown, filter),
+    counts: count(filterTransactions(all, filter)),
+  }))
 }

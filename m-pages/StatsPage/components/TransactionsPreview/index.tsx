@@ -96,7 +96,16 @@ const Component = ({
     () => (includeDuplicates ? allTransactions : allTransactions.filter((transaction) => !transaction.isDuplicate)),
     [allTransactions, includeDuplicates],
   )
-  const counts = useMemo(() => getTransactionCounts(allTransactions, deselectedDays), [allTransactions, deselectedDays])
+  // Duplicates are already marked, no need to look for them again
+  const counts = useMemo(
+    () =>
+      getTransactionCounts(
+        allTransactions,
+        deselectedDays,
+        new Set(allTransactions.filter((transaction) => transaction.isDuplicate)),
+      ),
+    [allTransactions, deselectedDays],
+  )
   const dayTransactions = useMemo(
     () =>
       includeDateExcluded
