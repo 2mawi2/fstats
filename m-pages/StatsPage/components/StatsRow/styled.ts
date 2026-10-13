@@ -35,10 +35,12 @@ export const ui = () => {
       lineHeight: '18px',
       color: 'text.secondary',
     },
+    // Greyed out like the transactions on deselected days in the table
     dateFiltered: {
       flexShrink: 0,
       fontSize: 15,
-      color: 'text.secondary',
+      color: 'text.primary',
+      opacity: 0.4,
     },
     balance: {
       flexShrink: 0,

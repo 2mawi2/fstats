@@ -1,9 +1,10 @@
 'use client'
 
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 
 import { useFileHelper } from '@/hooks'
 
+import { getShownFiles } from './actions'
 import type { DayFilter } from './useDayFilter'
 
 type WorkspaceContextValue = {
@@ -43,4 +44,14 @@ export const useWorkspaceFiles = () => {
  */
 export const useWorkspaceDayFilter = () => {
   return useWorkspace().dayFilter
+}
+
+/**
+ * The checked files as shown by the date explorer, the single source of the day filtered transactions, see
+ * `getShownFiles`.
+ */
+export const useShownFiles = () => {
+  const { checkedFiles } = useWorkspaceFiles()
+  const { deselectedDays } = useWorkspaceDayFilter()
+  return useMemo(() => getShownFiles(checkedFiles, deselectedDays), [checkedFiles, deselectedDays])
 }

@@ -6,14 +6,8 @@ import { Box, Divider, Stack } from '@mui/material'
 import { useTransactionHelper, useUserPreferences } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
-import {
-  filterTransactions,
-  getAmountFilterOptions,
-  getCurrency,
-  getEmptyReason,
-  getExcludedDayCount,
-} from '../../actions'
-import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
+import { filterTransactions, getAmountFilterOptions, getCurrency, getEmptyReason } from '../../actions'
+import { useShownFiles, useWorkspaceFiles } from '../../context'
 import { useAmountFilter } from '../../useAmountFilter'
 import BalanceChart from '../BalanceChart'
 import CategoryBreakdown from '../CategoryBreakdown'
@@ -33,9 +27,9 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { locale, dateFormat } = useUserPreferences()
-  const { files, selectedFiles } = useWorkspaceFiles()
+  const { files } = useWorkspaceFiles()
+  const { parsedFiles: selectedFiles, allParsedFiles, deselectedDays, excludedDayCount } = useShownFiles()
   const [amountFilter, setAmountFilter] = useAmountFilter()
-  const { deselectedDays } = useWorkspaceDayFilter()
   const { transactions, transactionRangeItems } = useTransactionHelper({
     files: selectedFiles,
     locale,
@@ -44,7 +38,7 @@ const Component = () => {
     excludedDays: deselectedDays,
   })
   const currency = getCurrency(transactions)
-  const emptyReason = getEmptyReason(selectedFiles, amountFilter, deselectedDays)
+  const emptyReason = getEmptyReason(allParsedFiles, selectedFiles, amountFilter)
 
   return (
     <>
@@ -71,10 +65,7 @@ const Component = () => {
         ) : (
           <Stack divider={<Divider flexItem />}>
             <Box sx={sx.section}>
-              <BalanceChart
-                transactionRangeItems={transactionRangeItems}
-                excludedDayCount={getExcludedDayCount(selectedFiles, deselectedDays)}
-              />
+              <BalanceChart transactionRangeItems={transactionRangeItems} excludedDayCount={excludedDayCount} />
             </Box>
 
             <Box sx={sx.section}>

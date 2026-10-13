@@ -191,14 +191,55 @@ export const filterDays = <T extends Transaction>(transactions: T[], deselectedD
 }
 
 /**
- * Transactions shown by the amount filter and the date explorer.
+ * A parsed file with only its transactions on selected days.
  */
-export const filterShown = <T extends Transaction>(
-  transactions: T[],
-  amountFilter: AmountFilter,
-  deselectedDays: Set<string>,
-) => {
-  return filterDays(filterTransactions(transactions, amountFilter), deselectedDays)
+const filterFileDays = (file: ParsedStatsFile, deselectedDays: Set<string>): ParsedStatsFile => {
+  return {
+    ...file,
+    sections: file.sections.map((section) => ({
+      ...section,
+      transactions: filterDays(section.transactions, deselectedDays),
+    })),
+  }
+}
+
+/**
+ * The checked files as shown by the date explorer: parsed files only with their transactions on selected days, see
+ * `useShownFiles`.
+ */
+export const getShownFiles = (checkedFiles: StatsFile[], deselectedDays: Set<string>) => {
+  const allParsedFiles = checkedFiles.filter(isParsed)
+  const shownCheckedFiles = deselectedDays.size
+    ? checkedFiles.map((file) => (isParsed(file) ? filterFileDays(file, deselectedDays) : file))
+    : checkedFiles
+  const excludedCounts = new Map(
+    allParsedFiles.map((file) => [
+      file.id,
+      getFileTransactions(file).filter((t) => deselectedDays.has(getTransactionDay(t))).length,
+    ]),
+  )
+  const days = new Set(allParsedFiles.flatMap(getFileTransactions).map(getTransactionDay))
+
+  return {
+    /**
+     * Checked files, parsed ones without the transactions on deselected days.
+     */
+    checkedFiles: shownCheckedFiles,
+    parsedFiles: shownCheckedFiles.filter(isParsed),
+    /**
+     * The checked parsed files with all their transactions.
+     */
+    allParsedFiles,
+    deselectedDays,
+    /**
+     * Days with transactions of the checked files that are deselected.
+     */
+    excludedDayCount: [...days].filter((day) => deselectedDays.has(day)).length,
+    /**
+     * Transactions of a checked file on deselected days.
+     */
+    getExcludedCount: (fileId: string) => excludedCounts.get(fileId) ?? 0,
+  }
 }
 
 export const EmptyReason = {
@@ -209,42 +250,32 @@ export const EmptyReason = {
 export type EmptyReason = (typeof EmptyReason)[keyof typeof EmptyReason]
 
 /**
- * Why the amount and day filters leave no transactions of the files, `null` if some are left (or the files have none).
+ * Why the date explorer (`allFiles` vs `shownFiles`) or the amount filter leave no transactions, `null` if some are
+ * left (or the files have none).
  */
-export const getEmptyReason = (files: ParsedStatsFile[], amountFilter: AmountFilter, deselectedDays: Set<string>) => {
-  const allTransactions = files.flatMap(getFileTransactions)
-  const dayTransactions = filterDays(allTransactions, deselectedDays)
+export const getEmptyReason = (
+  allFiles: ParsedStatsFile[],
+  shownFiles: ParsedStatsFile[],
+  amountFilter: AmountFilter,
+) => {
+  const shownTransactions = shownFiles.flatMap(getFileTransactions)
 
-  if (!allTransactions.length) {
+  if (!allFiles.some((file) => getFileTransactions(file).length)) {
     return null
   }
 
-  if (!dayTransactions.length) {
+  if (!shownTransactions.length) {
     return EmptyReason.NO_DATES
   }
 
-  return filterTransactions(dayTransactions, amountFilter).length ? null : EmptyReason.NO_MATCHES
+  return filterTransactions(shownTransactions, amountFilter).length ? null : EmptyReason.NO_MATCHES
 }
 
 /**
- * Days with transactions of the files that are deselected in the date explorer.
+ * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount filter.
  */
-export const getExcludedDayCount = (files: ParsedStatsFile[], deselectedDays: Set<string>) => {
-  const days = new Set(files.flatMap(getFileTransactions).map(getTransactionDay))
-  return [...days].filter((day) => deselectedDays.has(day)).length
-}
-
-/**
- * Transactions that are also in an earlier file (e.g. overlapping statements), of those shown by the amount and day
- * filters.
- */
-export const getDuplicateCount = (
-  files: ParsedStatsFile[],
-  amountFilter: AmountFilter,
-  deselectedDays: Set<string>,
-) => {
-  return splitDuplicates(filterShown(files.flatMap(getFileTransactions), amountFilter, deselectedDays)).duplicates
-    .length
+export const getDuplicateCount = (files: ParsedStatsFile[], amountFilter: AmountFilter) => {
+  return splitDuplicates(filterTransactions(files.flatMap(getFileTransactions), amountFilter)).duplicates.length
 }
 
 // TODO: Once we have currency conversion logic, convert files with different currencies

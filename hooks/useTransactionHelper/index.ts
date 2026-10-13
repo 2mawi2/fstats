@@ -5,7 +5,6 @@ import { parseISO } from 'date-fns'
 import { ParsedStatsFile, Transaction, TransactionRangeItem } from '@/types'
 import { DateFormat, UserLocale } from '@/types-enums'
 import { splitDuplicates } from '@/m-stats-file/service'
-import { getTransactionDay } from '@/utils/Date'
 
 import { getTransactionRangeItems, getTransactionsDateRange } from './helper'
 
@@ -26,7 +25,7 @@ export const useTransactionHelper = ({
    */
   filterTransactions?: (transactions: Transaction[]) => Transaction[]
   /**
-   * Days (`yyyy-MM-dd`) whose transactions are removed, shown as gaps.
+   * Days (`yyyy-MM-dd`) whose transactions were removed from `files`, shown as gaps.
    */
   excludedDays?: Set<string>
 }): {
@@ -34,10 +33,7 @@ export const useTransactionHelper = ({
   transactionRangeItems: TransactionRangeItem[]
 } => {
   const allTransactions = files.flatMap((file) => file.sections).flatMap((section) => section.transactions)
-  const filteredTransactions = filterTransactions(splitDuplicates(allTransactions).unique)
-  const transactions = excludedDays?.size
-    ? filteredTransactions.filter((transaction) => !excludedDays.has(getTransactionDay(transaction)))
-    : filteredTransactions
+  const transactions = filterTransactions(splitDuplicates(allTransactions).unique)
 
   if (!transactions.length) {
     return {

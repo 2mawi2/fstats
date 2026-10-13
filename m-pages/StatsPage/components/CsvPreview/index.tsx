@@ -50,7 +50,7 @@ const Component = ({ file, scrollElement }: CsvPreviewProps) => {
             key={index}
             title={data.length > 1 && accountName ? `${file.file.name} (${accountName})` : file.file.name}
             file={file}
-            rowCount={rows.length}
+            caption={t('STATS_PAGE.DATA_VIEW.ROW_COUNT', { count: rows.length })}
           >
             <VirtualTable
               columns={header?.map((label) => ({ label })) ?? null}

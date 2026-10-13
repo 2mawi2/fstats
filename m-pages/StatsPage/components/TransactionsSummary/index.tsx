@@ -9,15 +9,18 @@ import { getTransactionsByCurrency } from './actions'
 type TransactionsSummaryProps = {
   files: ParsedStatsFile[]
   includeDuplicates: boolean
-  deselectedDays: Set<string>
+  /**
+   * Before the date explorer, see `useShownFiles`.
+   */
+  allFiles: ParsedStatsFile[]
 }
 
 /**
  * Combined stats of all files, one row per currency.
  */
-const Component = ({ files, includeDuplicates, deselectedDays }: TransactionsSummaryProps) => {
+const Component = ({ files, allFiles, includeDuplicates }: TransactionsSummaryProps) => {
   const { t } = useTranslation()
-  const groups = getTransactionsByCurrency(files, includeDuplicates, deselectedDays)
+  const groups = getTransactionsByCurrency(files, allFiles, includeDuplicates)
 
   return groups.map(({ currency, transactions, duplicateCount, dateExcludedCount }) => (
     <StatsRow

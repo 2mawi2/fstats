@@ -10,19 +10,19 @@ import { useUserPreferences } from '@/hooks'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 
-import { filterDays, getFileAccount, getFileFormat, getFileNameColor } from '../../actions'
+import { getFileAccount, getFileFormat, getFileNameColor } from '../../actions'
 import StatsRow from '../StatsRow'
 import { ui } from './styled'
 
 type FileDetailsProps = {
   file: StatsFile
   /**
-   * Days deselected in the date explorer.
+   * Transactions on days deselected in the date explorer, `file` is without them.
    */
-  deselectedDays: Set<string>
+  dateExcludedCount: number
 }
 
-const Component = ({ file, deselectedDays }: FileDetailsProps) => {
+const Component = ({ file, dateExcludedCount }: FileDetailsProps) => {
   const sx = ui()
   const { locale } = useUserPreferences()
 
@@ -56,15 +56,12 @@ const Component = ({ file, deselectedDays }: FileDetailsProps) => {
     )
   }
 
-  const fileTransactions = isParsed(file) ? getFileTransactions(file) : []
-  const transactions = filterDays(fileTransactions, deselectedDays)
-
   return (
     <StatsRow
       title={file.file.name}
       titleColor={getFileNameColor(file)}
-      stats={isParsed(file) ? { transactions, currency: getFileCurrency(file) } : null}
-      dateExcludedCount={fileTransactions.length - transactions.length}
+      stats={isParsed(file) ? { transactions: getFileTransactions(file), currency: getFileCurrency(file) } : null}
+      dateExcludedCount={dateExcludedCount}
     >
       <Box sx={sx.info}>
         {renderAccount()}

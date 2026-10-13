@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { useTranslation } from '@/lib/i18n'
 
-import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
+import { useShownFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
 import FileDetails from '../FileDetails'
 import StatsCard from '../StatsCard'
@@ -23,8 +23,7 @@ type FileSidebarProps = {
 const Component = ({ includeDuplicates }: FileSidebarProps) => {
   const sx = ui()
   const { t } = useTranslation()
-  const { checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
-  const { deselectedDays } = useWorkspaceDayFilter()
+  const { checkedFiles, parsedFiles: checkedParsedFiles, allParsedFiles, getExcludedCount } = useShownFiles()
   // The summary is only a placeholder, the filters don't apply to the CSV view
   const isCsv = getView(useSearchParams()) === WorkspaceView.CSV
   const csvTitle = t('STATS_PAGE.CSV_DISABLED')
@@ -44,7 +43,7 @@ const Component = ({ includeDuplicates }: FileSidebarProps) => {
               <TransactionsSummary
                 files={checkedParsedFiles}
                 includeDuplicates={includeDuplicates}
-                deselectedDays={deselectedDays}
+                allFiles={allParsedFiles}
               />
             </StatsCard>
           )}
@@ -55,7 +54,7 @@ const Component = ({ includeDuplicates }: FileSidebarProps) => {
       ) : null}
       <StatsCard>
         {checkedFiles.map((file) => (
-          <FileDetails key={file.id} file={file} deselectedDays={deselectedDays} />
+          <FileDetails key={file.id} file={file} dateExcludedCount={getExcludedCount(file.id)} />
         ))}
       </StatsCard>
     </>

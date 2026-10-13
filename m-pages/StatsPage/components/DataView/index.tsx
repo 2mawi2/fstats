@@ -15,7 +15,7 @@ import {
   getTransactionsLayoutOptions,
   TransactionsLayout,
 } from '../../actions'
-import { useWorkspaceDayFilter, useWorkspaceFiles } from '../../context'
+import { useWorkspaceFiles } from '../../context'
 import { getView, WorkspaceView } from '../../params'
 import { useAmountFilter } from '../../useAmountFilter'
 import CsvPreview from '../CsvPreview'
@@ -45,10 +45,10 @@ const Component = () => {
     initializeWithValue: false,
   })
   const [amountFilter, setAmountFilter] = useAmountFilter()
-  const { deselectedDays } = useWorkspaceDayFilter()
+  // All transactions, those on days deselected in the date explorer are greyed out rather than removed
   const { files, checkedFiles, selectedFiles: checkedParsedFiles } = useWorkspaceFiles()
   // The filters don't apply to the CSV view
-  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, amountFilter, deselectedDays) : null
+  const emptyReason = isTransactions ? getEmptyReason(checkedParsedFiles, checkedParsedFiles, amountFilter) : null
   const isEmpty = !files.length || !checkedFiles.length || !!emptyReason
   // The view's controls only apply to checked files
   const isTransactionsView = checkedFiles.length > 0 && isTransactions
@@ -56,8 +56,7 @@ const Component = () => {
   const isCombined = checkedParsedFiles.length > 1
   const isTransactionsSplit = isCombined && transactionsLayout === TransactionsLayout.SPLIT
   // Only the combined table has duplicates
-  const duplicateCount =
-    isCombined && !isTransactionsSplit ? getDuplicateCount(checkedParsedFiles, amountFilter, deselectedDays) : 0
+  const duplicateCount = isCombined && !isTransactionsSplit ? getDuplicateCount(checkedParsedFiles, amountFilter) : 0
 
   return (
     <>
@@ -115,7 +114,6 @@ const Component = () => {
                   key={file.id}
                   files={[file]}
                   amountFilter={amountFilter}
-                  deselectedDays={deselectedDays}
                   includeDuplicates={includeDuplicates}
                   scrollElement={middleColumn}
                 />
@@ -124,7 +122,6 @@ const Component = () => {
               <TransactionsPreview
                 files={checkedFiles}
                 amountFilter={amountFilter}
-                deselectedDays={deselectedDays}
                 includeDuplicates={includeDuplicates}
                 scrollElement={middleColumn}
               />
