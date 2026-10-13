@@ -3,9 +3,8 @@
 import { Box } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { useDeferredValue, useMemo, useState } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 
-import { getView, MISC, WorkspaceView } from '@/common'
+import { getView, WorkspaceView } from '@/common'
 import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
@@ -42,15 +41,17 @@ const Component = () => {
   // State rather than a ref, so the previews re-render once the scroll element exists
   const [middleColumn, setMiddleColumn] = useState<HTMLDivElement | null>(null)
   const isTransactions = getView(useSearchParams()) === WorkspaceView.TRANSACTIONS
-  const [transactionsLayout, setTransactionsLayout] = useLocalStorage<TransactionsLayout>(
-    MISC.LS_STATS_TRANSACTIONS_LAYOUT_KEY,
-    TransactionsLayout.COMBINED,
-    { initializeWithValue: false },
-  )
   // Kept when switching between the CSV and transactions views. Deferred, so typing stays responsive with many rows.
   const [search, setSearch] = useState('')
   const searchQuery = toSearchQuery(useDeferredValue(search))
-  const { includeDuplicates, setIncludeDuplicates, includeDateExcluded, setIncludeDateExcluded } = useTableOptions()
+  const {
+    transactionsLayout,
+    setTransactionsLayout,
+    includeDuplicates,
+    setIncludeDuplicates,
+    includeDateExcluded,
+    setIncludeDateExcluded,
+  } = useTableOptions()
   const { filter, amountFilter, setAmountFilter } = useTransactionFilter()
   const { all, unique, shown, count } = useStatsTransactions()
   // All transactions, those on days deselected in the date explorer are greyed out or hidden

@@ -4,10 +4,8 @@ import { ReceiptLongOutlined } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
 import { mapValues } from 'lodash'
 import { useMemo } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
 
 import type { Currency } from '@/types-enums'
-import { MISC } from '@/common'
 import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
@@ -20,13 +18,14 @@ import {
   isMissingData,
 } from '../../actions'
 import { useStatsTransactions, useWorkspaceFiles } from '../../context'
+import { useBreakdownPeriod } from '../../useBreakdownPeriod'
 import { useCurrencySelect } from '../../useCurrencySelect'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import PreviewSection from '../PreviewSection'
 import SegmentedToggle from '../SegmentedToggle'
 import ViewEmptyState from '../ViewEmptyState'
 import ViewToolbar from '../ViewToolbar'
-import { BreakdownPeriod, getAccountTransactions, getBreakdownPeriodOptions, getProfitLoss } from './actions'
+import { getAccountTransactions, getBreakdownPeriodOptions, getProfitLoss } from './actions'
 import { ProfitLossTable } from './components'
 import { ui } from './styled'
 
@@ -38,11 +37,7 @@ const Component = () => {
   const { t } = useTranslation()
   const { files, checkedFiles, selectedFiles } = useWorkspaceFiles()
   const { all, unique, shown, byCurrency, deselectedDays, count } = useStatsTransactions()
-  const [period, setPeriod] = useLocalStorage<BreakdownPeriod>(
-    MISC.LS_STATS_BREAKDOWN_PERIOD_KEY,
-    BreakdownPeriod.MONTH,
-    { initializeWithValue: false },
-  )
+  const { period, setPeriod } = useBreakdownPeriod()
   // Income and expenses are both part of it, so the amount filter doesn't apply
   const { categoryFilter: filter } = useTransactionFilter()
   const emptyReason = useMemo(
