@@ -4,11 +4,11 @@ import { Box, List, Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 import { useRef } from 'react'
 
+import { getView, WorkspaceView } from '@/common'
 import { useResizeHandle, useStatsLayout } from '@/hooks'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace, useWorkspaceFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
 import DateExplorer from '../DateExplorer'
 import DateSkeleton from '../DateSkeleton'
 import FileRow from '../FileRow'

@@ -37,7 +37,7 @@ const Component = () => {
   const sx = ui()
   const { t } = useTranslation()
   const { files, checkedFiles, selectedFiles } = useWorkspaceFiles()
-  const { all, shown, byCurrency, deselectedDays, count } = useStatsTransactions()
+  const { all, unique, shown, byCurrency, deselectedDays, count } = useStatsTransactions()
   const [period, setPeriod] = useLocalStorage<BreakdownPeriod>(
     MISC.LS_STATS_BREAKDOWN_PERIOD_KEY,
     BreakdownPeriod.MONTH,
@@ -59,7 +59,7 @@ const Component = () => {
     [byCurrency, count, filter],
   )
   // With the bank account of their section, only depends on the files
-  const accountTransactions = useMemo(() => getAccountTransactions(selectedFiles), [selectedFiles])
+  const accountTransactions = useMemo(() => getAccountTransactions(selectedFiles, unique), [selectedFiles, unique])
   const profitLosses = useMemo(
     () =>
       getProfitLoss(accountTransactions, period, t, (transactions) =>

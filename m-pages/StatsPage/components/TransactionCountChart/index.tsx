@@ -4,7 +4,8 @@ import { Box } from '@mui/material'
 
 import type { Transaction } from '@/types'
 import { LineChart } from '@/components'
-import { useIsDarkMode, useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
+import { useIsDarkMode } from '@/hooks'
 import { getAreaFill, getThemeColor } from '@/utils/Chart'
 import { useTranslation } from '@/lib/i18n'
 

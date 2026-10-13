@@ -6,7 +6,7 @@ import { useMemo } from 'react'
 
 import type { StatsFile } from '@/types'
 import { isParsed } from '@/m-stats-file/service'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { getTransactionDay } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 

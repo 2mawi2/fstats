@@ -235,6 +235,18 @@
     },
     "PREFERENCES": {
       "TITLE": "Präferenzen"
+    },
+    "LANGUAGE_SWITCHER": {
+      "LANGUAGE": "Sprache",
+      "CHANGE_LANGUAGE": "Sprache ändern",
+      "LOCALE_EN_LANGUAGE_EN": "English",
+      "LOCALE_EN_LANGUAGE_DE": "Englisch",
+      "LOCALE_DE_LANGUAGE_EN": "German",
+      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
+    },
+    "DATE_FORMAT_SWITCHER": {
+      "TITLE": "Datumsformat",
+      "CHANGE_DATE_FORMAT": "Datumsformat ändern"
     }
   },
   "ABOUT_PAGE": {
@@ -257,18 +269,6 @@
       "THEME_LIGHT": "Hell",
       "THEME_DARK": "Dunkel",
       "THEME_SYSTEM": "System"
-    },
-    "LANGUAGE_SWITCHER": {
-      "LANGUAGE": "Sprache",
-      "CHANGE_LANGUAGE": "Sprache ändern",
-      "LOCALE_EN_LANGUAGE_EN": "English",
-      "LOCALE_EN_LANGUAGE_DE": "Englisch",
-      "LOCALE_DE_LANGUAGE_EN": "German",
-      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
-    },
-    "DATE_FORMAT_SWITCHER": {
-      "TITLE": "Datumsformat",
-      "CHANGE_DATE_FORMAT": "Datumsformat ändern"
     }
   }
 }

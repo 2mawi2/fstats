@@ -7,7 +7,7 @@ import { Fragment, useState } from 'react'
 
 import type { NumberString } from '@/types'
 import { MISC } from '@/common'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { getCurrencySymbol } from '@/utils/Currency'
 import { toDisplayDate } from '@/utils/Date'
 import { toFixedLocale, toFixedLocaleAmount } from '@/utils/Number'

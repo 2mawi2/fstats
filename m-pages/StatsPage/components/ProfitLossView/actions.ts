@@ -4,7 +4,6 @@ import { groupBy, sortBy } from 'lodash'
 import type { CategoryCode, NumberString, ParsedStatsFile, Transaction } from '@/types'
 import type { Currency, UserLocale } from '@/types-enums'
 import { EXPENSE_CATEGORIES } from '@/common'
-import { splitDuplicates } from '@/m-stats-file/service'
 import { getCategoryLabel, getParentCategoryCode } from '@/utils/Category'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import type { BankAccountId } from '@/utils/Parser'
@@ -44,19 +43,18 @@ const DAY_MS = 24 * 60 * 60 * 1000
 type AccountTransaction = Transaction & { bankAccountId: BankAccountId }
 
 /**
- * Transactions of the files without duplicates, with the bank account of their section.
+ * The transactions (e.g. `StatsTransactions.unique`) with the bank account of their section in the files.
  */
-export const getAccountTransactions = (files: ParsedStatsFile[]): AccountTransaction[] => {
-  const transactions = files.flatMap((file) =>
-    file.sections.flatMap((section) =>
-      section.transactions.map((transaction) => ({
-        ...transaction,
-        bankAccountId: getBankAccountId(section.parserId),
-      })),
+export const getAccountTransactions = (files: ParsedStatsFile[], transactions: Transaction[]): AccountTransaction[] => {
+  const bankAccountIds = new Map(
+    files.flatMap((file) =>
+      file.sections.flatMap((section) =>
+        section.transactions.map((transaction) => [transaction, getBankAccountId(section.parserId)] as const),
+      ),
     ),
   )
 
-  return splitDuplicates(transactions).unique
+  return transactions.map((transaction) => ({ ...transaction, bankAccountId: bankAccountIds.get(transaction)! }))
 }
 
 const getDayDiff = (a: Transaction, b: Transaction) => {
@@ -241,7 +239,7 @@ export type ProfitLoss = {
 }
 
 /**
- * Income statement of the transactions (without duplicates, see `getAccountTransactions`) per period, one per currency
+ * Income statement of the transactions (without duplicates, e.g. `StatsTransactions.unique`) per period, one per currency
  * as amounts in different currencies can't be summed up. Transfers between own accounts are excluded from it, but
  * listed separately. Transfers are paired before `filter` (e.g. the category and day filters) is applied, so excluding
  * one side of a transfer doesn't turn the other side into income or an expense.

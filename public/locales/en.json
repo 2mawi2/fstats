@@ -235,6 +235,18 @@
     },
     "PREFERENCES": {
       "TITLE": "Preferences"
+    },
+    "LANGUAGE_SWITCHER": {
+      "LANGUAGE": "Language",
+      "CHANGE_LANGUAGE": "Change language",
+      "LOCALE_EN_LANGUAGE_EN": "English",
+      "LOCALE_EN_LANGUAGE_DE": "Englisch",
+      "LOCALE_DE_LANGUAGE_EN": "German",
+      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
+    },
+    "DATE_FORMAT_SWITCHER": {
+      "TITLE": "Date format",
+      "CHANGE_DATE_FORMAT": "Change date format"
     }
   },
   "ABOUT_PAGE": {
@@ -257,18 +269,6 @@
       "THEME_LIGHT": "Light",
       "THEME_DARK": "Dark",
       "THEME_SYSTEM": "System"
-    },
-    "LANGUAGE_SWITCHER": {
-      "LANGUAGE": "Language",
-      "CHANGE_LANGUAGE": "Change language",
-      "LOCALE_EN_LANGUAGE_EN": "English",
-      "LOCALE_EN_LANGUAGE_DE": "Englisch",
-      "LOCALE_DE_LANGUAGE_EN": "German",
-      "LOCALE_DE_LANGUAGE_DE": "Deutsch"
-    },
-    "DATE_FORMAT_SWITCHER": {
-      "TITLE": "Date format",
-      "CHANGE_DATE_FORMAT": "Change date format"
     }
   }
 }

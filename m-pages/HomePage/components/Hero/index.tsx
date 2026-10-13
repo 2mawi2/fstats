@@ -4,49 +4,43 @@ import { Box, Button, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import Link from 'next/link'
 
-import { ROUTES } from '@/common'
-import { getDemoHref, WorkspaceView } from '@/m-pages/StatsPage/params'
-import { useIsDarkMode, useIsMobile } from '@/hooks'
+import { getDemoHref, ROUTES, WorkspaceView } from '@/common'
+import { useIsMobile } from '@/hooks'
 import { Trans, useTranslation } from '@/lib/i18n'
 
 import { ui } from './styled'
 
-type HeroProps = {
-  titleKey: string
-  subtitle: string
-  ctaLabel: string
-}
-
 /**
  * Logo, title with accent, subtitle and the "get started" / demo buttons.
  */
-const Component = ({ titleKey, subtitle, ctaLabel }: HeroProps) => {
+const Component = () => {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
-  const isDarkMode = useIsDarkMode()
   const theme = useTheme()
   const sx = ui(theme, isMobile)
 
   return (
     <Box sx={sx.hero}>
-      <Box component="img" src={isDarkMode ? '/img/logo-dark.svg' : '/img/logo.svg'} alt="fstats" sx={sx.logo} />
+      {/* Both, switched via CSS, so there's no flash before the colour scheme is known */}
+      <Box component="img" src="/img/logo.svg" alt="fstats" sx={sx.logo} />
+      <Box component="img" src="/img/logo-dark.svg" alt="fstats" sx={sx.logoDark} />
 
       <Typography variant="h1" sx={sx.title}>
-        <Trans i18nKey={titleKey} components={{ accent: <Box component="span" sx={sx.titleAccent} /> }} />
+        <Trans i18nKey="HOME_PAGE.HERO_TITLE" components={{ accent: <Box component="span" sx={sx.titleAccent} /> }} />
       </Typography>
 
       <Typography variant="body1" component="p" sx={sx.subtitle}>
-        {subtitle}
+        {t('HOME_PAGE.HERO_SUBTITLE')}
       </Typography>
 
       <Box sx={sx.buttons}>
         <Button component={Link} href={ROUTES.STATS} variant="contained" size="large" sx={sx.ctaButton}>
-          {ctaLabel}
+          {t('HOME_PAGE.GET_STARTED')}
         </Button>
 
         <Button
           component={Link}
-          href={getDemoHref(undefined, WorkspaceView.STATS)}
+          href={getDemoHref({ view: WorkspaceView.STATS })}
           variant="outlined"
           size="large"
           sx={sx.demoButton}

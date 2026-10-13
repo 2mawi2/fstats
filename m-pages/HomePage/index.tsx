@@ -21,11 +21,7 @@ const Page = () => {
 
   return (
     <PageWrapper>
-      <Hero
-        titleKey="HOME_PAGE.HERO_TITLE"
-        subtitle={t('HOME_PAGE.HERO_SUBTITLE')}
-        ctaLabel={t('HOME_PAGE.GET_STARTED')}
-      />
+      <Hero />
 
       <Box component="ul" sx={sx.badges}>
         {BADGES.map(({ Icon, key }) => (

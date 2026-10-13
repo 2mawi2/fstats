@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { useDeferredValue, useMemo, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC } from '@/common'
+import { getView, MISC, WorkspaceView } from '@/common'
 import { FletchingDivider } from '@/components'
 import { useTranslation } from '@/lib/i18n'
 
@@ -20,7 +20,6 @@ import {
   TransactionsLayout,
 } from '../../actions'
 import { useStatsTransactions, useWorkspaceFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
 import { ALL_CURRENCIES, useCurrencySelect } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'
 import { useTransactionFilter } from '../../useTransactionFilter'

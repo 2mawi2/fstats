@@ -3,10 +3,10 @@
 import { Box, Typography } from '@mui/material'
 import { useSearchParams } from 'next/navigation'
 
+import { getView, WorkspaceView } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspaceFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
 import { useTransactionFilter } from '../../useTransactionFilter'
 import FileDetails from '../FileDetails'
 import StatsCard from '../StatsCard'

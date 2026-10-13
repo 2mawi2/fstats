@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material'
 
 import type { Transaction } from '@/types'
 import type { Currency } from '@/types-enums'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { toFixedLocaleCurrency } from '@/utils/Number'
 import { getStats } from '@/utils/Stats'
 import { useTranslation } from '@/lib/i18n'

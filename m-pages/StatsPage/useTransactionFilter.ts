@@ -4,11 +4,10 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { MISC } from '@/common'
+import { getView, MISC, WorkspaceView } from '@/common'
 
 import type { TransactionFilter } from './actions'
 import { AmountFilter } from './actions'
-import { getView, WorkspaceView } from './params'
 
 const NO_CATEGORIES = new Set<string>()
 

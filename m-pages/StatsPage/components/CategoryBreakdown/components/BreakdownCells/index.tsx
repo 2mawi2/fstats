@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles'
 
 import type { GradientColorsLightDark, NumberString } from '@/types'
 import { Currency } from '@/types-enums'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { toFixedLocale, toFixedLocaleAmount } from '@/utils/Number'
 import { getPercentage } from '@/utils/Stats'
 import { Big } from '@/lib/w-big'

@@ -8,11 +8,11 @@ import type { KeyboardEvent, ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 
 import type { Currency } from '@/types-enums'
+import { getView, WorkspaceView } from '@/common'
 import { useTranslation } from '@/lib/i18n'
 
 import { AmountFilter, filterAmount, filterTransactions } from '../../actions'
 import { useStatsTransactions, useWorkspaceFiles } from '../../context'
-import { getView, WorkspaceView } from '../../params'
 import type { SelectedCurrency } from '../../useCurrencySelect'
 import { ALL_CURRENCIES } from '../../useCurrencySelect'
 import { useTableOptions } from '../../useTableOptions'

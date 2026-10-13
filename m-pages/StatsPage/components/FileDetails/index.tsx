@@ -7,7 +7,7 @@ import { useMemo } from 'react'
 import type { StatsFile } from '@/types'
 import { MISC } from '@/common'
 import { getFileCurrency, getFileTransactions, isParsed } from '@/m-stats-file/service'
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { toDisplayDate } from '@/utils/Date'
 import { formatFileSize } from '@/utils/File'
 

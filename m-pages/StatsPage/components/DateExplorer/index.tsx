@@ -5,7 +5,7 @@ import { Box, Typography } from '@mui/material'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useMemo, useState } from 'react'
 
-import { useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
 import { getTransactionDay, toDisplayDate } from '@/utils/Date'
 import { useTranslation } from '@/lib/i18n'
 

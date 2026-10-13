@@ -95,9 +95,7 @@ const sortByName = (a: string, b: string, dir: 'asc' | 'desc') => {
 }
 
 const sortByTotal = (a: NumberString, b: NumberString, dir: 'asc' | 'desc') => {
-  return dir === 'asc'
-    ? Big(Big(a).abs()).minus(Big(b).abs()).toNumber()
-    : Big(Big(b).abs()).minus(Big(a).abs()).toNumber()
+  return dir === 'asc' ? Big(a).abs().cmp(Big(b).abs()) : Big(b).abs().cmp(Big(a).abs())
 }
 
 export const getSortedCategories = <T extends ParentCategoryWithTransactions | CategoryWithTransactions>(

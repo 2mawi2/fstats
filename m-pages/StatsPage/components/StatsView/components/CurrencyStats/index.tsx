@@ -4,7 +4,8 @@ import { Box, Divider, Stack } from '@mui/material'
 import { useMemo } from 'react'
 
 import type { Currency } from '@/types-enums'
-import { getTransactionHelper, useUserPreferences } from '@/hooks'
+import { useUserPreferences } from '@/m-user/service'
+import { getTransactionHelper } from '@/hooks'
 
 import type { CurrencyTransactions } from '../../../../actions'
 import { filterTransactions } from '../../../../actions'
