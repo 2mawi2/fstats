@@ -243,17 +243,28 @@ export type ProfitLoss = {
 /**
  * Income statement of the transactions (without duplicates, see `getAccountTransactions`) per period, one per currency
  * as amounts in different currencies can't be summed up. Transfers between own accounts are excluded from it, but
- * listed separately.
+ * listed separately. Transfers are paired before `filter` (e.g. the category and day filters) is applied, so excluding
+ * one side of a transfer doesn't turn the other side into income or an expense.
  */
 export const getProfitLoss = (
   accountTransactions: AccountTransaction[],
   period: BreakdownPeriod,
   t: TFunction,
+  filter: (transactions: AccountTransaction[]) => AccountTransaction[] = (transactions) => transactions,
 ): ProfitLoss[] => {
   const byCurrency = groupBy(accountTransactions, (transaction) => transaction.currency)
 
-  return Object.entries(byCurrency).map(([currency, currencyTransactions]) => {
-    const { transactions, transfers } = splitTransfers(currencyTransactions)
+  return Object.entries(byCurrency).flatMap(([currency, allCurrencyTransactions]) => {
+    const currencyTransactions = filter(allCurrencyTransactions)
+
+    if (!currencyTransactions.length) {
+      return []
+    }
+
+    const shown = new Set(currencyTransactions)
+    const split = splitTransfers(allCurrencyTransactions)
+    const transactions = split.transactions.filter((transaction) => shown.has(transaction))
+    const transfers = split.transfers.filter((transaction) => shown.has(transaction))
     const expenses = transactions.filter(isExpenseCategory)
     const income = transactions.filter((transaction) => !isExpenseCategory(transaction))
     const incomingTransfers = transfers.filter(isIncome)

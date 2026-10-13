@@ -48,7 +48,10 @@ const Component = () => {
   // With the bank account of their section, only depends on the files
   const accountTransactions = useMemo(() => getAccountTransactions(selectedFiles), [selectedFiles])
   const profitLosses = useMemo(
-    () => getProfitLoss(filterTransactions(filterDays(accountTransactions, deselectedDays), filter), period, t),
+    () =>
+      getProfitLoss(accountTransactions, period, t, (transactions) =>
+        filterTransactions(filterDays(transactions, deselectedDays), filter),
+      ),
     [accountTransactions, deselectedDays, filter, period, t],
   )
   const getCaption = (currency: Currency) => {
