@@ -49,3 +49,4 @@ Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Pa
 3. IDs: each format has an `id`, unique within the bank, in snake_case, usually the account name (`'giro'`, `'visa'`, `'current'`); an old export of the same account gets a suffix (`'giro_legacy'`). Parser ID = `{bank.id}__{format.id}`, bank account ID = `{bank.id}__{accountType}` (shared by formats of the same account, part of transaction IDs — never change it).
 4. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.
 5. Changing how existing files are parsed or renaming a bank or format `id`: bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
+6. Add the bank to the README list under its country. The homepage "Supported banks" list derives from `BANKS` via `getSupportedBanks()` (`m-pages/HomePage/actions.ts`).

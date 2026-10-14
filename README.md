@@ -29,6 +29,7 @@ By default, your files **get deleted** when you close the tab or browser window.
 
 - [Comdirect](utils/Parser/banks/comdirect.ts)
 - [ING](utils/Parser/banks/ing.ts)
+- [N26](utils/Parser/banks/n26.ts)
 
 #### South Africa
 
