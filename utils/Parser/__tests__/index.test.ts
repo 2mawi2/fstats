@@ -26,6 +26,7 @@ describe('registry', () => {
       | 'fnb__credit_card__default'
       | 'ing__current__default'
       | 'lloyds__current__default'
+      | 'n26__current__default'
     >()
     expectTypeOf<BankAccountId>().toEqualTypeOf<
       | 'capitec__savings'
@@ -34,6 +35,7 @@ describe('registry', () => {
       | 'fnb__credit_card'
       | 'ing__current'
       | 'lloyds__current'
+      | 'n26__current'
     >()
   })
 

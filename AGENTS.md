@@ -46,5 +46,6 @@ Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Pa
 2. Export from `utils/Parser/banks/index.ts` and add to `BANKS` in `utils/Parser/registry.ts`
    - New account type: add it to `AccountType` in `types-enums/index.ts`
    - Update the expected IDs in the "should derive literal ID types" test (`utils/Parser/__tests__/index.test.ts`)
+   - No manual step for the home page: its "Supported banks" list derives from `BANKS` via `getSupportedBanks()` (`m-pages/HomePage/actions.ts`), but the README list under the bank's country must be updated
 3. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.
 4. Changing how existing files are parsed (e.g. transaction IDs) or renaming parser IDs (bank `id`, `accountType`, `variant`): bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
