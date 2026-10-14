@@ -7,6 +7,7 @@ const baseConfig = {
 
 let filesStore: LocalForage | null = null
 let userStore: LocalForage | null = null
+let customParsersStore: LocalForage | null = null
 
 export const initStorage = () => {
   filesStore = localforage.createInstance({
@@ -20,6 +21,23 @@ export const initStorage = () => {
     storeName: 'fstats__user',
     description: 'User store',
   })
+
+  customParsersStore = localforage.createInstance({
+    ...baseConfig,
+    storeName: 'fstats__custom_parsers',
+    description: 'Custom parsers store',
+  })
+}
+
+/**
+ * Approximate size of a store (UTF-8 bytes of each serialised record).
+ */
+export const getStoreSize = async (store: LocalForage): Promise<number> => {
+  let totalSize = 0
+  await store.iterate((value) => {
+    totalSize += new Blob([JSON.stringify(value)]).size
+  })
+  return totalSize
 }
 
 export const db = {
@@ -34,5 +52,11 @@ export const db = {
       throw new Error('DB not initialised! Call initStorage() first.')
     }
     return userStore
+  },
+  get customParsersStore() {
+    if (!customParsersStore) {
+      throw new Error('DB not initialised! Call initStorage() first.')
+    }
+    return customParsersStore
   },
 }

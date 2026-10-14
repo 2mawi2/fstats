@@ -18,7 +18,7 @@ const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
  * Bump when the parse output changes (e.g. how transaction IDs are generated or transactions are categorised), so
  * stored files are re-parsed.
  */
-export const PARSER_VERSION = 4
+export const PARSER_VERSION = 5
 
 type Row = {
   get: (header: string) => string
@@ -28,12 +28,13 @@ type Row = {
  * Turns a declarative bank format into a parser. Parsers work on sections, i.e. rows starting at the header row up to
  * the next section (see `findSections`).
  */
-export const createParser = (bank: BankDef, format: FormatDef): Parser => {
+export const createParser = (bank: Pick<BankDef, 'id' | 'name' | 'currency'>, format: FormatDef): Parser => {
   const { columns, extraColumns, dateFormat, numberFormat } = format
   const { amount } = columns
   const { headers, required } = getFormatHeaders(format)
 
-  const toNumber = (value: string) => (numberFormat === 'de' ? parseGermanNumber(value) : value)
+  // Thousands separators aren't valid in number strings, e.g. "1,234.56"
+  const toNumber = (value: string) => (numberFormat === 'de' ? parseGermanNumber(value) : value.replace(/,/g, ''))
 
   const isValidDate = (value: string) => isValid(parse(value, dateFormat, new Date()))
 
@@ -49,6 +50,22 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
       }
       case 'firstOf':
         return toNumber(amount.headers.map(row.get).find(Boolean) ?? '')
+      case 'sum': {
+        const parts = [
+          ...amount.signed.map((header) => ({ value: row.get(header), sign: 0 })),
+          ...amount.in.map((header) => ({ value: row.get(header), sign: 1 })),
+          ...amount.out.map((header) => ({ value: row.get(header), sign: -1 })),
+        ].filter(({ value }) => value)
+
+        return parts.length
+          ? parts
+              .reduce((total, { value, sign }) => {
+                const number = Big(toNumber(value))
+                return total.plus(sign ? number.abs().times(sign) : number)
+              }, Big(0))
+              .toString()
+          : ''
+      }
     }
   }
 

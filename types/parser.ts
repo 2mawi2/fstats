@@ -38,26 +38,30 @@ export type HeaderDef<H extends string = string> = H | { readonly header: H; rea
  * - `signed`: one signed column
  * - `inOut`: money in / money out columns, out values are stored as negative whether the file has them positive or negative
  * - `firstOf`: first non-empty signed column
+ * - `sum`: sum of the non-empty columns, `signed` as they are, `in` as positive and `out` as negative (e.g. money out
+ *   and a fee column)
  */
 export type AmountColumnDef<H extends string = string> =
   | { readonly type: 'signed'; readonly header: H }
   | { readonly type: 'inOut'; readonly in: H; readonly out: H }
   | { readonly type: 'firstOf'; readonly headers: readonly H[] }
+  | { readonly type: 'sum'; readonly signed: readonly H[]; readonly in: readonly H[]; readonly out: readonly H[] }
 
 export type FormatDef<H extends string = string> = {
   /**
-   * Part of the persisted IDs.
-   * Parser ID: `${bank.id}__${accountType}__${variant}`, bank account ID: `${bank.id}__${accountType}`.
+   * Unique within the bank, in snake_case, e.g. "giro", "visa" or "savings_legacy". Parser ID:
+   * `${bank.id}__${id}`, changing it requires bumping `PARSER_VERSION`.
+   */
+  id: string
+  /**
+   * Bank account ID: `${bank.id}__${accountType}`, formats of the same account share it. Part of the persisted
+   * transaction IDs, so never change it.
    */
   accountType: AccountType
   /**
    * Display name, e.g. "Giro" or "Current Account".
    */
   accountName: string
-  /**
-   * Part of the parser ID, distinguishes multiple CSV formats of the same account ("default", "legacy", etc.).
-   */
-  variant: string
   dateFormat: string
   /**
    * 'de' = "1.234,56". 'en' = "1,234.56".
@@ -109,11 +113,8 @@ type HeaderNames<F> = F extends { headers: readonly (infer D)[] }
  */
 export type ValidFormats<F extends readonly FormatDef[]> = { [K in keyof F]: FormatDef<HeaderNames<F[K]>> }
 
-type ParserIdOf<BankId extends string, F> = F extends {
-  accountType: infer A extends string
-  variant: infer V extends string
-}
-  ? `${BankId}__${A}__${V}`
+type ParserIdOf<BankId extends string, F> = F extends { id: infer FormatId extends string }
+  ? `${BankId}__${FormatId}`
   : never
 
 type AccountIdOf<BankId extends string, F> = F extends { accountType: infer A extends string }

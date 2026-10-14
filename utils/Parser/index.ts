@@ -1,4 +1,6 @@
+export * from './auto-detect'
 export * from './create-parser'
+export * from './custom'
 export * from './definition'
 export * from './lookup'
 export * from './registry'

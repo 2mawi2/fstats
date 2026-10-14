@@ -50,6 +50,8 @@ export const useStorageSize = () => {
     queryFn: () => {
       return getStorageSize()
     },
+    // Invalidated while the settings page isn't shown (e.g. files added), refetched once it is
+    refetchOnMount: true,
     retry: false,
   })
 }

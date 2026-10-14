@@ -83,6 +83,7 @@
       "SELECT_ALL": "All",
       "SELECT_NONE": "None",
       "SELECT_SUPPORTED": "Supported",
+      "SELECT_CONVERTIBLE": "Needs setup",
       "SELECT_UNSUPPORTED": "Unsupported",
       "SELECT_INVALID": "Invalid",
       "BANK_ACCOUNTS": "Bank accounts",
@@ -107,7 +108,8 @@
     },
     "FILE_STATUS": {
       "PARSING": "Parsing…",
-      "UNSUPPORTED_FORMAT": "Unsupported format"
+      "UNSUPPORTED_FORMAT": "Unsupported format",
+      "CONVERTIBLE_FORMAT": "New format, set it up to read this file"
     },
     "NO_FILES": {
       "TITLE": "No files"
@@ -208,6 +210,84 @@
       "TRANSFERS_IN": "Transfers in",
       "TRANSFERS_OUT": "Transfers out",
       "TRANSFERS_NET": "Net transfers"
+    },
+    "PARSER_SETUP": {
+      "SET_UP": "Set up",
+      "TITLE": "Set up {{file}}",
+      "CLOSE": "Close",
+      "BANK_NAME": "Bank name",
+      "BANK_NAME_PLACEHOLDER": "e.g. Barclays",
+      "ACCOUNT_NAME": "Account name",
+      "ACCOUNT_NAME_PLACEHOLDER": "e.g. Savings account",
+      "DEFAULT_ACCOUNT_NAME": "Current account",
+      "CURRENCY": "Currency",
+      "HEADER_ROW_OPTION": "Row {{row}}",
+      "FIELD": {
+        "DATE": "Date",
+        "DESCRIPTION": "Description",
+        "MONEY_IN": "Money in",
+        "MONEY_OUT": "Money out",
+        "BALANCE": "Balance",
+        "REFERENCE": "Reference",
+        "TRANSACTION_TYPE": "Transaction type",
+        "CATEGORY": "Bank category",
+        "PARENT_CATEGORY": "Bank parent category"
+      },
+      "DATE_FORMAT": "Date format",
+      "NUMBER_FORMAT": "Number format",
+      "PREVIEW_COUNT_one": "{{count}} transaction found",
+      "PREVIEW_COUNT_other": "{{count}} transactions found",
+      "SAVE_FAILED": "Saving failed: {{message}}",
+      "REVIEW_TITLE": "Here's how we read this file",
+      "QUESTION": "Does this look right?",
+      "FIX_HINT": "Use the selectors below to adjust the mapping.",
+      "HEADER_ROW": "Header",
+      "NAME_HINT": "From now on, files in this format will be read automatically.",
+      "BACK": "Back",
+      "CONFIRM": "Save format",
+      "TAB": {
+        "PREVIEW": "Preview",
+        "CSV": "Original CSV"
+      },
+      "FIX_TITLE": "Confirm column mapping",
+      "NAME_TITLE": "Which bank is this from?",
+      "STEP": {
+        "REVIEW": "Header row",
+        "FIX": "Columns",
+        "NAME": "Account"
+      },
+      "CONNECTOR": {
+        "COLUMNS": "Columns in file",
+        "REMOVE": "Remove connection",
+        "PICK_COLUMN": "Now pick a column",
+        "PICK_FIELD": "Now pick a field",
+        "MISSING": "Required, pick a column for it",
+        "REQUIRED": "Required fields",
+        "OPTIONAL": "Optional fields",
+        "DATE_MISMATCH": "Date format doesn't match the column",
+        "MATCHES": "likely match",
+        "NUMBER_MISMATCH": "Amounts can't be read as numbers.",
+        "MULTIPLE_IN": "One or more columns, can be the same as money out",
+        "MULTIPLE_OUT": "One or more columns, can be the same as money in"
+      },
+      "PREVIEW_MISSING": "Can't create a preview yet, please check the columns.",
+      "PREVIEW_INVALID": "Can't read the amounts, please check the amount columns and number format.",
+      "PREVIEW_EMPTY": "No transactions found, please check the date column and date format.",
+      "PREVIEW_UNAVAILABLE": "Cannot generate a preview yet. Please go through the steps below to confirm your file's details.",
+      "CONTINUE": "Continue",
+      "HEADER_ROW_PROBLEM": "Cannot continue with the selected header.",
+      "HEADER_ROW_PROBLEMS": {
+        "NAMES": "Fewer than two column names.",
+        "COLUMN_COUNT": "Column count doesn't match the rows below."
+      },
+      "NUMBER_MISMATCH_HINT": "Check the number format and the amount columns.",
+      "HEADER_ROW_DATA": "This row looks like data, not column names.",
+      "HEADER_ROW_DATA_HINT": "Rows above it are skipped, and other files of this format may not be recognised.",
+      "HEADER_CANDIDATES_one": "We found 1 possible header row, please check it.",
+      "HEADER_CANDIDATES_other": "We found {{count}} possible header rows, please pick the right one.",
+      "SHOW_ALL_ROWS": "Show more possible header rows",
+      "SHOW_CANDIDATES": "Show less",
+      "HEADER_NONE": "We couldn't find a header row, please pick the right one."
     }
   },
   "SETTINGS_PAGE": {
@@ -221,10 +301,18 @@
       "TITLE": "Storage details",
       "FILES_one": "File",
       "FILES_other": "Files",
+      "CUSTOM_FORMATS_one": "Custom format",
+      "CUSTOM_FORMATS_other": "Custom formats",
       "STORAGE_USED": "Storage used",
+      "NO_FILES": "No files stored.",
+      "NO_FORMATS": "No custom formats yet. Set one up from an unsupported file on the stats page.",
       "FAILED_TO_CALCULATE": "Failed to calculate",
-      "CONFIRM_CLEAR": "Are you sure you want to clear all data?",
-      "CLEAR_ALL_DATA": "Clear all data"
+      "CONFIRM_DELETE_FILES": "Are you sure you want to delete all files?",
+      "DELETE_FILES": "Delete files",
+      "CONFIRM_DELETE_FORMATS": "Are you sure you want to delete all custom formats? Files read with them will need to be set up again.",
+      "DELETE_FORMATS": "Delete formats",
+      "CONFIRM_DELETE_ALL": "Are you sure you want to delete all data? This deletes all files and custom formats.",
+      "DELETE_ALL_DATA": "Delete all data"
     },
     "LAYOUT": {
       "TITLE": "Stats page layout",
