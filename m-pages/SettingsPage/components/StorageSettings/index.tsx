@@ -75,7 +75,11 @@ const Component = () => {
         ? files.map((file) => ({ id: file.id, label: file.file.name }))
         : parsers.map((parser) => ({
             id: parser.id,
-            label: `${parser.bankName} ${parser.accountName} (${parser.currency})`,
+            label: (
+              <>
+                <strong>{parser.bankName}</strong> {parser.accountName} ({parser.currency})
+              </>
+            ),
           }))
 
     if (!items.length) {
