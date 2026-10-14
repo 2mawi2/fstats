@@ -106,7 +106,7 @@ const Component = () => {
         <Box sx={sx.statsContainer}>
           <ButtonBase {...getTabProps('files')}>
             <FolderOutlined sx={sx.statIcon} />
-            <Box>
+            <Box sx={sx.statText}>
               <Typography sx={sx.statValue(isLoadingFiles)}>{fileCount}</Typography>
               <Typography variant="caption" sx={sx.statLabel}>
                 {t('SETTINGS_PAGE.STORAGE.FILES', { count: fileCount })}
@@ -117,7 +117,7 @@ const Component = () => {
 
           <ButtonBase {...getTabProps('formats')}>
             <TableChartOutlined sx={sx.statIcon} />
-            <Box>
+            <Box sx={sx.statText}>
               <Typography sx={sx.statValue(isLoadingParsers)}>{parsers.length}</Typography>
               <Typography variant="caption" sx={sx.statLabel}>
                 {t('SETTINGS_PAGE.STORAGE.CUSTOM_FORMATS', { count: parsers.length })}
@@ -128,7 +128,7 @@ const Component = () => {
 
           <Box sx={sx.statItem}>
             <StorageRounded sx={sx.statIcon} />
-            <Box>
+            <Box sx={sx.statText}>
               <Typography sx={sx.statValue(isCalculating)}>{storageSize}</Typography>
               <Typography variant="caption" sx={sx.statLabel}>
                 {t('SETTINGS_PAGE.STORAGE.STORAGE_USED')}

@@ -72,6 +72,11 @@ export const ui = () => {
       py: 0.75,
     },
 
+    statText: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+
     statIcon: {
       fontSize: 20,
       color: 'text.secondary',
