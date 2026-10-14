@@ -300,10 +300,18 @@
       "TITLE": "Speicherdetails",
       "FILES_one": "Datei",
       "FILES_other": "Dateien",
+      "CUSTOM_FORMATS_one": "Eigenes Format",
+      "CUSTOM_FORMATS_other": "Eigene Formate",
       "STORAGE_USED": "Belegter Speicher",
+      "NO_FILES": "Keine Dateien gespeichert.",
+      "NO_FORMATS": "Noch keine eigenen Formate. Richte eines über eine nicht unterstützte Datei auf der Statistikseite ein.",
       "FAILED_TO_CALCULATE": "Berechnung fehlgeschlagen",
-      "CONFIRM_CLEAR": "Möchtest du wirklich alle Daten löschen?",
-      "CLEAR_ALL_DATA": "Alle Daten löschen"
+      "CONFIRM_DELETE_FILES": "Möchtest du wirklich alle Dateien löschen?",
+      "DELETE_FILES": "Dateien löschen",
+      "CONFIRM_DELETE_FORMATS": "Möchtest du wirklich alle eigenen Formate löschen? Damit gelesene Dateien müssen erneut eingerichtet werden.",
+      "DELETE_FORMATS": "Formate löschen",
+      "CONFIRM_DELETE_ALL": "Möchtest du wirklich alle Daten löschen? Dabei werden alle Dateien und eigenen Formate gelöscht.",
+      "DELETE_ALL_DATA": "Alle Daten löschen"
     },
     "LAYOUT": {
       "TITLE": "Layout der Statistikseite",

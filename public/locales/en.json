@@ -300,10 +300,18 @@
       "TITLE": "Storage details",
       "FILES_one": "File",
       "FILES_other": "Files",
+      "CUSTOM_FORMATS_one": "Custom format",
+      "CUSTOM_FORMATS_other": "Custom formats",
       "STORAGE_USED": "Storage used",
+      "NO_FILES": "No files stored.",
+      "NO_FORMATS": "No custom formats yet. Set one up from an unsupported file on the stats page.",
       "FAILED_TO_CALCULATE": "Failed to calculate",
-      "CONFIRM_CLEAR": "Are you sure you want to clear all data?",
-      "CLEAR_ALL_DATA": "Clear all data"
+      "CONFIRM_DELETE_FILES": "Are you sure you want to delete all files?",
+      "DELETE_FILES": "Delete files",
+      "CONFIRM_DELETE_FORMATS": "Are you sure you want to delete all custom formats? Files read with them will need to be set up again.",
+      "DELETE_FORMATS": "Delete formats",
+      "CONFIRM_DELETE_ALL": "Are you sure you want to delete all data? This deletes all files and custom formats.",
+      "DELETE_ALL_DATA": "Delete all data"
     },
     "LAYOUT": {
       "TITLE": "Stats page layout",

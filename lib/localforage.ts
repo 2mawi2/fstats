@@ -29,6 +29,17 @@ export const initStorage = () => {
   })
 }
 
+/**
+ * Approximate size of a store (UTF-8 bytes of each serialised record).
+ */
+export const getStoreSize = async (store: LocalForage): Promise<number> => {
+  let totalSize = 0
+  await store.iterate((value) => {
+    totalSize += new Blob([JSON.stringify(value)]).size
+  })
+  return totalSize
+}
+
 export const db = {
   get filesStore() {
     if (!filesStore) {
