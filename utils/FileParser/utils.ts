@@ -3,7 +3,7 @@ import { parse } from 'papaparse'
 import type { RowData, StatsFile, StatsFileSection, StatsFileState } from '@/types'
 import { zStatsFileState } from '@/types'
 import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
-import { findSections, PARSER_VERSION } from '@/utils/Parser'
+import { canConvert, findSections, PARSER_VERSION } from '@/utils/Parser'
 import { formatZodIssues } from '@/lib/zod'
 
 export const parseFiles = async (files: StatsFile[]): Promise<{ id: string; state: StatsFileState }[]> => {
@@ -20,7 +20,8 @@ const parseFile = async (file: File): Promise<StatsFileState> => {
 
   const { sections, error } = findSections(rows)
   if (!sections.length) {
-    return _toError(StatsFileErrorCode.UNSUPPORTED_FORMAT, error)
+    const code = canConvert(rows) ? StatsFileErrorCode.CONVERTIBLE_FORMAT : StatsFileErrorCode.UNSUPPORTED_FORMAT
+    return _toError(code, error)
   }
 
   const parsedSections: StatsFileSection[] = []

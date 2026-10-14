@@ -2,7 +2,7 @@ import { formatISO } from 'date-fns'
 
 import type { NewStatsFile, StatsFile, StatsFileAtRest, StatsFileState } from '@/types'
 import { StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
-import { db } from '@/lib/localforage'
+import { db, getStoreSize } from '@/lib/localforage'
 
 import { getFileHash, parseStatsFile, syncStatsFile } from './helper'
 
@@ -101,10 +101,6 @@ export const removeAllFiles = async (): Promise<void> => {
 /**
  * Approximate size of the stored files (UTF-8 bytes of each serialised record).
  */
-export const getStorageSize = async (): Promise<number> => {
-  let totalSize = 0
-  await db.filesStore.iterate<StatsFileAtRest, void>((value) => {
-    totalSize += new Blob([JSON.stringify(value)]).size
-  })
-  return totalSize
+export const getStorageSize = () => {
+  return getStoreSize(db.filesStore)
 }

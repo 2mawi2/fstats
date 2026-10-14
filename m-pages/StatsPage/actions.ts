@@ -7,13 +7,14 @@ import { MISC } from '@/common'
 import {
   getFileCurrency,
   getFileTransactions,
+  isConvertible,
   isError,
   isParsed,
   isUnknown,
   splitDuplicates,
 } from '@/m-stats-file/service'
 import { getTransactionDay } from '@/utils/Date'
-import { AVAILABLE_PARSERS } from '@/utils/Parser'
+import { getParser } from '@/utils/Parser'
 import { isExpense, isIncome } from '@/utils/Stats'
 import { i18n } from '@/lib/i18n'
 import { Big } from '@/lib/w-big'
@@ -27,7 +28,10 @@ export const HEADER_HEIGHT = 28 // px
  * Bank and accounts of a parsed file, e.g. Comdirect with Giro and Visa.
  */
 export const getFileAccount = (file: ParsedStatsFile) => {
-  const parsers = uniq(file.sections.map((section) => section.parserId)).map((parserId) => AVAILABLE_PARSERS[parserId])
+  // Files of deleted custom parsers are re-parsed on start, until then they show their parser ID
+  const parsers = uniq(file.sections.map((section) => section.parserId)).map(
+    (parserId) => getParser(parserId) ?? { bankName: parserId, accountName: parserId },
+  )
   return { bankName: parsers[0].bankName, accountNames: parsers.map((parser) => parser.accountName) }
 }
 
@@ -35,7 +39,13 @@ export const getFileAccount = (file: ParsedStatsFile) => {
  * Same colors as `FileStatusIcon`.
  */
 export const getFileNameColor = (file: StatsFile) => {
-  return isUnknown(file) ? 'warning.main' : isError(file) ? 'error.main' : 'text.primary'
+  return isConvertible(file)
+    ? 'info.main'
+    : isUnknown(file)
+      ? 'warning.main'
+      : isError(file)
+        ? 'error.main'
+        : 'text.primary'
 }
 
 /**
@@ -50,6 +60,10 @@ export const getFileFormat = (file: StatsFile) => {
 
   if (file.status === StatsFileStatus.PARSING) {
     return { value: i18n.t('STATS_PAGE.FILE_STATUS.PARSING'), color: 'text.secondary' }
+  }
+
+  if (isConvertible(file)) {
+    return { value: i18n.t('STATS_PAGE.FILE_STATUS.CONVERTIBLE_FORMAT'), color: 'info.main' }
   }
 
   if (isUnknown(file)) {

@@ -2,22 +2,43 @@ import type { Parser } from '@/types'
 import { MISC } from '@/common'
 
 import { createParser } from './create-parser'
-import type { BankAccountId, ParserId } from './registry'
+import { getCustomParsers } from './custom'
+import type { BankAccountId, BuiltInParserId, ParserId } from './registry'
 import { BANKS } from './registry'
 
+/**
+ * The built-in parsers, see `getParser` for custom ones too.
+ */
 export const AVAILABLE_PARSERS = Object.fromEntries(
   BANKS.flatMap((bank) => bank.formats.map((format) => createParser(bank, format))).map((parser) => [
     parser.id,
     parser,
   ]),
-) as Record<ParserId, Parser>
+) as Record<BuiltInParserId, Parser>
+
+/**
+ * Built-in or registered custom parser, `undefined` e.g. for a deleted custom parser.
+ */
+export const getParser = (parserId: ParserId): Parser | undefined => {
+  return AVAILABLE_PARSERS[parserId as BuiltInParserId] ?? getCustomParsers().find((parser) => parser.id === parserId)
+}
+
+const requireParser = (parserId: ParserId): Parser => {
+  const parser = getParser(parserId)
+
+  if (!parser) {
+    throw new Error(`Unknown parser ID: ${parserId}`)
+  }
+
+  return parser
+}
 
 export const getParserCurrency = (parserId: ParserId) => {
-  return AVAILABLE_PARSERS[parserId].currency
+  return requireParser(parserId).currency
 }
 
 export const getBankAccountId = (parserId: ParserId): BankAccountId => {
-  return AVAILABLE_PARSERS[parserId].bankAccountId
+  return requireParser(parserId).bankAccountId
 }
 
 type BankAccountName = {
@@ -35,7 +56,7 @@ export const getBankAccountName = (value: ParserId | null): BankAccountName => {
     }
   }
 
-  const parser = AVAILABLE_PARSERS[value]
+  const parser = getParser(value)
 
   if (parser) {
     return {

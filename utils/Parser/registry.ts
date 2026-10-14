@@ -14,10 +14,30 @@ export const BANKS = [capitec, comdirect, fnb, ing, lloyds, n26, tradeRepublic] 
 
 type Bank = (typeof BANKS)[number]
 
-export type ParserId = ParserIds<Bank>
+export type BuiltInParserId = ParserIds<Bank>
 
-export type BankAccountId = AccountIds<Bank>
+export type BuiltInBankAccountId = AccountIds<Bank>
 
-export const PARSER_IDS = BANKS.flatMap((bank) => bank.formats.map((format) => toParserId(bank, format))) as ParserId[]
+/**
+ * Bank ID of a custom parser, from its (UUID) ID, see `toCustomBankId`.
+ */
+export type CustomBankId = `custom_${string}`
 
-export const zParserId = z.enum(PARSER_IDS)
+export type CustomParserId = `${CustomBankId}__default`
+
+export type CustomBankAccountId = `${CustomBankId}__current`
+
+export type ParserId = BuiltInParserId | CustomParserId
+
+export type BankAccountId = BuiltInBankAccountId | CustomBankAccountId
+
+export const PARSER_IDS = BANKS.flatMap((bank) =>
+  bank.formats.map((format) => toParserId(bank, format)),
+) as BuiltInParserId[]
+
+const CUSTOM_PARSER_ID = /^custom_[0-9a-f]{32}__default$/
+
+export const zParserId = z.union([
+  z.enum(PARSER_IDS),
+  z.custom<CustomParserId>((value) => typeof value === 'string' && CUSTOM_PARSER_ID.test(value)),
+])

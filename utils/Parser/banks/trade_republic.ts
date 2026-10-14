@@ -10,9 +10,9 @@ export const tradeRepublic = defineBank({
   currency: Currency.EUR,
   formats: [
     {
+      id: 'current',
       accountType: AccountType.CURRENT,
       accountName: 'Cash',
-      variant: 'default',
       dateFormat: 'yyyy-MM-dd',
       numberFormat: 'en',
       headers: [

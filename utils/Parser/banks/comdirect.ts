@@ -10,9 +10,9 @@ export const comdirect = defineBank({
   currency: Currency.EUR,
   formats: [
     {
+      id: 'giro',
       accountType: AccountType.CURRENT,
       accountName: 'Giro',
-      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: ['Buchungstag', 'Wertstellung (Valuta)', 'Vorgang', 'Buchungstext', 'Umsatz in EUR'],
@@ -33,9 +33,9 @@ export const comdirect = defineBank({
       },
     },
     {
+      id: 'visa',
       accountType: AccountType.CREDIT_CARD,
       accountName: 'Visa',
-      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: ['Buchungstag', 'Umsatztag', 'Vorgang', 'Referenz', 'Buchungstext', 'Umsatz in EUR'],

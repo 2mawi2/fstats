@@ -10,9 +10,9 @@ export const ing = defineBank({
   currency: Currency.EUR,
   formats: [
     {
+      id: 'giro',
       accountType: AccountType.CURRENT,
       accountName: 'Giro',
-      variant: 'default',
       dateFormat: 'dd.MM.yyyy',
       numberFormat: 'de',
       headers: [

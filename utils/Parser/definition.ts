@@ -45,13 +45,15 @@ const getAmountHeaders = (amount: AmountColumnDef) => {
       return [amount.in, amount.out]
     case 'firstOf':
       return amount.headers
+    case 'sum':
+      return [...amount.signed, ...amount.in, ...amount.out]
   }
 }
 
-export const toAccountId = (bank: BankDef, format: FormatDef) => {
+export const toAccountId = (bank: Pick<BankDef, 'id'>, format: FormatDef) => {
   return `${bank.id}__${format.accountType}`
 }
 
-export const toParserId = (bank: BankDef, format: FormatDef) => {
-  return `${toAccountId(bank, format)}__${format.variant}`
+export const toParserId = (bank: Pick<BankDef, 'id'>, format: FormatDef) => {
+  return `${bank.id}__${format.id}`
 }
