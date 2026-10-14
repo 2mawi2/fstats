@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import { AccountType, Country, Currency } from '@/types-enums'
-import type { BankAccountId, ParserId } from '@/utils/Parser'
+import type { BuiltInBankAccountId, BuiltInParserId } from '@/utils/Parser'
 import {
   AVAILABLE_PARSERS,
   BANKS,
@@ -18,17 +18,17 @@ import {
 
 describe('registry', () => {
   it('should derive literal ID types', () => {
-    expectTypeOf<ParserId>().toEqualTypeOf<
-      | 'capitec__savings__default'
-      | 'capitec__savings__legacy'
-      | 'comdirect__current__default'
-      | 'comdirect__credit_card__default'
-      | 'fnb__credit_card__default'
-      | 'ing__current__default'
-      | 'lloyds__current__default'
-      | 'n26__current__default'
+    expectTypeOf<BuiltInParserId>().toEqualTypeOf<
+      | 'capitec__savings'
+      | 'capitec__savings_legacy'
+      | 'comdirect__giro'
+      | 'comdirect__visa'
+      | 'fnb__credit_card'
+      | 'ing__giro'
+      | 'lloyds__current'
+      | 'n26__current'
     >()
-    expectTypeOf<BankAccountId>().toEqualTypeOf<
+    expectTypeOf<BuiltInBankAccountId>().toEqualTypeOf<
       | 'capitec__savings'
       | 'comdirect__current'
       | 'comdirect__credit_card'
@@ -41,6 +41,20 @@ describe('registry', () => {
 
   it('should have unique parser IDs', () => {
     expect(new Set(PARSER_IDS).size).toBe(PARSER_IDS.length)
+  })
+
+  it('should have unique format IDs in snake_case per bank', () => {
+    BANKS.forEach((bank) => {
+      const ids = bank.formats.map((format) => format.id)
+      expect(
+        ids.filter((id) => !/^[a-z0-9]+(_[a-z0-9]+)*$/.test(id)),
+        bank.id,
+      ).toEqual([])
+      expect(
+        ids.filter((id, index) => ids.indexOf(id) !== index),
+        bank.id,
+      ).toEqual([])
+    })
   })
 
   it('should expose all parsers where parser ID matches the registry key', () => {
@@ -93,9 +107,9 @@ describe('createParser', () => {
     currency: Currency.EUR,
     formats: [
       {
+        id: 'giro',
         accountType: AccountType.CURRENT,
         accountName: 'Giro',
-        variant: 'default',
         dateFormat: 'dd.MM.yyyy',
         numberFormat: 'de',
         headers: ['Datum', 'Text', 'Betrag', 'Saldo', 'Referenz'],
@@ -140,9 +154,9 @@ describe('transaction IDs', () => {
       currency: Currency.EUR,
       formats: [
         {
+          id: 'giro',
           accountType: AccountType.CURRENT,
           accountName: 'Giro',
-          variant: 'default',
           dateFormat: 'dd.MM.yyyy',
           numberFormat: 'de',
           headers: header,
@@ -213,10 +227,7 @@ describe('findSections', () => {
     const { sections, error } = findSections(file)
 
     expect(error).toBe('')
-    expect(sections.map(({ parser }) => parser.id)).toEqual([
-      'comdirect__current__default',
-      'comdirect__credit_card__default',
-    ])
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__giro', 'comdirect__visa'])
     expect(sections.map(({ parser, rows }) => parser.parse(rows).length)).toEqual([200, 1])
   })
 
@@ -229,13 +240,13 @@ describe('findSections', () => {
   it('should find a single section', () => {
     const { sections } = findSections([preamble('Umsätze Visa-Karte (Kreditkarte)'), visaHeader, visaRow])
 
-    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__default'])
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__visa'])
   })
 
   it('should drop sections without transactions', () => {
     const { sections } = findSections([giroHeader, ['Keine Umsätze vorhanden.'], visaHeader, visaRow])
 
-    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__credit_card__default'])
+    expect(sections.map(({ parser }) => parser.id)).toEqual(['comdirect__visa'])
   })
 
   it('should explain why nothing matched', () => {

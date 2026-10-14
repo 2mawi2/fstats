@@ -193,7 +193,7 @@ export const getTransactionColumns = (
  * Shown values of the transaction, without the source (only a tooltip).
  */
 export const getTransactionCells = (
-  transaction: SourcedTransaction,
+  transaction: Transaction,
   {
     currency,
     amountFilter,

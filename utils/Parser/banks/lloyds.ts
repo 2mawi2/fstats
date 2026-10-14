@@ -10,9 +10,9 @@ export const lloyds = defineBank({
   currency: Currency.GBP,
   formats: [
     {
+      id: 'current',
       accountType: AccountType.CURRENT,
       accountName: 'Current Account',
-      variant: 'default',
       dateFormat: 'dd/MM/yyyy',
       numberFormat: 'en',
       headers: [

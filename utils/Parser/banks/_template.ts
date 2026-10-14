@@ -42,6 +42,13 @@ export const newBank = defineBank({
   formats: [
     {
       /**
+       * Unique within the bank, in snake_case, usually the account name, e.g.
+       * 'current', 'giro', 'visa'. An old export of the same account gets a
+       * suffix, e.g. 'giro_legacy'. Changing it later requires bumping
+       * `PARSER_VERSION`.
+       */
+      id: 'current',
+      /**
        * `AccountType.CURRENT`, `AccountType.SAVINGS` or
        * `AccountType.CREDIT_CARD`. New types: add to `AccountType`.
        */
@@ -50,11 +57,6 @@ export const newBank = defineBank({
        * Display name, e.g. 'Current Account', 'Giro', 'Visa'.
        */
       accountName: 'Current Account',
-      /**
-       * 'default', or a descriptive name for additional formats of the same
-       * account type, e.g. 'legacy'.
-       */
-      variant: 'default',
       /**
        * date-fns format (https://date-fns.org/docs/parse), e.g.
        * 'dd/MM/yyyy', 'dd.MM.yyyy', 'yyyy-MM-dd HH:mm'.

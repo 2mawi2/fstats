@@ -10,9 +10,9 @@ export const capitec = defineBank({
   currency: Currency.ZAR,
   formats: [
     {
+      id: 'savings',
       accountType: AccountType.SAVINGS,
       accountName: 'Savings',
-      variant: 'default',
       dateFormat: 'yyyy-MM-dd HH:mm',
       numberFormat: 'en',
       headers: [
@@ -46,9 +46,9 @@ export const capitec = defineBank({
       },
     },
     {
+      id: 'savings_legacy',
       accountType: AccountType.SAVINGS,
       accountName: 'Savings',
-      variant: 'legacy',
       dateFormat: 'dd/MM/yyyy',
       numberFormat: 'en',
       headers: [

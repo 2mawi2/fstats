@@ -10,9 +10,9 @@ export const n26 = defineBank({
   currency: Currency.EUR,
   formats: [
     {
+      id: 'current',
       accountType: AccountType.CURRENT,
       accountName: 'Current Account',
-      variant: 'default',
       dateFormat: 'yyyy-MM-dd',
       numberFormat: 'en',
       headers: [

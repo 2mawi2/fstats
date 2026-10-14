@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
 import { MISC } from '@/common'
+import { loadCustomParsers } from '@/m-custom-parser/service'
 import { clearSessionFiles, reparseOutdatedFiles } from '@/m-stats-file/service'
 import { ensureUserExists } from '@/m-user/service'
 import { logger } from '@/utils/Logger'
@@ -25,6 +26,8 @@ const Component = ({ children }: StorageProps) => {
         await clearSessionFiles()
       }
 
+      // Before parsing and showing files, which may use them
+      await loadCustomParsers()
       await reparseOutdatedFiles()
       sessionStorage.setItem(MISC.SS_SESSION_KEY, 'true')
     }

@@ -40,12 +40,13 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 ## Adding a New Bank / CSV Format
 
-Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Parser/registry.ts` is the single registry; `ParserId`, `BankAccountId` and `zParserId` are derived from it.
+Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Parser/registry.ts` is the single registry; `BuiltInParserId`, `BuiltInBankAccountId` and `zParserId` are derived from it. Users can also set up custom parsers for unsupported files (`m-custom-parser/`, stored in IndexedDB), which are only tried when no built-in format matches.
 
 1. Copy `utils/Parser/banks/_template.ts` (documents every field) to `utils/Parser/banks/new_bank.ts`, or add a format to an existing bank
 2. Export from `utils/Parser/banks/index.ts` and add to `BANKS` in `utils/Parser/registry.ts`
    - New account type: add it to `AccountType` in `types-enums/index.ts`
    - Update the expected IDs in the "should derive literal ID types" test (`utils/Parser/__tests__/index.test.ts`)
-   - No manual step for the home page: its "Supported banks" list derives from `BANKS` via `getSupportedBanks()` (`m-pages/HomePage/actions.ts`), but the README list under the bank's country must be updated
-3. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.
-4. Changing how existing files are parsed (e.g. transaction IDs) or renaming parser IDs (bank `id`, `accountType`, `variant`): bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
+3. IDs: each format has an `id`, unique within the bank, in snake_case, usually the account name (`'giro'`, `'visa'`, `'current'`); an old export of the same account gets a suffix (`'giro_legacy'`). Parser ID = `{bank.id}__{format.id}`, bank account ID = `{bank.id}__{accountType}` (shared by formats of the same account, part of transaction IDs — never change it).
+4. A file must match exactly one format. The registry test fails if a format's required headers are a subset of another format's headers — make sure `headers` lists all headers of the file.
+5. Changing how existing files are parsed or renaming a bank or format `id`: bump `PARSER_VERSION` in `utils/Parser/create-parser.ts`, so stored files are re-parsed.
+6. Add the bank to the README list under its country. The homepage "Supported banks" list derives from `BANKS` via `getSupportedBanks()` (`m-pages/HomePage/actions.ts`).

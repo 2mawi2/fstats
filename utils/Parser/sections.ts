@@ -1,7 +1,8 @@
-import { uniq } from 'lodash'
+import { maxBy, uniq } from 'lodash'
 
 import type { Parser, RowData } from '@/types'
 
+import { getCustomParsers } from './custom'
 import { AVAILABLE_PARSERS } from './lookup'
 
 type Section = {
@@ -14,15 +15,30 @@ type Section = {
 
 const getParserName = ({ bankName, accountName }: Parser) => `${bankName} ${accountName}`
 
+type SectionsResult = { sections: Section[]; error: string }
+
 /**
  * Splits a file into sections, each starting at a header row of a known format. Most files have one section, some
  * have one per account (e.g. Comdirect Giro + Visa). The whole file is searched, as sections can start anywhere.
  * Sections without transactions are dropped.
  *
- * If there are no sections, `error` explains why the closest parser was rejected.
+ * Custom parsers are only tried if no built-in one matches, so they can't make built-in formats ambiguous.
+ *
+ * If there are no sections, `error` explains why the closest built-in parser was rejected.
  */
-export const findSections = (rows: RowData[]): { sections: Section[]; error: string } => {
-  const parsers = Object.values(AVAILABLE_PARSERS)
+export const findSections = (rows: RowData[]): SectionsResult => {
+  const builtIn = findSectionsWith(rows, Object.values(AVAILABLE_PARSERS), { isCustom: false })
+  const customParsers = getCustomParsers()
+
+  if (builtIn.sections.length || !customParsers.length) {
+    return builtIn
+  }
+
+  const custom = findSectionsWith(rows, customParsers, { isCustom: true })
+  return custom.sections.length ? custom : builtIn
+}
+
+const findSectionsWith = (rows: RowData[], parsers: Parser[], { isCustom }: { isCustom: boolean }): SectionsResult => {
   const starts: { index: number; parser: Parser }[] = []
   let closest: { parser: Parser; closeness: number; missing: string[] } | null = null
 
@@ -40,13 +56,14 @@ export const findSections = (rows: RowData[]): { sections: Section[]; error: str
       }
     }
 
-    // Multiple matches are an error rather than a guess
-    if (matches.length > 1) {
+    // Multiple built-in matches are an error rather than a guess. Custom parsers are set up from a file's headers, so
+    // the one with the most headers fits best.
+    if (matches.length > 1 && !isCustom) {
       return { sections: [], error: `Ambiguous format, matches: ${matches.map(getParserName).join(', ')}` }
     }
 
     if (matches.length) {
-      starts.push({ index, parser: matches[0] })
+      starts.push({ index, parser: maxBy(matches, (parser) => parser.requiredHeaders.length)! })
     }
   }
 

@@ -83,6 +83,7 @@
       "SELECT_ALL": "Alle",
       "SELECT_NONE": "Keine",
       "SELECT_SUPPORTED": "Unterstützt",
+      "SELECT_CONVERTIBLE": "Einrichtung nötig",
       "SELECT_UNSUPPORTED": "Nicht unterstützt",
       "SELECT_INVALID": "Ungültig",
       "BANK_ACCOUNTS": "Bankkonten",
@@ -107,7 +108,8 @@
     },
     "FILE_STATUS": {
       "PARSING": "Wird ausgewertet…",
-      "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format"
+      "UNSUPPORTED_FORMAT": "Nicht unterstütztes Format",
+      "CONVERTIBLE_FORMAT": "Neues Format, richte es ein, um die Datei einzulesen"
     },
     "NO_FILES": {
       "TITLE": "Keine Dateien"
@@ -208,6 +210,84 @@
       "TRANSFERS_IN": "Eingehende Umbuchungen",
       "TRANSFERS_OUT": "Ausgehende Umbuchungen",
       "TRANSFERS_NET": "Umbuchungen netto"
+    },
+    "PARSER_SETUP": {
+      "SET_UP": "Einrichten",
+      "TITLE": "{{file}} einrichten",
+      "CLOSE": "Schließen",
+      "BANK_NAME": "Name der Bank",
+      "BANK_NAME_PLACEHOLDER": "z. B. Sparkasse",
+      "ACCOUNT_NAME": "Kontoname",
+      "ACCOUNT_NAME_PLACEHOLDER": "z. B. Tagesgeldkonto",
+      "DEFAULT_ACCOUNT_NAME": "Girokonto",
+      "CURRENCY": "Währung",
+      "HEADER_ROW_OPTION": "Zeile {{row}}",
+      "FIELD": {
+        "DATE": "Datum",
+        "DESCRIPTION": "Beschreibung",
+        "MONEY_IN": "Eingang",
+        "MONEY_OUT": "Ausgang",
+        "BALANCE": "Kontostand",
+        "REFERENCE": "Referenz",
+        "TRANSACTION_TYPE": "Buchungsart",
+        "CATEGORY": "Bank-Kategorie",
+        "PARENT_CATEGORY": "Bank-Hauptkategorie"
+      },
+      "DATE_FORMAT": "Datumsformat",
+      "NUMBER_FORMAT": "Zahlenformat",
+      "PREVIEW_COUNT_one": "{{count}} Umsatz erkannt",
+      "PREVIEW_COUNT_other": "{{count}} Umsätze erkannt",
+      "SAVE_FAILED": "Speichern fehlgeschlagen: {{message}}",
+      "REVIEW_TITLE": "So lesen wir diese Datei",
+      "QUESTION": "Sieht das richtig aus?",
+      "FIX_HINT": "Passe die Zuordnung unten bei Bedarf an.",
+      "HEADER_ROW": "Kopfzeile",
+      "NAME_HINT": "Dateien in diesem Format werden ab jetzt automatisch eingelesen.",
+      "BACK": "Zurück",
+      "CONFIRM": "Format speichern",
+      "TAB": {
+        "PREVIEW": "Vorschau",
+        "CSV": "Original-CSV"
+      },
+      "FIX_TITLE": "Spaltenzuordnung bestätigen",
+      "NAME_TITLE": "Von welcher Bank ist diese Datei?",
+      "STEP": {
+        "REVIEW": "Kopfzeile",
+        "FIX": "Spalten",
+        "NAME": "Konto"
+      },
+      "CONNECTOR": {
+        "COLUMNS": "Spalten der Datei",
+        "REMOVE": "Verbindung entfernen",
+        "PICK_COLUMN": "Jetzt eine Spalte wählen",
+        "PICK_FIELD": "Jetzt ein Feld wählen",
+        "MISSING": "Pflichtfeld, wähle eine Spalte dafür",
+        "REQUIRED": "Pflichtfelder",
+        "OPTIONAL": "Optionale Felder",
+        "DATE_MISMATCH": "Datumsformat passt nicht zur Spalte",
+        "MATCHES": "passt wahrscheinlich",
+        "NUMBER_MISMATCH": "Beträge können nicht als Zahlen gelesen werden.",
+        "MULTIPLE_IN": "Eine oder mehrere Spalten, auch dieselbe wie Ausgang",
+        "MULTIPLE_OUT": "Eine oder mehrere Spalten, auch dieselbe wie Eingang"
+      },
+      "PREVIEW_MISSING": "Noch keine Vorschau möglich, bitte prüfe die Spalten.",
+      "PREVIEW_INVALID": "Die Beträge können nicht gelesen werden, bitte prüfe die Betragsspalten und das Zahlenformat.",
+      "PREVIEW_EMPTY": "Keine Umsätze gefunden, bitte prüfe die Datumsspalte und das Datumsformat.",
+      "PREVIEW_UNAVAILABLE": "Noch keine Vorschau möglich. Bitte gehe die Schritte unten durch, um die Details deiner Datei zu bestätigen.",
+      "CONTINUE": "Weiter",
+      "HEADER_ROW_PROBLEM": "Mit der ausgewählten Kopfzeile geht es nicht weiter.",
+      "HEADER_ROW_PROBLEMS": {
+        "NAMES": "Weniger als zwei Spaltennamen.",
+        "COLUMN_COUNT": "Spaltenanzahl passt nicht zu den Zeilen darunter."
+      },
+      "NUMBER_MISMATCH_HINT": "Prüfe das Zahlenformat und die Betragsspalten.",
+      "HEADER_ROW_DATA": "Diese Zeile sieht nach Daten aus, nicht nach Spaltennamen.",
+      "HEADER_ROW_DATA_HINT": "Zeilen darüber werden übersprungen und andere Dateien dieses Formats werden eventuell nicht erkannt.",
+      "HEADER_CANDIDATES_one": "Wir haben 1 mögliche Kopfzeile gefunden, bitte prüfe sie.",
+      "HEADER_CANDIDATES_other": "Wir haben {{count}} mögliche Kopfzeilen gefunden, bitte wähle die richtige.",
+      "SHOW_ALL_ROWS": "Weitere mögliche Kopfzeilen anzeigen",
+      "SHOW_CANDIDATES": "Weniger anzeigen",
+      "HEADER_NONE": "Wir konnten keine Kopfzeile finden, bitte wähle die richtige."
     }
   },
   "SETTINGS_PAGE": {
@@ -221,10 +301,18 @@
       "TITLE": "Speicherdetails",
       "FILES_one": "Datei",
       "FILES_other": "Dateien",
+      "CUSTOM_FORMATS_one": "Eigenes Format",
+      "CUSTOM_FORMATS_other": "Eigene Formate",
       "STORAGE_USED": "Belegter Speicher",
+      "NO_FILES": "Keine Dateien gespeichert.",
+      "NO_FORMATS": "Noch keine eigenen Formate. Richte eines über eine nicht unterstützte Datei auf der Statistikseite ein.",
       "FAILED_TO_CALCULATE": "Berechnung fehlgeschlagen",
-      "CONFIRM_CLEAR": "Möchtest du wirklich alle Daten löschen?",
-      "CLEAR_ALL_DATA": "Alle Daten löschen"
+      "CONFIRM_DELETE_FILES": "Möchtest du wirklich alle Dateien löschen?",
+      "DELETE_FILES": "Dateien löschen",
+      "CONFIRM_DELETE_FORMATS": "Möchtest du wirklich alle eigenen Formate löschen? Damit gelesene Dateien müssen erneut eingerichtet werden.",
+      "DELETE_FORMATS": "Formate löschen",
+      "CONFIRM_DELETE_ALL": "Möchtest du wirklich alle Daten löschen? Dabei werden alle Dateien und eigenen Formate gelöscht.",
+      "DELETE_ALL_DATA": "Alle Daten löschen"
     },
     "LAYOUT": {
       "TITLE": "Layout der Statistikseite",

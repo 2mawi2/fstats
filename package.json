@@ -1,7 +1,7 @@
 {
   "name": "fstats",
   "private": true,
-  "version": "1.39.0",
+  "version": "1.39.1",
   "description": "fstats",
   "author": "Cornelius Weidmann <cornelius@kyco.io>",
   "scripts": {
@@ -27,7 +27,7 @@
     "@mui/material-nextjs": "9.5.0",
     "@tanstack/react-query": "5.104.2",
     "@tanstack/react-query-devtools": "5.104.2",
-    "@tanstack/react-virtual": "3.14.17",
+    "@tanstack/react-virtual": "3.14.19",
     "big.js": "7.0.1",
     "chart.js": "4.5.1",
     "chartjs-plugin-annotation": "3.1.0",
@@ -69,7 +69,7 @@
     "prettier": "3.9.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "typescript-eslint": "8.71.2",
-    "vercel": "63.1.2",
+    "vercel": "64.0.1",
     "vitest": "5.0.4"
   }
 }
