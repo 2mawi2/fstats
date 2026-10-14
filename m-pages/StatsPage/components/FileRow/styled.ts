@@ -7,6 +7,7 @@ export const ui = () => {
       gap: 0.75,
       pl: 1,
       pr: 1.25,
+      minWidth: 0,
     },
     checkbox: sxSmallCheckbox,
     name: sxListRowTitle,
@@ -17,6 +18,7 @@ export const ui = () => {
     setupButton: {
       flexShrink: 0,
       minWidth: 0,
+      mr: 1.25,
       py: 0,
       px: 1,
       fontSize: 12,

@@ -46,29 +46,27 @@ const Component = ({ file, isChecked, onToggle, disabled = false }: FileRowProps
             <FileStatusIcon file={file} sx={sx.status} />
           </Tooltip>
         ) : null}
-        {isConvertible(file) && !disabled ? (
-          <Tooltip title={format.value}>
-            <Button
-              component={NextLink}
-              href={getWorkspaceHref(searchParams, getSetupChange(file.id))}
-              size="small"
-              color="info"
-              variant="outlined"
-              // Opens the setup without (un)checking the file
-              onClick={(event) => event.stopPropagation()}
-              onMouseDown={(event) => event.stopPropagation()}
-              sx={sx.setupButton}
-            >
-              {t('STATS_PAGE.PARSER_SETUP.SET_UP')}
-            </Button>
-          </Tooltip>
-        ) : null}
         {isParsed(file) ? (
           <TextChip title={format.value} sx={sx.bankChip}>
             {format.value}
           </TextChip>
         ) : null}
       </ListItemButton>
+      {/* Sibling of the row button, interactive elements can't be nested */}
+      {isConvertible(file) && !disabled ? (
+        <Tooltip title={format.value}>
+          <Button
+            component={NextLink}
+            href={getWorkspaceHref(searchParams, getSetupChange(file.id))}
+            size="small"
+            color="info"
+            variant="outlined"
+            sx={sx.setupButton}
+          >
+            {t('STATS_PAGE.PARSER_SETUP.SET_UP')}
+          </Button>
+        </Tooltip>
+      ) : null}
     </ListItem>
   )
 }
