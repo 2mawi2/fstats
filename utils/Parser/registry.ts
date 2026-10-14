@@ -7,10 +7,10 @@ import { z } from 'zod'
 
 import type { AccountIds, ParserIds } from '@/types'
 
-import { capitec, comdirect, fnb, ing, lloyds } from './banks'
+import { capitec, comdirect, fnb, ing, lloyds, n26 } from './banks'
 import { toParserId } from './definition'
 
-export const BANKS = [capitec, comdirect, fnb, ing, lloyds] as const
+export const BANKS = [capitec, comdirect, fnb, ing, lloyds, n26] as const
 
 type Bank = (typeof BANKS)[number]
 
