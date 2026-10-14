@@ -90,7 +90,8 @@ export const newBank = defineBank({
          */
         date: 'Date',
         /**
-         * E.g. the payee or booking text.
+         * E.g. the payee or booking text. A list uses the first non-empty column, e.g.
+         * `['Name', 'Description']`.
          */
         description: 'Description',
         /**
@@ -126,6 +127,11 @@ export const newBank = defineBank({
         category: null,
         parentCategory: null,
       },
+      /**
+       * Optional: skip rows where a header has one of these values, e.g.
+       * `{ header: 'Category', values: ['TRANSFER'] }` to exclude non-transaction
+       * rows. The header must be listed in `headers`.
+       */
     },
   ],
 })

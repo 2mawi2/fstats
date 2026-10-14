@@ -21,15 +21,18 @@ export const getFormatHeaders = ({ headers }: FormatDef) => {
 }
 
 /**
- * Headers read by `columns` and `extraColumns`.
+ * Headers read by `columns`, `extraColumns` and `skipValues`.
  */
-export const getReferencedHeaders = ({ columns, extraColumns }: FormatDef) => {
+export const getReferencedHeaders = ({ columns, extraColumns, skipValues }: FormatDef) => {
+  const description = Array.isArray(columns.description) ? columns.description : [columns.description]
+
   return [
     ...new Set([
       columns.date,
-      columns.description,
+      ...description,
       ...getAmountHeaders(columns.amount),
       ...Object.values(extraColumns).filter((header) => header !== null),
+      ...(skipValues ? [skipValues.header] : []),
     ]),
   ]
 }

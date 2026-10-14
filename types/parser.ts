@@ -69,13 +69,18 @@ export type FormatDef<H extends string = string> = {
    */
   headers: readonly HeaderDef<H>[]
   /**
-   * Core transaction fields, headers must be listed in `headers`.
+   * Core transaction fields, headers must be listed in `headers`. If `description` is a list, the first non-empty
+   * column is used.
    */
-  columns: { date: H; description: H; amount: AmountColumnDef<H> }
+  columns: { date: H; description: H | readonly H[]; amount: AmountColumnDef<H> }
   /**
    * Stored in `Transaction['extra']`, headers must be listed in `headers`. `null` if the file has no such column.
    */
   extraColumns: Record<ExtraField, H | null>
+  /**
+   * Rows where the header's value is one of `values` are skipped, e.g. to exclude non-cash rows of a broker export.
+   */
+  skipValues?: { readonly header: H; readonly values: readonly string[] }
 }
 
 export type BankDef = {

@@ -1,5 +1,8 @@
+import { readFileSync } from 'node:fs'
+import { parse } from 'papaparse'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
+import type { RowData } from '@/types'
 import { AccountType, Country, Currency } from '@/types-enums'
 import type { BankAccountId, ParserId } from '@/utils/Parser'
 import {
@@ -27,6 +30,7 @@ describe('registry', () => {
       | 'ing__current__default'
       | 'lloyds__current__default'
       | 'n26__current__default'
+      | 'trade_republic__current__default'
     >()
     expectTypeOf<BankAccountId>().toEqualTypeOf<
       | 'capitec__savings'
@@ -36,6 +40,7 @@ describe('registry', () => {
       | 'ing__current'
       | 'lloyds__current'
       | 'n26__current'
+      | 'trade_republic__current'
     >()
   })
 
@@ -126,6 +131,40 @@ describe('createParser', () => {
       { reference: 'Ref' },
       null,
     ])
+  })
+})
+
+describe('Trade Republic', () => {
+  const csv = readFileSync(new URL('../__fixtures__/trade_republic_fake.csv', import.meta.url), 'utf8')
+  const rows = parse<RowData>(csv, { header: false, skipEmptyLines: 'greedy' }).data
+  const parseCsv = () => {
+    const [section] = findSections(rows).sections
+
+    return section.parser.parse(section.rows)
+  }
+
+  it('should match only the Trade Republic parser', () => {
+    expect(findSections(rows).sections.map(({ parser }) => parser.id)).toEqual(['trade_republic__current__default'])
+  })
+
+  it('should skip security trades and keep cash transactions', () => {
+    const transactions = parseCsv()
+
+    expect(transactions).toHaveLength(4)
+    expect(transactions.map(({ description, value }) => [description, value])).toEqual([
+      ['Interest payment for payout collection 6188b6bc-f7f6-41e4-9af6-45574bffc855', '1.350000'],
+      ['Apple Inc.', '2.170000'],
+      ['Alex Example', '1200.000000'],
+      ['Alex Example', '850.000000'],
+    ])
+  })
+
+  it('should store the transaction type as extra', () => {
+    const [interest, dividend, deposit] = parseCsv()
+
+    expect(interest.extra).toEqual({ transactionType: 'INTEREST_PAYMENT' })
+    expect(dividend.extra).toEqual({ transactionType: 'DIVIDEND' })
+    expect(deposit.extra).toEqual({ transactionType: 'CUSTOMER_INPAYMENT' })
   })
 })
 

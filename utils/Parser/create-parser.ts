@@ -29,9 +29,11 @@ type Row = {
  * the next section (see `findSections`).
  */
 export const createParser = (bank: BankDef, format: FormatDef): Parser => {
-  const { columns, extraColumns, dateFormat, numberFormat } = format
+  const { columns, extraColumns, dateFormat, numberFormat, skipValues } = format
   const { amount } = columns
   const { headers, required } = getFormatHeaders(format)
+
+  const descriptionHeaders = typeof columns.description === 'string' ? [columns.description] : columns.description
 
   const toNumber = (value: string) => (numberFormat === 'de' ? parseGermanNumber(value) : value)
 
@@ -51,6 +53,8 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
         return toNumber(amount.headers.map(row.get).find(Boolean) ?? '')
     }
   }
+
+  const getDescription = (row: Row): string => descriptionHeaders.map(row.get).find(Boolean) ?? ''
 
   const getExtra = (row: Row): Transaction['extra'] => {
     const fields = (Object.entries(extraColumns) as [ExtraField, string | null][])
@@ -84,6 +88,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
       // Rows with a different column count are footers or notes
       .filter((row) => row.length === header.length)
       .filter((row) => isValidDate(toRow(row).get(columns.date)))
+      .filter((row) => !skipValues || !skipValues.values.includes(toRow(row).get(skipValues.header)))
 
     return { header, rawRows, rows: rawRows.map(toRow) }
   }
@@ -123,7 +128,7 @@ export const createParser = (bank: BankDef, format: FormatDef): Parser => {
 
       const parsedRows: Omit<Transaction, 'id'>[] = locateRows(section).rows.map((row) => ({
         date: formatISO(toDate(row.get(columns.date), { formatFrom: dateFormat })),
-        description: row.get(columns.description),
+        description: getDescription(row),
         value: getValue(row) || '0',
         category: null,
         currency: bank.currency,
