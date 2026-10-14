@@ -18,7 +18,7 @@ const NUMERIC_EXTRA_FIELDS: ExtraField[] = ['balance']
  * Bump when the parse output changes (e.g. how transaction IDs are generated or transactions are categorised), so
  * stored files are re-parsed.
  */
-export const PARSER_VERSION = 4
+export const PARSER_VERSION = 5
 
 type Row = {
   get: (header: string) => string

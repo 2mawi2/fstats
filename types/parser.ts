@@ -49,18 +49,19 @@ export type AmountColumnDef<H extends string = string> =
 
 export type FormatDef<H extends string = string> = {
   /**
-   * Part of the persisted IDs.
-   * Parser ID: `${bank.id}__${accountType}__${variant}`, bank account ID: `${bank.id}__${accountType}`.
+   * Unique within the bank, in snake_case, e.g. "giro", "visa" or "savings_legacy". Parser ID:
+   * `${bank.id}__${id}`, changing it requires bumping `PARSER_VERSION`.
+   */
+  id: string
+  /**
+   * Bank account ID: `${bank.id}__${accountType}`, formats of the same account share it. Part of the persisted
+   * transaction IDs, so never change it.
    */
   accountType: AccountType
   /**
    * Display name, e.g. "Giro" or "Current Account".
    */
   accountName: string
-  /**
-   * Part of the parser ID, distinguishes multiple CSV formats of the same account ("default", "legacy", etc.).
-   */
-  variant: string
   dateFormat: string
   /**
    * 'de' = "1.234,56". 'en' = "1,234.56".
@@ -112,11 +113,8 @@ type HeaderNames<F> = F extends { headers: readonly (infer D)[] }
  */
 export type ValidFormats<F extends readonly FormatDef[]> = { [K in keyof F]: FormatDef<HeaderNames<F[K]>> }
 
-type ParserIdOf<BankId extends string, F> = F extends {
-  accountType: infer A extends string
-  variant: infer V extends string
-}
-  ? `${BankId}__${A}__${V}`
+type ParserIdOf<BankId extends string, F> = F extends { id: infer FormatId extends string }
+  ? `${BankId}__${FormatId}`
   : never
 
 type AccountIdOf<BankId extends string, F> = F extends { accountType: infer A extends string }

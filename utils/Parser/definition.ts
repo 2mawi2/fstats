@@ -52,5 +52,5 @@ export const toAccountId = (bank: Pick<BankDef, 'id'>, format: FormatDef) => {
 }
 
 export const toParserId = (bank: Pick<BankDef, 'id'>, format: FormatDef) => {
-  return `${toAccountId(bank, format)}__${format.variant}`
+  return `${bank.id}__${format.id}`
 }

@@ -12,13 +12,13 @@ export const toCustomBankId = (id: string): CustomBankId => {
 }
 
 /**
- * The format of a mapping, its parser ID is `${toCustomBankId(id)}__current__default`.
+ * The format of a mapping, its parser ID is `${toCustomBankId(id)}__default`.
  */
 export const toCustomFormat = (mapping: CustomParserMapping): FormatDef => {
   return {
+    id: 'default',
     accountType: AccountType.CURRENT,
     accountName: mapping.accountName,
-    variant: 'default',
     dateFormat: mapping.dateFormat,
     numberFormat: mapping.numberFormat,
     headers: mapping.headers,

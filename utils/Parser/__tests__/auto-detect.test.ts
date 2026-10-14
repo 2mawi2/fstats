@@ -186,7 +186,7 @@ describe('custom parsers', () => {
     const parser = createMappingParser('00000000-0000-0000-0000-000000000001', toCustomParser('a'))
     const transactions = parser.parse(ukFile.slice(1))
 
-    expect(parser.id).toBe('custom_00000000000000000000000000000001__current__default')
+    expect(parser.id).toBe('custom_00000000000000000000000000000001__default')
     expect(transactions.map(({ value, extra }) => [value, extra?.balance])).toEqual([
       ['-12.5', '1234.56'],
       ['2000.00', '3234.56'],

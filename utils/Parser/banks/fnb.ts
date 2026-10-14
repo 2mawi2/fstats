@@ -10,9 +10,9 @@ export const fnb = defineBank({
   currency: Currency.ZAR,
   formats: [
     {
+      id: 'credit_card',
       accountType: AccountType.CREDIT_CARD,
       accountName: 'Credit Card',
-      variant: 'default',
       dateFormat: 'yyyy/MM/dd',
       numberFormat: 'en',
       headers: ['Date', 'Amount', 'Balance', 'Description'],

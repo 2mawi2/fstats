@@ -23,7 +23,7 @@ export type BuiltInBankAccountId = AccountIds<Bank>
  */
 export type CustomBankId = `custom_${string}`
 
-export type CustomParserId = `${CustomBankId}__current__default`
+export type CustomParserId = `${CustomBankId}__default`
 
 export type CustomBankAccountId = `${CustomBankId}__current`
 
@@ -35,7 +35,7 @@ export const PARSER_IDS = BANKS.flatMap((bank) =>
   bank.formats.map((format) => toParserId(bank, format)),
 ) as BuiltInParserId[]
 
-const CUSTOM_PARSER_ID = /^custom_[0-9a-f]{32}__current__default$/
+const CUSTOM_PARSER_ID = /^custom_[0-9a-f]{32}__default$/
 
 export const zParserId = z.union([
   z.enum(PARSER_IDS),
