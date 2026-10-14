@@ -40,7 +40,7 @@ Privacy-focused CSV bank statement parser. All processing is client-side (Indexe
 
 ## Adding a New Bank / CSV Format
 
-Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Parser/registry.ts` is the single registry; `ParserId`, `BankAccountId` and `zParserId` are derived from it.
+Banks are declarative definitions in `utils/Parser/banks/`. `BANKS` in `utils/Parser/registry.ts` is the single registry; `BuiltInParserId`, `BuiltInBankAccountId` and `zParserId` are derived from it. Users can also set up custom parsers for unsupported files (`m-custom-parser/`, stored in IndexedDB), which are only tried when no built-in format matches.
 
 1. Copy `utils/Parser/banks/_template.ts` (documents every field) to `utils/Parser/banks/new_bank.ts`, or add a format to an existing bank
 2. Export from `utils/Parser/banks/index.ts` and add to `BANKS` in `utils/Parser/registry.ts`

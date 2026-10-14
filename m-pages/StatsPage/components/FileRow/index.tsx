@@ -1,10 +1,13 @@
 'use client'
 
-import { Checkbox, CircularProgress, ListItem, ListItemButton, Tooltip, Typography } from '@mui/material'
+import { Button, Checkbox, CircularProgress, ListItem, ListItemButton, Tooltip, Typography } from '@mui/material'
+import NextLink from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import type { StatsFile } from '@/types'
 import { StatsFileStatus } from '@/types-enums'
-import { isError, isParsed, isUnknown } from '@/m-stats-file/service'
+import { getSetupChange, getWorkspaceHref } from '@/common'
+import { isConvertible, isError, isParsed, isUnknown } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import { getFileFormat, getFileNameColor } from '../../actions'
@@ -22,7 +25,8 @@ type FileRowProps = {
 const Component = ({ file, isChecked, onToggle, disabled = false }: FileRowProps) => {
   const sx = ui()
   // Re-render on language change, the format label is translated
-  useTranslation()
+  const { t } = useTranslation()
+  const searchParams = useSearchParams()
   const format = getFileFormat(file)
 
   return (
@@ -40,6 +44,23 @@ const Component = ({ file, isChecked, onToggle, disabled = false }: FileRowProps
         ) : isUnknown(file) || isError(file) ? (
           <Tooltip title={format.value}>
             <FileStatusIcon file={file} sx={sx.status} />
+          </Tooltip>
+        ) : null}
+        {isConvertible(file) && !disabled ? (
+          <Tooltip title={format.value}>
+            <Button
+              component={NextLink}
+              href={getWorkspaceHref(searchParams, getSetupChange(file.id))}
+              size="small"
+              color="info"
+              variant="outlined"
+              // Opens the setup without (un)checking the file
+              onClick={(event) => event.stopPropagation()}
+              onMouseDown={(event) => event.stopPropagation()}
+              sx={sx.setupButton}
+            >
+              {t('STATS_PAGE.PARSER_SETUP.SET_UP')}
+            </Button>
           </Tooltip>
         ) : null}
         {isParsed(file) ? (

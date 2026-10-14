@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import { AccountType, Country, Currency } from '@/types-enums'
-import type { BankAccountId, ParserId } from '@/utils/Parser'
+import type { BuiltInBankAccountId, BuiltInParserId } from '@/utils/Parser'
 import {
   AVAILABLE_PARSERS,
   BANKS,
@@ -18,7 +18,7 @@ import {
 
 describe('registry', () => {
   it('should derive literal ID types', () => {
-    expectTypeOf<ParserId>().toEqualTypeOf<
+    expectTypeOf<BuiltInParserId>().toEqualTypeOf<
       | 'capitec__savings__default'
       | 'capitec__savings__legacy'
       | 'comdirect__current__default'
@@ -27,7 +27,7 @@ describe('registry', () => {
       | 'ing__current__default'
       | 'lloyds__current__default'
     >()
-    expectTypeOf<BankAccountId>().toEqualTypeOf<
+    expectTypeOf<BuiltInBankAccountId>().toEqualTypeOf<
       | 'capitec__savings'
       | 'comdirect__current'
       | 'comdirect__credit_card'

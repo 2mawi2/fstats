@@ -47,6 +47,7 @@ export const StatsFileErrorCode = {
   DUPLICATE: 'duplicate', // Same content as an existing file
   UNREADABLE: 'unreadable', // CSV could not be read
   UNSUPPORTED_FORMAT: 'unsupported_format', // No parser matched
+  CONVERTIBLE_FORMAT: 'convertible_format', // No parser matched, but the format was detected, so it can be set up
   INVALID_DATA: 'invalid_data', // Parser matched, but parsing or validation failed
 } as const
 
@@ -55,6 +56,7 @@ export const zStatsFileErrorCode = z.enum([
   StatsFileErrorCode.DUPLICATE,
   StatsFileErrorCode.UNREADABLE,
   StatsFileErrorCode.UNSUPPORTED_FORMAT,
+  StatsFileErrorCode.CONVERTIBLE_FORMAT,
   StatsFileErrorCode.INVALID_DATA,
 ] as const)
 

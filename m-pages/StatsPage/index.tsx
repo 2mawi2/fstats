@@ -5,12 +5,22 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { Fragment, useMemo, useRef } from 'react'
 
-import { getEndDemoHref, getView, isDemo, WorkspaceView } from '@/common'
+import { getEndDemoHref, getSetupFileId, getView, isDemo, WorkspaceView } from '@/common'
 import { PageWrapper } from '@/components'
+import { isConvertible } from '@/m-stats-file/service'
 import { useFileHelper, useResizeHandle, useStatsLayout } from '@/hooks'
 
 import { getCheckedTransactions, getStatsTransactions, resizeColumns } from './actions'
-import { DataView, DemoBanner, DropOverlay, FileExplorer, FileSidebar, ProfitLossView, StatsView } from './components'
+import {
+  DataView,
+  DemoBanner,
+  DropOverlay,
+  FileExplorer,
+  FileSidebar,
+  ParserSetup,
+  ProfitLossView,
+  StatsView,
+} from './components'
 import { WorkspaceContext } from './context'
 import { ui } from './styled'
 import { useDayFilter } from './useDayFilter'
@@ -19,7 +29,7 @@ import { useDemoState } from './useViewStorage'
 
 /**
  * Workspace of the stats page: file explorer, the transactions, stats, breakdown or CSV view (`view` param) in the middle column, and the file
- * summary.
+ * summary. Setting up an unsupported file (`setup` param) replaces the view.
  */
 const Component = () => {
   const sx = ui()
@@ -29,6 +39,9 @@ const Component = () => {
   const view = getView(searchParams)
   const isDemoMode = isDemo(searchParams)
   const files = useFileHelper({ isDemoMode })
+  // Only while the file isn't set up yet, it's parsed once it is
+  const setupFileId = getSetupFileId(searchParams)
+  const setupFile = files.files.find((file) => file.id === setupFileId && isConvertible(file))
   const dayFilter = useDayFilter({ isDemoMode, isDisabled: view === WorkspaceView.CSV })
   // Once for all components, the part only depending on the files is kept when (de)selecting days
   const checkedTransactions = useMemo(() => getCheckedTransactions(files.selectedFiles), [files.selectedFiles])
@@ -58,14 +71,15 @@ const Component = () => {
     },
     {
       id: 'middle',
-      content:
-        view === WorkspaceView.STATS ? (
-          <StatsView />
-        ) : view === WorkspaceView.BREAKDOWN ? (
-          <ProfitLossView />
-        ) : (
-          <DataView />
-        ),
+      content: setupFile ? (
+        <ParserSetup key={setupFile.id} file={setupFile} />
+      ) : view === WorkspaceView.STATS ? (
+        <StatsView />
+      ) : view === WorkspaceView.BREAKDOWN ? (
+        <ProfitLossView />
+      ) : (
+        <DataView />
+      ),
     },
     {
       id: 'right',

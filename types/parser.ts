@@ -38,11 +38,14 @@ export type HeaderDef<H extends string = string> = H | { readonly header: H; rea
  * - `signed`: one signed column
  * - `inOut`: money in / money out columns, out values are stored as negative whether the file has them positive or negative
  * - `firstOf`: first non-empty signed column
+ * - `sum`: sum of the non-empty columns, `signed` as they are, `in` as positive and `out` as negative (e.g. money out
+ *   and a fee column)
  */
 export type AmountColumnDef<H extends string = string> =
   | { readonly type: 'signed'; readonly header: H }
   | { readonly type: 'inOut'; readonly in: H; readonly out: H }
   | { readonly type: 'firstOf'; readonly headers: readonly H[] }
+  | { readonly type: 'sum'; readonly signed: readonly H[]; readonly in: readonly H[]; readonly out: readonly H[] }
 
 export type FormatDef<H extends string = string> = {
   /**

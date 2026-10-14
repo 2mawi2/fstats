@@ -14,6 +14,14 @@ export const ui = () => {
       flexShrink: 0,
       fontSize: 16,
     },
+    setupButton: {
+      flexShrink: 0,
+      minWidth: 0,
+      py: 0,
+      px: 1,
+      fontSize: 12,
+      lineHeight: 1.6,
+    },
     bankChip: {
       maxWidth: '45%',
     },

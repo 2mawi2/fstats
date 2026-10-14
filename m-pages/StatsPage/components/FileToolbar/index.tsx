@@ -5,7 +5,7 @@ import { Box, Checkbox, Divider, IconButton, Tooltip, Typography } from '@mui/ma
 import { useState } from 'react'
 
 import { MISC } from '@/common'
-import { isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-file/service'
+import { isConvertible, isError, isParsed, isUnknown, useMutateRemoveFiles } from '@/m-stats-file/service'
 import { useTranslation } from '@/lib/i18n'
 
 import { useWorkspace, useWorkspaceFiles } from '../../context'
@@ -29,6 +29,12 @@ const Component = () => {
     { id: 'none', label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_NONE'), fileIds: [] },
     { id: 'supported', label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_SUPPORTED'), fileIds: toIds(files.filter(isParsed)) },
     // Same colors as the file names in the list
+    {
+      id: 'convertible',
+      label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_CONVERTIBLE'),
+      fileIds: toIds(files.filter(isConvertible)),
+      color: 'info.main',
+    },
     {
       id: 'unsupported',
       label: t('STATS_PAGE.FILE_TOOLBAR.SELECT_UNSUPPORTED'),

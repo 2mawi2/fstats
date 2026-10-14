@@ -46,6 +46,14 @@ type VirtualTableProps = {
   getCells: (index: number) => string[]
   getRowStyle?: (index: number) => CSSProperties | undefined
   /**
+   * Makes the rows clickable, e.g. to pick one.
+   */
+  onRowClick?: (index: number) => void
+  /**
+   * The columns are only used for the cells (e.g. their widths), e.g. for rows of a file without a header.
+   */
+  hideHeader?: boolean
+  /**
    * Keeps the header row at this offset (px) from the top of the scroll element's content while scrolling.
    */
   stickyHeaderTop?: number
@@ -75,6 +83,8 @@ const Component = ({
   rowCount,
   getCells,
   getRowStyle,
+  onRowClick,
+  hideHeader = false,
   stickyHeaderTop,
   minColumnWidth,
   scrollElement,
@@ -123,7 +133,7 @@ const Component = ({
       sx={{
         ...sx.wrapper,
         // The header row draws the top border, see `sx.table`
-        ...(columns ? sx.headerWrapper : null),
+        ...(columns && !hideHeader ? sx.headerWrapper : null),
         ...(minColumnWidth === undefined ? null : sx.scrollWrapper),
       }}
     >
@@ -138,7 +148,7 @@ const Component = ({
             <col key={index} style={{ width }} />
           ))}
         </colgroup>
-        {columns ? (
+        {columns && !hideHeader ? (
           <thead>
             <tr>
               {/* Index keys, CSV headers aren't necessarily unique */}
@@ -167,7 +177,8 @@ const Component = ({
               key={item.key}
               data-index={item.index}
               ref={virtualizer.measureElement}
-              style={getRowStyle?.(item.index)}
+              style={onRowClick ? { cursor: 'pointer', ...getRowStyle?.(item.index) } : getRowStyle?.(item.index)}
+              onClick={onRowClick ? () => onRowClick(item.index) : undefined}
             >
               {getCells(item.index).map((cell, cellIndex) => {
                 const column = columns?.[cellIndex]

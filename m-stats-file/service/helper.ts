@@ -3,7 +3,7 @@ import { Currency, StatsFileErrorCode, StatsFileStatus } from '@/types-enums'
 import { MISC } from '@/common'
 import { parseFiles } from '@/utils/FileParser'
 import type { BankAccountId } from '@/utils/Parser'
-import { getBankAccountId, getBankAccountName, getParserCurrency, PARSER_VERSION } from '@/utils/Parser'
+import { getBankAccountId, getBankAccountName, getParser, getParserCurrency, PARSER_VERSION } from '@/utils/Parser'
 
 import { getFiles, removeAllFiles, updateFiles } from '../api'
 
@@ -12,10 +12,11 @@ export const isParsed = (file: StatsFile): file is ParsedStatsFile => {
 }
 
 /**
- * Files which are broken, as opposed to `isUnknown()` files which are valid CSVs from an unsupported bank.
+ * Files which are broken, as opposed to `isUnknown()` and `isConvertible()` files which are valid CSVs from an
+ * unsupported bank.
  */
 export const isError = (file: StatsFile) => {
-  return file.status === StatsFileStatus.ERROR && file.error.code !== StatsFileErrorCode.UNSUPPORTED_FORMAT
+  return file.status === StatsFileStatus.ERROR && !isUnknown(file) && !isConvertible(file)
 }
 
 /**
@@ -25,8 +26,18 @@ export const isRejected = (file: StatsFile): file is Extract<StatsFile, { status
   return file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.REJECTED
 }
 
+/**
+ * Files of an unsupported format that couldn't be detected either.
+ */
 export const isUnknown = (file: StatsFile) => {
   return file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.UNSUPPORTED_FORMAT
+}
+
+/**
+ * Files of an unsupported format that was detected, so they can be set up as a custom parser (see `ParserSetup`).
+ */
+export const isConvertible = (file: StatsFile) => {
+  return file.status === StatsFileStatus.ERROR && file.error.code === StatsFileErrorCode.CONVERTIBLE_FORMAT
 }
 
 export const getFileTransactions = (file: ParsedStatsFile) => {
@@ -93,16 +104,32 @@ export const splitDuplicates = <T extends Transaction>(transactions: T[]) => {
   return { unique, duplicates }
 }
 
-/**
- * Re-parses stored files that were parsed with an older parser version, e.g. to update their transaction IDs.
- */
-export const reparseOutdatedFiles = async () => {
-  const files = await getFiles()
-  const outdatedFiles = files.filter((file) => isParsed(file) && file.parserVersion !== PARSER_VERSION)
+const reparseFiles = async (isOutdated: (file: StatsFile) => boolean) => {
+  const outdatedFiles = (await getFiles()).filter(isOutdated)
 
   if (outdatedFiles.length) {
     await updateFiles(await parseFiles(outdatedFiles))
   }
+}
+
+/**
+ * Re-parses stored files that were parsed with an older parser version (e.g. to update their transaction IDs) or with
+ * a parser that no longer exists (a deleted custom parser). Unknown files too, as detection may have improved.
+ */
+export const reparseOutdatedFiles = async () => {
+  await reparseFiles(
+    (file) =>
+      isUnknown(file) ||
+      (isParsed(file) &&
+        (file.parserVersion !== PARSER_VERSION || file.sections.some((section) => !getParser(section.parserId)))),
+  )
+}
+
+/**
+ * Re-parses the files of unsupported formats, e.g. after adding a custom parser.
+ */
+export const reparseUnsupportedFiles = async () => {
+  await reparseFiles((file) => isUnknown(file) || isConvertible(file))
 }
 
 /**

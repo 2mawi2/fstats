@@ -12,7 +12,7 @@ type FileStatusIconProps = {
 }
 
 /**
- * Warning for unsupported files, error for invalid files, nothing otherwise. Rest props (incl. `ref`) are forwarded, so
+ * Warning for unsupported files, error for invalid files, nothing otherwise (convertible files have a setup button). Rest props (incl. `ref`) are forwarded, so
  * it works as a `Tooltip` child.
  */
 const Component = ({ file, sx, ...props }: FileStatusIconProps) => {

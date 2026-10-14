@@ -9,6 +9,8 @@ const VIEW_PARAM = 'view'
 
 const DEMO_PARAM = 'demo'
 
+const SETUP_PARAM = 'setup'
+
 /**
  * View of the middle column, `transactions` when the URL has none (or an unknown one).
  */
@@ -26,6 +28,17 @@ type SearchParams = { get: (name: string) => string | null; toString: () => stri
 export const getView = (searchParams: SearchParams): WorkspaceView => {
   const view = searchParams.get(VIEW_PARAM)
   return Object.values(WorkspaceView).find((value) => value === view) ?? WorkspaceView.TRANSACTIONS
+}
+
+/**
+ * ID of the unsupported file whose format is being set up in the middle column, see `ParserSetup`.
+ */
+export const getSetupFileId = (searchParams: SearchParams) => {
+  return searchParams.get(SETUP_PARAM)
+}
+
+export const getSetupChange = (fileId: string | null) => {
+  return { [SETUP_PARAM]: fileId }
 }
 
 export const isDemo = (searchParams: SearchParams) => {
