@@ -216,8 +216,9 @@
       "TITLE": "Set up {{file}}",
       "CLOSE": "Close",
       "BANK_NAME": "Bank name",
-      "BANK_NAME_PLACEHOLDER": "e.g. Sparkasse",
+      "BANK_NAME_PLACEHOLDER": "e.g. Barclays",
       "ACCOUNT_NAME": "Account name",
+      "ACCOUNT_NAME_PLACEHOLDER": "e.g. Savings account",
       "DEFAULT_ACCOUNT_NAME": "Current account",
       "CURRENCY": "Currency",
       "HEADER_ROW_OPTION": "Row {{row}}",
@@ -251,7 +252,7 @@
       "FIX_TITLE": "Confirm column mapping",
       "NAME_TITLE": "Which bank is this from?",
       "STEP": {
-        "REVIEW": "Check",
+        "REVIEW": "Header row",
         "FIX": "Columns",
         "NAME": "Account"
       },
@@ -284,8 +285,8 @@
       "HEADER_ROW_DATA_HINT": "Rows above it are skipped, and other files of this format may not be recognised.",
       "HEADER_CANDIDATES_one": "We found 1 possible header row, please check it.",
       "HEADER_CANDIDATES_other": "We found {{count}} possible header rows, please pick the right one.",
-      "SHOW_ALL_ROWS": "Show all rows",
-      "SHOW_CANDIDATES": "Only show possible header rows",
+      "SHOW_ALL_ROWS": "Show more possible header rows",
+      "SHOW_CANDIDATES": "Show less",
       "HEADER_NONE": "We couldn't find a header row, please pick the right one."
     }
   },

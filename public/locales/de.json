@@ -218,6 +218,7 @@
       "BANK_NAME": "Name der Bank",
       "BANK_NAME_PLACEHOLDER": "z. B. Sparkasse",
       "ACCOUNT_NAME": "Kontoname",
+      "ACCOUNT_NAME_PLACEHOLDER": "z. B. Tagesgeldkonto",
       "DEFAULT_ACCOUNT_NAME": "Girokonto",
       "CURRENCY": "Währung",
       "HEADER_ROW_OPTION": "Zeile {{row}}",
@@ -251,7 +252,7 @@
       "FIX_TITLE": "Spaltenzuordnung bestätigen",
       "NAME_TITLE": "Von welcher Bank ist diese Datei?",
       "STEP": {
-        "REVIEW": "Prüfen",
+        "REVIEW": "Kopfzeile",
         "FIX": "Spalten",
         "NAME": "Konto"
       },
@@ -284,8 +285,8 @@
       "HEADER_ROW_DATA_HINT": "Zeilen darüber werden übersprungen und andere Dateien dieses Formats werden eventuell nicht erkannt.",
       "HEADER_CANDIDATES_one": "Wir haben 1 mögliche Kopfzeile gefunden, bitte prüfe sie.",
       "HEADER_CANDIDATES_other": "Wir haben {{count}} mögliche Kopfzeilen gefunden, bitte wähle die richtige.",
-      "SHOW_ALL_ROWS": "Alle Zeilen anzeigen",
-      "SHOW_CANDIDATES": "Nur mögliche Kopfzeilen anzeigen",
+      "SHOW_ALL_ROWS": "Weitere mögliche Kopfzeilen anzeigen",
+      "SHOW_CANDIDATES": "Weniger anzeigen",
       "HEADER_NONE": "Wir konnten keine Kopfzeile finden, bitte wähle die richtige."
     }
   },

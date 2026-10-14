@@ -33,6 +33,7 @@ const Component = ({ draft, onChange }: AccountFormProps) => {
       <TextField
         size="small"
         label={t('STATS_PAGE.PARSER_SETUP.ACCOUNT_NAME')}
+        placeholder={t('STATS_PAGE.PARSER_SETUP.ACCOUNT_NAME_PLACEHOLDER')}
         value={draft.accountName}
         onChange={(event) => onChange({ accountName: event.target.value })}
         required
