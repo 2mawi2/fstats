@@ -25,12 +25,8 @@ export const getCurve = (start: Point, end: Point) => {
 }
 
 /**
- * The field and column of two ends on different sides, `null` for ends on the same side.
+ * The field and column of two ends on different sides.
  */
 export const toConnection = (a: ConnectorEnd, b: ConnectorEnd) => {
-  if (a.side === b.side) {
-    return null
-  }
-
   return a.side === 'field' ? { field: a.key, column: b.key } : { field: b.key, column: a.key }
 }

@@ -23,12 +23,7 @@ export const toCustomFormat = (mapping: CustomParserMapping): FormatDef => {
     numberFormat: mapping.numberFormat,
     headers: mapping.headers,
     columns: mapping.columns,
-    extraColumns: {
-      ...mapping.extraColumns,
-      // Mappings saved before the categories were added don't have them
-      category: mapping.extraColumns.category ?? null,
-      parentCategory: mapping.extraColumns.parentCategory ?? null,
-    },
+    extraColumns: mapping.extraColumns,
   }
 }
 

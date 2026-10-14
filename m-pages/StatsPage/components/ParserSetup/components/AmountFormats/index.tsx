@@ -56,7 +56,6 @@ const Component = ({ draft, isNumberMismatch, onChange }: AmountFormatsProps) =>
                 description: currencyNames.of(currency),
                 end,
                 buttonLabel: end ? `${currency} ${end}` : currency,
-                isMatch: false,
               }
             })}
             onChange={(currency) => onChange({ currency: currency as Currency })}
@@ -67,7 +66,7 @@ const Component = ({ draft, isNumberMismatch, onChange }: AmountFormatsProps) =>
           <FormatSelect
             title={t('STATS_PAGE.PARSER_SETUP.NUMBER_FORMAT')}
             value={draft.numberFormat}
-            options={Object.entries(NUMBER_FORMAT_LABELS).map(([value, label]) => ({ value, label, isMatch: false }))}
+            options={Object.entries(NUMBER_FORMAT_LABELS).map(([value, label]) => ({ value, label }))}
             isError={isNumberMismatch}
             onChange={(numberFormat) => onChange({ numberFormat: numberFormat as NumberFormat })}
           />

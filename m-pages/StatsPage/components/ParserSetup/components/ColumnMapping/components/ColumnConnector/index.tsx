@@ -162,18 +162,11 @@ const Component = ({ fields, columns, connections, onConnect, onDisconnect }: Co
     }
   }
 
-  const connect = (a: ConnectorEnd, b: ConnectorEnd) => {
-    const connection = toConnection(a, b)
-
-    if (connection) {
-      onConnect(connection.field, connection.column)
-    }
-  }
-
   // Click mode: the first click starts a line, a click on the other side ends it
   const select = (end: ConnectorEnd) => {
     if (pending && pending.side !== end.side) {
-      connect(pending, end)
+      const { field, column } = toConnection(pending, end)
+      onConnect(field, column)
       setPending(null)
     } else {
       setPending(isSameEnd(pending, end) ? null : end)
@@ -193,6 +186,19 @@ const Component = ({ fields, columns, connections, onConnect, onDisconnect }: Co
     ...sx.row,
     // The others of the same side are greyed out, the other side can be clicked
     ...(isSameEnd(pending, end) ? sx.selectedRow : pending?.side === end.side ? sx.inactiveRow : null),
+  })
+
+  // Same for fields and columns
+  const getRowProps = (end: ConnectorEnd) => ({
+    ref: setRowRef(end),
+    'data-side': end.side,
+    'data-key': end.key,
+    role: 'button',
+    tabIndex: 0,
+    'aria-pressed': isSameEnd(pending, end),
+    onClick: () => select(end),
+    onMouseDown: preventFocus,
+    onKeyDown: onRowKeyDown(end),
   })
 
   // The list a selected row can be connected to
@@ -223,15 +229,7 @@ const Component = ({ fields, columns, connections, onConnect, onDisconnect }: Co
     return (
       <Box
         key={field.key}
-        ref={setRowRef(end)}
-        data-side={end.side}
-        data-key={end.key}
-        role="button"
-        tabIndex={0}
-        aria-pressed={isSameEnd(pending, end)}
-        onClick={() => select(end)}
-        onMouseDown={preventFocus}
-        onKeyDown={onRowKeyDown(end)}
+        {...getRowProps(end)}
         sx={{ ...getRowSx(end), ...(field.isRequired ? null : { ...sx.compactRow, ...sx.optionalRow }) }}
       >
         <Box component="span" sx={sx.fieldText}>
@@ -333,19 +331,7 @@ const Component = ({ fields, columns, connections, onConnect, onDisconnect }: Co
               const end: ConnectorEnd = { side: 'column', key: column.name }
 
               return (
-                <Box
-                  key={column.name}
-                  ref={setRowRef(end)}
-                  data-side={end.side}
-                  data-key={end.key}
-                  role="button"
-                  tabIndex={0}
-                  aria-pressed={isSameEnd(pending, end)}
-                  onClick={() => select(end)}
-                  onMouseDown={preventFocus}
-                  onKeyDown={onRowKeyDown(end)}
-                  sx={{ ...getRowSx(end), ...sx.compactRow }}
-                >
+                <Box key={column.name} {...getRowProps(end)} sx={{ ...getRowSx(end), ...sx.compactRow }}>
                   <Box
                     component="span"
                     data-dot

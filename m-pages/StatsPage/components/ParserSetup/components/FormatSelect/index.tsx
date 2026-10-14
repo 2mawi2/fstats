@@ -18,7 +18,7 @@ export type FormatOption = {
   /**
    * The values of the column can be read with it.
    */
-  isMatch: boolean
+  isMatch?: boolean
   /**
    * In the menu, after the label (e.g. the name of a currency).
    */
@@ -54,6 +54,7 @@ const Component = ({ title, value, options, isError = false, onChange }: FormatS
   const sx = ui()
   const { t } = useTranslation()
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  const selected = options.find((option) => option.value === value)
 
   const select = (option: string) => {
     onChange(option)
@@ -74,10 +75,7 @@ const Component = ({ title, value, options, isError = false, onChange }: FormatS
         aria-expanded={anchor ? true : undefined}
         sx={{ ...sx.button, ...(isError ? sx.errorButton : null) }}
       >
-        {(() => {
-          const option = options.find((item) => item.value === value)
-          return option ? (option.buttonLabel ?? option.label) : title
-        })()}
+        {selected ? (selected.buttonLabel ?? selected.label) : title}
       </Button>
       <DropdownMenu anchorEl={anchor} open={!!anchor} onClose={() => setAnchor(null)}>
         {options.map((option) => (

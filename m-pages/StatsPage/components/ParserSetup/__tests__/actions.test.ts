@@ -8,8 +8,8 @@ import {
   getAmountValues,
   getConnectChanges,
   getHeaderRowProblem,
-  getMissingFields,
   getPreview,
+  isNamed,
   toDraft,
   toMapping,
 } from '../actions'
@@ -43,8 +43,11 @@ describe('toMapping', () => {
     const draft = { ...testDraft, columns: { ...testDraft.columns, moneyOut: [] } }
 
     expect(toMapping(draft, rows)).toBeNull()
-    expect(getMissingFields(draft)).toEqual(['moneyOut'])
-    expect(getMissingFields({ ...draft, bankName: '' })).toEqual(['bankName', 'moneyOut'])
+  })
+
+  it('should require bank and account names', () => {
+    expect(isNamed(toTestDraft())).toBe(true)
+    expect(isNamed({ ...toTestDraft(), bankName: ' ' })).toBe(false)
   })
 
   it('should read one column for money in and out as a signed amount', () => {

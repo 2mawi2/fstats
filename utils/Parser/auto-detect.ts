@@ -112,13 +112,19 @@ const isDate = (value: string, format: string) => {
 
 const isDateLike = (value: string) => /\d/.test(value) && DATE_FORMATS.some((format) => isDate(value, format))
 
+const hasDate = (row: RowData) => row.some((cell) => isDateLike(cell.trim()))
+
+// The formats all of the dates can be read with
+const getDateFormats = (dates: string[]) =>
+  DATE_FORMATS.filter((format) => dates.every((value) => isDate(value, format)))
+
 /**
  * The formats all dates of a column can be read with. Values that aren't dates in any format (e.g. a "Total" footer)
  * are ignored, a column without dates matches none.
  */
 export const getMatchingDateFormats = (values: string[]): string[] => {
   const dates = values.map((value) => value.trim()).filter(isDateLike)
-  return dates.length ? DATE_FORMATS.filter((format) => dates.every((value) => isDate(value, format))) : []
+  return dates.length ? getDateFormats(dates) : []
 }
 
 /**
@@ -157,7 +163,7 @@ export const getTransactionRows = (rows: RowData[], headerIndex: number, limit =
     if (row.length === header.length) {
       dataRows.push(row)
 
-      if (row.some((cell) => isDateLike(cell.trim()))) {
+      if (hasDate(row)) {
         transactionRows.push(row)
       }
     }
@@ -190,11 +196,7 @@ export const getHeaderCandidates = (rows: RowData[]): { index: number; score: nu
     .slice(0, MAX_HEADER_INDEX)
     .map((row, index) => ({
       index,
-      score: looksLikeHeader(row)
-        ? getDataRows(rows, index, HEADER_SAMPLE_SIZE).filter((dataRow) =>
-            dataRow.some((cell) => isDateLike(cell.trim())),
-          ).length
-        : 0,
+      score: looksLikeHeader(row) ? getDataRows(rows, index, HEADER_SAMPLE_SIZE).filter(hasDate).length : 0,
     }))
     .filter(({ score }) => score > 0)
 }
@@ -225,10 +227,7 @@ const toColumns = (header: RowData, dataRows: RowData[]): Column[] => {
     const values = dataRows.map((row) => row[index]?.trim() ?? '').filter(Boolean)
     // Footer rows (e.g. totals) can have as many cells, so most values being dates is enough
     const dates = values.filter(isDateLike)
-    const dateFormats =
-      dates.length && dates.length > values.length * MIN_DATE_SHARE
-        ? DATE_FORMATS.filter((format) => dates.every((value) => isDate(value, format)))
-        : []
+    const dateFormats = dates.length && dates.length > values.length * MIN_DATE_SHARE ? getDateFormats(dates) : []
     const isAmountLike = values.every(isNumberLike)
 
     return {
@@ -364,23 +363,18 @@ export const detectMapping = (rows: RowData[], headerIndex = detectHeaderIndex(r
   )
 
   const isAmountColumn = (column: Column) => column.isAmountLike
+  // Both or neither, a single one is no amount
   const moneyIn = pickColumn(columns, IN_SYNONYMS, isAmountColumn, used)
   const moneyOut = pickColumn(columns, OUT_SYNONYMS, isAmountColumn, used)
-  const signed =
-    moneyIn && moneyOut ? null : claim(pickColumn(columns, AMOUNT_SYNONYMS, (column) => column.isNumeric, used))
-
-  if (moneyIn && moneyOut) {
-    claim(moneyIn)
-    claim(moneyOut)
-  }
+  const inOut = moneyIn && moneyOut ? { moneyIn: claim(moneyIn)!, moneyOut: claim(moneyOut)! } : null
+  const signed = inOut ? null : claim(pickColumn(columns, AMOUNT_SYNONYMS, (column) => column.isNumeric, used))
 
   const balance = claim(pickColumn(columns, BALANCE_SYNONYMS, isAmountColumn, used))
   // Without known names, the first numeric column, preferring one with negative values
   const numeric = columns.filter((column) => column.isNumeric && !used.has(column.name))
-  const fallback =
-    moneyIn && moneyOut
-      ? null
-      : (signed ?? claim(numeric.find((column) => column.values.some((value) => value.startsWith('-'))) ?? numeric[0]))
+  const fallback = inOut
+    ? null
+    : (signed ?? claim(numeric.find((column) => column.values.some((value) => value.startsWith('-'))) ?? numeric[0]))
 
   // Before the description, which could otherwise be a category column. The parent first, "Category" matches it too.
   const parentCategory = claim(pickColumn(columns, PARENT_CATEGORY_SYNONYMS, (column) => !column.isNumeric, used))
@@ -397,12 +391,11 @@ export const detectMapping = (rows: RowData[], headerIndex = detectHeaderIndex(r
   const reference = claim(pickColumn(columns, REFERENCE_SYNONYMS, () => true, used))
   const transactionType = claim(pickColumn(columns, TYPE_SYNONYMS, (column) => !column.isNumeric, used))
 
-  const amount: DetectedMapping['columns']['amount'] =
-    moneyIn && moneyOut
-      ? { type: 'inOut', in: moneyIn.name, out: moneyOut.name }
-      : fallback
-        ? { type: 'signed', header: fallback.name }
-        : null
+  const amount: DetectedMapping['columns']['amount'] = inOut
+    ? { type: 'inOut', in: inOut.moneyIn.name, out: inOut.moneyOut.name }
+    : fallback
+      ? { type: 'signed', header: fallback.name }
+      : null
   const amountValues = [moneyIn, moneyOut, fallback, balance].flatMap((column) => column?.values ?? [])
 
   return {

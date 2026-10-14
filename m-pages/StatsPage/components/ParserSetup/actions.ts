@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next'
+import { mapValues, pick, without, xor } from 'lodash'
 
 import type { CustomParserMapping, RowData, Transaction } from '@/types'
 import { Currency } from '@/types-enums'
@@ -25,7 +26,7 @@ export const SetupStep = {
 export type SetupStep = (typeof SetupStep)[keyof typeof SetupStep]
 
 /**
- * In order, the columns step counts as done when the preview is confirmed without it.
+ * In order, each step is reached from the previous one.
  */
 export const SETUP_STEPS = Object.values(SetupStep)
 
@@ -46,6 +47,8 @@ export type ColumnField =
 const AMOUNT_FIELDS: ColumnField[] = ['moneyIn', 'moneyOut']
 
 export const isAmountField = (field: ColumnField) => AMOUNT_FIELDS.includes(field)
+
+const EXTRA_FIELDS = ['balance', 'reference', 'transactionType', 'category', 'parentCategory'] as const
 
 /**
  * The form state, the connected header names per field. At most one, except for the amount fields.
@@ -90,11 +93,7 @@ export const toDraft = (
       date: toList(detected.columns.date),
       description: toList(detected.columns.description),
       ...getAmountColumns(detected.columns.amount),
-      balance: toList(detected.extraColumns.balance),
-      reference: toList(detected.extraColumns.reference),
-      transactionType: toList(detected.extraColumns.transactionType),
-      category: toList(detected.extraColumns.category),
-      parentCategory: toList(detected.extraColumns.parentCategory),
+      ...mapValues(detected.extraColumns, toList),
     },
   }
 }
@@ -104,10 +103,7 @@ export const toDraft = (
  */
 export const COLUMN_FIELDS: { field: ColumnField; isRequired: boolean }[] = [
   ...(['date', 'description', ...AMOUNT_FIELDS] as const).map((field) => ({ field, isRequired: true })),
-  ...(['balance', 'reference', 'transactionType', 'category', 'parentCategory'] as const).map((field) => ({
-    field,
-    isRequired: false,
-  })),
+  ...EXTRA_FIELDS.map((field) => ({ field, isRequired: false })),
 ]
 
 /**
@@ -120,23 +116,11 @@ export const connectColumn = (
   field: ColumnField,
   column: string,
 ): SetupDraft['columns'] => {
-  const canShare = (other: ColumnField) => isAmountField(field) && isAmountField(other)
-  const next = Object.fromEntries(
-    Object.entries(columns).map(([key, headers]) => [
-      key,
-      canShare(key as ColumnField) ? headers : headers.filter((header) => header !== column),
-    ]),
-  ) as SetupDraft['columns']
+  const next = mapValues(columns, (headers, key) =>
+    isAmountField(field) && isAmountField(key as ColumnField) ? headers : without(headers, column),
+  )
 
-  if (!isAmountField(field)) {
-    return { ...next, [field]: [column] }
-  }
-
-  const headers = columns[field]
-  return {
-    ...next,
-    [field]: headers.includes(column) ? headers.filter((header) => header !== column) : [...headers, column],
-  }
+  return { ...next, [field]: isAmountField(field) ? xor(columns[field], [column]) : [column] }
 }
 
 /**
@@ -178,23 +162,14 @@ export const getAmountValues = (rows: RowData[], headerIndex: number, columns: S
  * The columns without `column`, from all fields.
  */
 export const disconnectColumn = (columns: SetupDraft['columns'], column: string): SetupDraft['columns'] => {
-  return Object.fromEntries(
-    Object.entries(columns).map(([field, headers]) => [field, headers.filter((header) => header !== column)]),
-  ) as SetupDraft['columns']
+  return mapValues(columns, (headers) => without(headers, column))
 }
 
 /**
- * Required fields that aren't set yet.
+ * Bank and account names are set.
  */
-export const getMissingFields = (draft: SetupDraft): (ColumnField | 'bankName' | 'accountName' | 'dateFormat')[] => {
-  return [
-    ...(draft.bankName.trim() ? [] : (['bankName'] as const)),
-    ...(draft.accountName.trim() ? [] : (['accountName'] as const)),
-    ...(draft.dateFormat ? [] : (['dateFormat'] as const)),
-    ...COLUMN_FIELDS.filter(({ field, isRequired }) => isRequired && !draft.columns[field].length).map(
-      ({ field }) => field,
-    ),
-  ]
+export const isNamed = (draft: SetupDraft) => {
+  return !!draft.bankName.trim() && !!draft.accountName.trim()
 }
 
 /**
@@ -237,13 +212,7 @@ export const toMapping = (draft: SetupDraft, rows: RowData[]): CustomParserMappi
     numberFormat: draft.numberFormat,
     headers: getHeaderNames(rows[draft.headerIndex] ?? []),
     columns: { date, description, amount: toAmount(columns.moneyIn, columns.moneyOut) },
-    extraColumns: {
-      balance: columns.balance[0] ?? null,
-      reference: columns.reference[0] ?? null,
-      transactionType: columns.transactionType[0] ?? null,
-      category: columns.category[0] ?? null,
-      parentCategory: columns.parentCategory[0] ?? null,
-    },
+    extraColumns: mapValues(pick(columns, EXTRA_FIELDS), ([header]) => header ?? null),
   }
 }
 
@@ -332,13 +301,11 @@ export const getHeaderRowProblem = (rows: RowData[], headerIndex: number): Heade
  * First non-empty value of a column below the header, as an example.
  */
 export const getSampleValue = (rows: RowData[], headerIndex: number, header: string) => {
-  const index = (rows[headerIndex] ?? []).findIndex((cell) => cell.trim() === header)
-
-  return index < 0
-    ? ''
-    : (getColumnValues(rows, headerIndex, header, 50)
-        .map((value) => value.trim())
-        .find(Boolean) ?? '')
+  return (
+    getColumnValues(rows, headerIndex, header, 50)
+      .map((value) => value.trim())
+      .find(Boolean) ?? ''
+  )
 }
 
 /**

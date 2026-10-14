@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useRouter, useSearchParams } from 'next/navigation'
+import type { KeyboardEvent } from 'react'
 import { useMemo, useState } from 'react'
 
 import type { RowData, StatsFile } from '@/types'
@@ -30,10 +31,10 @@ import type { HeaderRowProblem, SetupDraft } from './actions'
 import {
   getAmountValues,
   getHeaderRowProblem,
-  getMissingFields,
   getPreview,
   getPreviewCaption,
   getPreviewMessageKey,
+  isNamed,
   isValidPreview,
   SETUP_STEPS,
   SetupStep,
@@ -139,20 +140,15 @@ const SetupSteps = ({ file, rows, scrollElement, onClose }: SetupStepsProps) => 
     toDraft(detectMapping(rows), { accountName: t('STATS_PAGE.PARSER_SETUP.DEFAULT_ACCOUNT_NAME') }),
   )
   const preview = useMemo(() => getPreview(rows, draft), [rows, draft])
-  // Without transactions there's nothing to confirm, so the columns are shown right away
   const [step, setStep] = useState<SetupStep>(SetupStep.REVIEW)
-  // Visited steps, for "Back" and the stepper
-  const [visited, setVisited] = useState<SetupStep[]>(() => [step])
-  // Steps up to the furthest one reached can be opened from the stepper, back and forth
-  const furthestIndex = Math.max(...visited.map((item) => SETUP_STEPS.indexOf(item)))
-  const previousStep = SETUP_STEPS.slice(0, SETUP_STEPS.indexOf(step))
-    .filter((item) => visited.includes(item))
-    .at(-1)
+  // Steps are reached in order, those up to the furthest one can be opened from the stepper, back and forth
+  const [furthestIndex, setFurthestIndex] = useState(0)
+  const stepIndex = SETUP_STEPS.indexOf(step)
+  const previousStep = SETUP_STEPS[stepIndex - 1]
   // The columns can only be mapped with a row of column names
   const headerProblem = getHeaderRowProblem(rows, draft.headerIndex)
   // Possible (e.g. numbered columns), so only a warning
   const isDataRow = !looksLikeHeader(rows[draft.headerIndex] ?? [])
-  const isNamed = !getMissingFields(draft).some((field) => field === 'bankName' || field === 'accountName')
 
   const update = (changes: Partial<SetupDraft>) => setDraft((prev) => ({ ...prev, ...changes }))
 
@@ -181,7 +177,7 @@ const SetupSteps = ({ file, rows, scrollElement, onClose }: SetupStepsProps) => 
 
   const goTo = (nextStep: SetupStep) => {
     setStep(nextStep)
-    setVisited((prev) => (prev.includes(nextStep) ? prev : [...prev, nextStep]))
+    setFurthestIndex((prev) => Math.max(prev, SETUP_STEPS.indexOf(nextStep)))
   }
 
   const backButton = previousStep ? (
@@ -259,7 +255,7 @@ const SetupSteps = ({ file, rows, scrollElement, onClose }: SetupStepsProps) => 
                 <Button
                   variant="contained"
                   onClick={save}
-                  disabled={!isNamed || !isValidPreview(preview) || isPending}
+                  disabled={!isNamed(draft) || !isValidPreview(preview) || isPending}
                   loading={isPending}
                 >
                   {t('STATS_PAGE.PARSER_SETUP.CONFIRM')}
@@ -303,28 +299,28 @@ const SetupSteps = ({ file, rows, scrollElement, onClose }: SetupStepsProps) => 
       </PreviewSection>
       {/* Non-linear, so steps after the current one aren't disabled when going back. Steps not reached yet are opened
           with the buttons of the steps. */}
-      <Stepper nonLinear activeStep={SETUP_STEPS.indexOf(step)} sx={sx.stepper}>
+      <Stepper nonLinear activeStep={stepIndex} sx={sx.stepper}>
         {SETUP_STEPS.map((item, index) => (
           <MuiStep key={item} completed={index < furthestIndex}>
             {/* A label rather than a `StepButton`, which changes the layout */}
-            {index <= furthestIndex && item !== step ? (
-              <StepLabel
-                slots={{ stepIcon: StepIcon }}
-                role="button"
-                tabIndex={0}
-                onClick={() => goTo(item)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    goTo(item)
+            <StepLabel
+              slots={{ stepIcon: StepIcon }}
+              {...(index <= furthestIndex && item !== step
+                ? {
+                    role: 'button',
+                    tabIndex: 0,
+                    onClick: () => goTo(item),
+                    onKeyDown: (event: KeyboardEvent) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        goTo(item)
+                      }
+                    },
                   }
-                }}
-              >
-                {t(STEP_LABEL_KEYS[item])}
-              </StepLabel>
-            ) : (
-              <StepLabel slots={{ stepIcon: StepIcon }}>{t(STEP_LABEL_KEYS[item])}</StepLabel>
-            )}
+                : null)}
+            >
+              {t(STEP_LABEL_KEYS[item])}
+            </StepLabel>
           </MuiStep>
         ))}
       </Stepper>
