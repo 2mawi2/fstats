@@ -21,9 +21,9 @@ export const getFormatHeaders = ({ headers }: FormatDef) => {
 }
 
 /**
- * Headers read by `columns`, `extraColumns` and `skipValues`.
+ * Headers read by `columns` and `extraColumns`.
  */
-export const getReferencedHeaders = ({ columns, extraColumns, skipValues }: FormatDef) => {
+export const getReferencedHeaders = ({ columns, extraColumns }: FormatDef) => {
   const description = Array.isArray(columns.description) ? columns.description : [columns.description]
 
   return [
@@ -32,7 +32,6 @@ export const getReferencedHeaders = ({ columns, extraColumns, skipValues }: Form
       ...description,
       ...getAmountHeaders(columns.amount),
       ...Object.values(extraColumns).filter((header) => header !== null),
-      ...(skipValues ? [skipValues.header] : []),
     ]),
   ]
 }

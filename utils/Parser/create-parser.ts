@@ -29,7 +29,7 @@ type Row = {
  * the next section (see `findSections`).
  */
 export const createParser = (bank: Pick<BankDef, 'id' | 'name' | 'currency'>, format: FormatDef): Parser => {
-  const { columns, extraColumns, dateFormat, numberFormat, skipValues } = format
+  const { columns, extraColumns, dateFormat, numberFormat } = format
   const { amount } = columns
   const { headers, required } = getFormatHeaders(format)
 
@@ -105,7 +105,6 @@ export const createParser = (bank: Pick<BankDef, 'id' | 'name' | 'currency'>, fo
       // Rows with a different column count are footers or notes
       .filter((row) => row.length === header.length)
       .filter((row) => isValidDate(toRow(row).get(columns.date)))
-      .filter((row) => !skipValues || !skipValues.values.includes(toRow(row).get(skipValues.header)))
 
     return { header, rawRows, rows: rawRows.map(toRow) }
   }

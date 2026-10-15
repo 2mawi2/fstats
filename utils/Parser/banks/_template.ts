@@ -129,11 +129,6 @@ export const newBank = defineBank({
         category: null,
         parentCategory: null,
       },
-      /**
-       * Optional: skip rows where a header has one of these values, e.g.
-       * `{ header: 'Category', values: ['TRANSFER'] }` to exclude non-transaction
-       * rows. The header must be listed in `headers`.
-       */
     },
   ],
 })

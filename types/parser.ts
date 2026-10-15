@@ -81,10 +81,6 @@ export type FormatDef<H extends string = string> = {
    * Stored in `Transaction['extra']`, headers must be listed in `headers`. `null` if the file has no such column.
    */
   extraColumns: Record<ExtraField, H | null>
-  /**
-   * Rows where the header's value is one of `values` are skipped, e.g. to exclude non-cash rows of a broker export.
-   */
-  skipValues?: { readonly header: H; readonly values: readonly string[] }
 }
 
 export type BankDef = {

@@ -161,24 +161,25 @@ describe('Trade Republic', () => {
     expect(findSections(rows).sections.map(({ parser }) => parser.id)).toEqual(['trade_republic__current'])
   })
 
-  it('should skip security trades and keep cash transactions', () => {
-    const transactions = parseCsv()
-
-    expect(transactions).toHaveLength(4)
-    expect(transactions.map(({ description, value }) => [description, value])).toEqual([
+  it('should keep cash and trading transactions', () => {
+    expect(parseCsv().map(({ description, value }) => [description, value])).toEqual([
       ['Interest payment for payout collection 6188b6bc-f7f6-41e4-9af6-45574bffc855', '1.350000'],
       ['Apple Inc.', '2.170000'],
       ['Alex Example', '1200.000000'],
+      ['Core MSCI World USD (Acc)', '-1000.00'],
+      ['Core MSCI EM IMI USD (Acc)', '-500.00'],
+      ['Shell plc', '328.92'],
       ['Alex Example', '850.000000'],
     ])
   })
 
-  it('should store the transaction type as extra', () => {
-    const [interest, dividend, deposit] = parseCsv()
+  it('should store the category and transaction type as extra', () => {
+    const [interest, dividend, deposit, buy] = parseCsv()
 
-    expect(interest.extra).toEqual({ transactionType: 'INTEREST_PAYMENT' })
-    expect(dividend.extra).toEqual({ transactionType: 'DIVIDEND' })
-    expect(deposit.extra).toEqual({ transactionType: 'CUSTOMER_INPAYMENT' })
+    expect(interest.extra).toEqual({ category: 'CASH', transactionType: 'INTEREST_PAYMENT' })
+    expect(dividend.extra).toEqual({ category: 'CASH', transactionType: 'DIVIDEND' })
+    expect(deposit.extra).toEqual({ category: 'CASH', transactionType: 'CUSTOMER_INPAYMENT' })
+    expect(buy.extra).toEqual({ category: 'TRADING', transactionType: 'BUY' })
   })
 })
 

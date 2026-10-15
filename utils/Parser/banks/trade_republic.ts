@@ -52,11 +52,9 @@ export const tradeRepublic = defineBank({
         balance: null,
         reference: 'payment_reference',
         transactionType: 'type',
-        category: null,
+        category: 'category',
         parentCategory: null,
       },
-      // Security trades would count as spending/income, only the cash account is relevant here
-      skipValues: { header: 'category', values: ['TRADING'] },
     },
   ],
 })
